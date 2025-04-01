@@ -1,0 +1,103 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { EyeCloseIcon, EyeIcon, Logo } from '@/apps/assets/icons'
+import { useSignInForm } from '@/features/auth/sign-in-form/use-sign-in-form'
+import { ControlledTextField } from '@/shared/input/controlled-text-field'
+import { ControlledCheckbox } from '@/shared/checkbox/controlled-checkbox'
+import Button from '@/shared/button/button'
+
+export function SignInForm() {
+  const [showPassword, setShowPassword] = useState(false)
+
+  const { handleSubmit, control } = useSignInForm()
+
+  const onSubmit = (data: any) => {
+    console.log('Form data:', data)
+  }
+
+  return (
+    <div className="flex min-h-screen">
+      {/* Left side - Authorization form */}
+      <div className="w-full lg:w-1/2 p-8 flex items-center justify-center">
+        <div className="w-full max-w-[440px]">
+          <div className="mb-5">
+            <h1 className="text-4xl font-semibold text-gray-800 mb-2">Авторизация</h1>
+            <p className="text-sm text-gray-500">
+              Введите свой Email и пароль для входа в аккаунт!
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email<span className="text-rose-500">*</span>
+                </label>
+                <ControlledTextField
+                  placeholder="Введите Email"
+                  name="email"
+                  rounded="full"
+                  control={control}
+                  className="w-full border border-gray-300 rounded-full px-4 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Пароль<span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <ControlledTextField
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="hello123"
+                    name="password"
+                    rounded="full"
+                    control={control}
+                    className="w-full border border-gray-300 rounded-full px-4 py-2"
+                  />
+                  <span
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                  >
+                    {showPassword ? (
+                      <EyeIcon className="fill-gray-500 size-5" />
+                    ) : (
+                      <EyeCloseIcon className="fill-gray-500 size-5" />
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ControlledCheckbox control={control} name="rememberMe" />
+                  <span className="text-sm text-gray-700">Оставаться в системе</span>
+                </div>
+                <Link href="/reset-password" className="text-sm text-blue-800 hover:text-blue-700">
+                  Забыли пароль?
+                </Link>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-purple-900 hover:bg-purple-800 text-white py-2 px-4 rounded-full transition-colors cursor-pointer"
+              >
+                Войти
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Right side - Purple background with logo */}
+      <div
+        style={{ backgroundColor: 'var(--color-purple-900)' }}
+        className="hidden lg:flex w-1/2 items-center justify-center"
+      >
+        <Logo className="text-white" width={260} height={65} />
+      </div>
+    </div>
+  )
+}
