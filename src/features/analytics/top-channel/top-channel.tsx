@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MoreDotIcon } from '@/apps/assets/icons'
+import { MoreDotIcon } from '../../../../public/assets/icons'
 import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
 
@@ -18,7 +18,7 @@ export default function TopChannel() {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-200 dark:bg-white/[0.03] md:p-6">
       <div className="flex items-start justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Top Channels</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Рейтинг операторов</h3>
         <div className="relative inline-block">
           <button className="dropdown-toggle" onClick={toggleDropdown}>
             <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />

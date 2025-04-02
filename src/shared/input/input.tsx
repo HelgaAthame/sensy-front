@@ -1,10 +1,13 @@
 import React, { FC } from 'react'
+import Label from '@/shared/label/label'
 
 export interface InputProps {
   type?: 'text' | 'number' | 'email' | 'password' | 'date' | 'time' | string
   id?: string
+  label?: string
   name?: string
   placeholder?: string
+  autoComplete?: string
   value?: string | number
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   className?: string
@@ -13,13 +16,14 @@ export interface InputProps {
   step?: number
   disabled?: boolean
   success?: boolean
-  error?: boolean
+  error?: string
   hint?: string
   rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full' | string
 }
 
 const Input: FC<InputProps> = ({
   type = 'text',
+  label,
   id,
   name,
   placeholder,
@@ -29,6 +33,7 @@ const Input: FC<InputProps> = ({
   min,
   max,
   step,
+  autoComplete,
   disabled = false,
   success = false,
   error = false,
@@ -43,10 +48,10 @@ const Input: FC<InputProps> = ({
     inputClasses += ` text-gray-500 border-gray-300 bg-gray-100 cursor-not-allowed opacity-40
       dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700`
   } else if (error) {
-    inputClasses += ` border-danger-500 bg-danger-50/10 text-danger-900
-      focus:border-danger-500 focus:ring-danger-500/20
-      dark:border-danger-500 dark:text-danger-400 dark:focus:border-danger-400
-      dark:bg-danger-900/10`
+    inputClasses += ` border-rose-500 bg-drose-50/10 text-rose-900
+      focus:border-rose-500 focus:ring-rose-500/20
+      dark:border-rose-500 dark:text-rose-400 dark:focus:border-rose-400
+      dark:bg-rose-900/10`
   } else if (success) {
     inputClasses += ` border-success-500 bg-success-50/10 text-success-900
       focus:border-success-500 focus:ring-success-500/20
@@ -60,9 +65,11 @@ const Input: FC<InputProps> = ({
 
   return (
     <div className="relative">
+      {label && <Label htmlFor={id}>{label}</Label>}
       <input
         type={type}
         id={id}
+        autoComplete={autoComplete}
         name={name}
         placeholder={placeholder}
         value={value}
@@ -74,11 +81,23 @@ const Input: FC<InputProps> = ({
         className={inputClasses}
       />
 
+      <div className="min-h-[20px] transition-all duration-200">
+        {' '}
+        {/* Добавляем анимацию */}
+        {error && (
+          <p className="text-xs text-rose-500 dark:text-rose-400 animate-fade-in">
+            {' '}
+            {/* Добавляем анимацию появления */}
+            {error}
+          </p>
+        )}
+      </div>
+
       {hint && (
         <p
           className={`mt-1.5 text-xs ${
             error
-              ? 'text-danger-500 dark:text-danger-400'
+              ? 'text-rose-500 dark:text-rose-400'
               : success
                 ? 'text-success-500 dark:text-success-400'
                 : 'text-gray-500 dark:text-gray-400'

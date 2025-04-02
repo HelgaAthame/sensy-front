@@ -1,4 +1,4 @@
-import '@/apps/styles/globals.css'
+import '@/app/globals.css'
 import Providers from '@/app/providers'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

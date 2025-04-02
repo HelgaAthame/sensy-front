@@ -4,7 +4,7 @@ import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
 import { Sidebar } from '@/shared/sidebar/ui/sidebar'
 import Backdrop from '@/shared/backdrop/backdrop'
 import { Header } from '@/shared/header/header'
-import { ReactElement, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { RootLayout } from '@/widgets/root-layout/root-layout'
 
 interface MainLayoutProps {
@@ -32,8 +32,4 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </div>
     </RootLayout>
   )
-}
-
-export const getLayout = (page: ReactElement) => {
-  return <MainLayout>{page}</MainLayout>
 }

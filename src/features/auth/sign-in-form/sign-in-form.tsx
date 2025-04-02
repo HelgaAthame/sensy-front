@@ -2,19 +2,21 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { EyeCloseIcon, EyeIcon, Logo } from '@/apps/assets/icons'
+import { EyeCloseIcon, EyeIcon, Logo } from '../../../../public/assets/icons'
 import { useSignInForm } from '@/features/auth/sign-in-form/use-sign-in-form'
 import { ControlledTextField } from '@/shared/input/controlled-text-field'
 import { ControlledCheckbox } from '@/shared/checkbox/controlled-checkbox'
 import Button from '@/shared/button/button'
+import { useRouter } from 'next/navigation'
+import { appRoutes } from '../../../shared/constants/routes'
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
-
+  const router = useRouter()
   const { handleSubmit, control } = useSignInForm()
 
   const onSubmit = (data: any) => {
-    console.log('Form data:', data)
+    router.push(appRoutes.private.dashboard)
   }
 
   return (
@@ -39,6 +41,7 @@ export function SignInForm() {
                   placeholder="Введите Email"
                   name="email"
                   rounded="full"
+                  autoComplete="new-email"
                   control={control}
                   className="w-full border border-gray-300 rounded-full px-4 py-2"
                 />
@@ -53,13 +56,14 @@ export function SignInForm() {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="hello123"
                     name="password"
+                    autoComplete="new-password"
                     rounded="full"
                     control={control}
-                    className="w-full border border-gray-300 rounded-full px-4 py-2"
+                    className="w-full border border-gray-300 rounded-full px-4 py-2 pr-12" //
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                    className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-5.5"
                   >
                     {showPassword ? (
                       <EyeIcon className="fill-gray-500 size-5" />
