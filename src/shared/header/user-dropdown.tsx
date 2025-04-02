@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
 import Link from 'next/link'
-import { appRoutes } from '@/apps/routes'
+import { appRoutes } from '../constants/routes'
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false)

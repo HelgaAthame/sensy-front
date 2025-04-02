@@ -1,7 +1,6 @@
 'use client'
 
 import { ApexOptions } from 'apexcharts'
-import { ChartTab } from '@/shared/chart-tab/chart-tab'
 import dynamic from 'next/dynamic'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })

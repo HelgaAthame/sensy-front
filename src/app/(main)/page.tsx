@@ -5,6 +5,6 @@ interface AnalyticsPageProps {
   searchParams: Promise<{ canonical?: string }>
 }
 
-export default async function AnalyticsPage() {
+export default function Home() {
   return <Analytics />
 }

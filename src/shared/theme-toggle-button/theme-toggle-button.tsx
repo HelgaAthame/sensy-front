@@ -1,9 +1,7 @@
-import { useTheme } from '@/apps/theme-context/theme-context'
+import { useTheme } from '@/shared/context/theme-context/theme-context'
 
 export const ThemeToggleButton: React.FC = () => {
   const { toggleTheme } = useTheme()
-
-  console.log('toggleTheme', toggleTheme)
 
   return (
     <button
