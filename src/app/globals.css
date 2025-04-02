@@ -1,5 +1,5 @@
-@import './_colors.css';
-@import "./fonts.css";
+@import '../shared/styles/_colors.css';
+@import '../shared/styles/fonts.css';
 @import 'tailwindcss';
 @tailwind base;
 @tailwind components;
@@ -21,7 +21,8 @@
   }
 
   body {
-    font-family: "Outfit", sans-serif;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
     background: var(--foreground);
     color: var(--color-neutral-900);
   }
