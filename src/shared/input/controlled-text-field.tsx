@@ -26,5 +26,5 @@ export const ControlledTextField = <T extends FieldValues>({
     shouldUnregister,
   })
 
-  return <Input {...field} error={!!error} id={name} {...rest} />
+  return <Input {...field} error={error?.message} id={name} {...rest} />
 }
