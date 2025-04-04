@@ -78,13 +78,17 @@ export const ProjectsTable = <T extends Record<string, any>>({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+      <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
 }
