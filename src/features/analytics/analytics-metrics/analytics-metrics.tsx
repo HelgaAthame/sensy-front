@@ -1,51 +1,67 @@
-import Badge from '@/shared/badge/badge'
+import { SummaryData } from '@/entities/analytics/analytics.types'
 
-const mockData = [
+interface AnalyticsMetricsProps {
+  data?: SummaryData // Изменили тип с SummaryData[] на SummaryData
+}
+
+const formatDuration = (seconds: number): string => {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  return `${minutes} мин ${remainingSeconds} сек`
+}
+
+const formatPercentage = (value: number): string => {
+  return `${Math.round(value)}%`
+}
+
+const metricsMapping = [
   {
-    id: 1,
+    key: 'recordsCount',
     title: 'Количество звонков',
-    value: '12 257',
+    format: (value: number) => value.toLocaleString('ru-RU'),
   },
   {
-    id: 2,
+    key: 'averageDuration',
     title: 'Средняя длительность звонка',
-    value: '2 мин 57 сек',
+    format: formatDuration,
   },
   {
-    id: 3,
+    key: 'averageNegativeLevelOverall',
     title: 'Средний процент негатива',
-    value: '54%',
+    format: formatPercentage,
     color: 'error',
   },
   {
-    id: 4,
+    key: 'averageKeywordsCount',
     title: 'Среднее количество стоп-слов',
-    value: '25',
+    format: (value: number) => Math.round(value).toString(),
   },
   {
-    id: 5,
+    key: 'averageMaxSimultaneousSilenceDuration',
     title: 'Средняя длительность синхр. паузы',
-    value: '2 мин 57 сек',
+    format: formatDuration,
   },
   {
-    id: 6,
+    key: 'averageSimultaneousSpeechCount',
     title: 'Среднее число перебиваний',
-    value: '25',
+    format: (value: number) => Math.round(value).toString(),
   },
-]
+] as const
 
-const AnalyticsMetrics: React.FC = () => {
+const AnalyticsMetrics: React.FC<AnalyticsMetricsProps> = ({ data }: AnalyticsMetricsProps) => {
+  if (!data) return null
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-      {mockData.map(item => (
+      {metricsMapping.map(({ key, title, format }) => (
         <div
-          key={item.id}
+          key={key}
           className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-200 dark:bg-white/[0.03]"
         >
-          <p className="text-gray-500 text-sm dark:text-gray-400 mb-3 leading-[32px]">
-            {item.title}
-          </p>
-          <h4 className="text-2xl font-bold text-neutral-900 leading-[32px]">{item.value}</h4>
+          <p className="text-gray-500 text-sm dark:text-gray-400 mb-3 leading-[32px]">{title}</p>
+          <h4 className={`text-2xl font-bold leading-[32px]`}>
+            {format(data[key as keyof SummaryData])}
+          </h4>
         </div>
       ))}
     </div>

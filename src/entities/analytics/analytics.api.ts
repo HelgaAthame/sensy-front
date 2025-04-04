@@ -1,4 +1,4 @@
-import { commonApi } from '@/entities/common/base-query-with-reauth'
+import { commonApi } from '@/entities/common/base-query'
 import {
   AnalyticsDashboardQueryParams,
   AnalyticsDashboardResponse,
@@ -11,9 +11,17 @@ const AnalyticsApi = commonApi.injectEndpoints({
       AnalyticsDashboardQueryParams | void
     >({
       query: args => ({
-        url: 'v2/dashboard',
+        url: 'api/v2/dashboard',
         method: 'GET',
-        params: args || undefined,
+        params: {
+          start: args?.start,
+          end: args?.end,
+          offset: args?.offset ?? 0,
+          limit: args?.limit ?? 10,
+          operatorId: args?.operatorId,
+          topNKeywords: args?.topNKeywords ?? 5,
+          filterByPhrasesCategoriesCommaSeparated: args?.filterByPhrasesCategoriesCommaSeparated,
+        },
       }),
       providesTags: ['ANALYTICS_DASHBOARD'],
     }),
