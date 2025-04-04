@@ -1,18 +1,18 @@
 'use client'
 
 import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   BarIcon,
   ChevronDownIcon,
   StarFatIcon,
   TelephoneIcon,
   UserCircleIcon,
-} from '../../../../public/assets/icons'
+} from '@/../public/assets/icons'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Logo } from '../../../../public/assets/svg-components/Logo'
-import { appRoutes } from '../../constants/routes'
+import { Logo } from '@/../public/assets/svg-components/Logo'
+import { appRoutes } from '@/shared/constants/routes'
 
 type NavItem = {
   name: string
@@ -30,6 +30,7 @@ const navItems: NavItem[] = [
   {
     icon: <TelephoneIcon width={24} height={24} />,
     name: 'Звонки',
+    path: appRoutes.private.calls,
     subItems: [{ name: 'Загрузка записи', path: appRoutes.private.uploadingRecord }],
   },
   {
@@ -48,12 +49,6 @@ export const Sidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
   const pathname = usePathname()
 
-  const [openSubmenus, setOpenSubmenus] = useState<number[]>(() =>
-    navItems
-      .map((item, index) => (item.subItems && item.subItems.length > 0 ? index : -1))
-      .filter(index => index !== -1)
-  )
-
   const isActive = useCallback((path: string) => pathname === path, [pathname])
 
   const hasActiveChild = useCallback(
@@ -62,6 +57,23 @@ export const Sidebar: React.FC = () => {
     },
     [isActive]
   )
+
+  // Инициализируем открытые подменю, предварительно проверяя активные пути
+  const [openSubmenus, setOpenSubmenus] = useState<number[]>([])
+
+  // Автоматически открываем подменю, если активен родительский пункт или дочерний элемент
+  useEffect(() => {
+    const newOpenSubmenus = navItems
+      .map((item, index) => {
+        if (item.subItems && (isActive(item.path || '') || hasActiveChild(item.subItems))) {
+          return index
+        }
+        return -1
+      })
+      .filter(index => index !== -1)
+
+    setOpenSubmenus(newOpenSubmenus)
+  }, [pathname, isActive, hasActiveChild])
 
   const handleSubmenuToggle = (index: number) => {
     setOpenSubmenus(prev =>
@@ -101,11 +113,19 @@ export const Sidebar: React.FC = () => {
               <li key={nav.name}>
                 {nav.subItems ? (
                   <>
-                    <button
-                      onClick={() => handleSubmenuToggle(index)}
+                    <Link
+                      href={nav.path || '#'}
+                      onClick={e => {
+                        // Если нет пути или мы кликнули на шеврон, предотвращаем навигацию
+                        if (!nav.path || (e.target as HTMLElement).closest('.chevron-icon')) {
+                          e.preventDefault()
+                        }
+
+                        // В любом случае переключаем подменю
+                        handleSubmenuToggle(index)
+                      }}
                       className={`menu-item group flex items-center gap-3 px-4 py-3 w-[250px] h-[40px] rounded-full transition-all duration-200 
-    ${hasActiveChild(nav.subItems) ? 'text-gray-900' : 'text-gray-700'}
-    hover:bg-gray-100`}
+                        ${isActive(nav.path || '') ? 'bg-purple-100 text-purple-900 font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
                       <span className="flex items-center justify-center">{nav.icon}</span>
                       {(isExpanded || isHovered || isMobileOpen) && (
@@ -116,13 +136,13 @@ export const Sidebar: React.FC = () => {
                           <ChevronDownIcon
                             width={17.5}
                             height={17.5}
-                            className={`transition-transform duration-300 ${
+                            className={`chevron-icon transition-transform duration-300 ${
                               openSubmenus.includes(index) ? 'rotate-180' : 'rotate-0'
                             }`}
                           />
                         </>
                       )}
-                    </button>
+                    </Link>
                     {openSubmenus.includes(index) && (
                       <div className="overflow-hidden transition-all duration-300">
                         <ul className="mt-4 space-y-1 ml-10">

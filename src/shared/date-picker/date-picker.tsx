@@ -7,7 +7,7 @@ import 'flatpickr/dist/flatpickr.css'
 import Hook = flatpickr.Options.Hook
 import DateOption = flatpickr.Options.DateOption
 import Label from '@/shared/label/label'
-import { CalenderIcon } from '../../../public/assets/icons'
+import { CalenderIcon } from '@/../public/assets/icons'
 
 type PropsType = {
   id: string

@@ -70,12 +70,12 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
       hover: {
         filter: {
           type: 'none',
-        }
+        },
       },
       active: {
         filter: {
           type: 'none',
-        }
+        },
       },
     },
     grid: {
@@ -85,13 +85,13 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
       position: 'back',
       xaxis: {
         lines: {
-          show: false
-        }
+          show: false,
+        },
       },
       yaxis: {
         lines: {
-          show: true
-        }
+          show: true,
+        },
       },
     },
     xaxis: {
@@ -112,7 +112,7 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
     },
     yaxis: {
       min: 0,
-      max: (max) => Math.ceil(max / 200) * 200, // Round to nearest 200
+      max: max => Math.ceil(max / 200) * 200, // Round to nearest 200
       tickAmount: 4,
       labels: {
         style: {
@@ -120,7 +120,7 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
           fontSize: '12px',
           fontFamily: 'Outfit, sans-serif',
         },
-        formatter: (value) => Math.round(value).toString(),
+        formatter: value => Math.round(value).toString(),
       },
     },
     legend: {
@@ -133,16 +133,18 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
       enabled: true,
       theme: 'light',
       y: {
-        formatter: (val) => val.toString(),
+        formatter: val => val.toString(),
       },
     },
   }
 
   // Define series in the correct format
-  const series = [{
-    name: 'Негатив',
-    data: values,
-  }]
+  const series = [
+    {
+      name: 'Негатив',
+      data: values,
+    },
+  ]
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white px-5 pt-5 dark:border-gray-200 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
@@ -153,12 +155,7 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
       </div>
       <div className="overflow-x-auto custom-scrollbar">
         <div className="min-w-full">
-          <Chart
-            options={options}
-            series={series}
-            type="bar"
-            height={354}
-          />
+          <Chart options={options} series={series} type="bar" height={354} />
         </div>
       </div>
     </div>
