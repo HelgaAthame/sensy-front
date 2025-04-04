@@ -2,22 +2,53 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { EyeCloseIcon, EyeIcon, Logo } from '../../../../public/assets/icons'
+import { EyeCloseIcon, EyeIcon, Logo } from '@/../public/assets/icons'
 import { useSignInForm } from '@/features/auth/sign-in-form/use-sign-in-form'
 import { ControlledTextField } from '@/shared/input/controlled-text-field'
 import { ControlledCheckbox } from '@/shared/checkbox/controlled-checkbox'
 import Button from '@/shared/button/button'
 import { useRouter } from 'next/navigation'
-import { appRoutes } from '../../../shared/constants/routes'
+import { appRoutes } from '@/shared/constants/routes'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { setToLocalStorage } from '@/shared/utils/common-utils'
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const { handleSubmit, control } = useSignInForm()
 
-  const onSubmit = (data: any) => {
-    router.push(appRoutes.private.dashboard)
-  }
+  const onSubmit = handleSubmit(async (data: any) => {
+    try {
+      const payload = {
+        email: data.email,
+        password: data.password,
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}auth/signin`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      )
+
+      if (response.status === 200) {
+        setToLocalStorage('accessToken', response.data.accessToken)
+        router.push(appRoutes.private.dashboard)
+      } else {
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        toast.error('Неверный логин или пароль')
+      } else {
+        toast.error('Ошибка авторизации')
+      }
+    }
+  })
 
   return (
     <div className="flex min-h-screen">
@@ -31,7 +62,7 @@ export function SignInForm() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={onSubmit}>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
