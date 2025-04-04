@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ThemeToggleButton } from '@/shared/theme-toggle-button/theme-toggle-button'
 import { NotificationDropdown } from '@/shared/notification-dropdown/notification-dropdown'
 import UserDropdown from '@/shared/header/user-dropdown'
+import { Logo } from '@/../public/assets/svg-components/Logo'
 
 export const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false)
@@ -85,8 +86,7 @@ export const Header = () => {
           </button>
 
           <Link href="/" className="lg:hidden">
-            <img className="dark:hidden" src="./images/logo/logo.svg" alt="Logo" />
-            <img className="hidden dark:block" src="./images/logo/logo-dark.svg" alt="Logo" />
+            <Logo />
           </Link>
 
           <button

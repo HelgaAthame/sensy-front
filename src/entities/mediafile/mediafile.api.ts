@@ -54,4 +54,4 @@ const MediaFileApi = commonApi.injectEndpoints({
   }),
 })
 
-export const { useCreateMediaFileMutation } = MediaFileApi
+export const { useCreateMediaFileMutation, useGetMediaFilesQueryQuery } = MediaFileApi
