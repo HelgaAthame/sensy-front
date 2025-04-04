@@ -1,5 +1,6 @@
 import React, { FC } from 'react'
 import Label from '@/shared/label/label'
+import { ErrorComponent } from '@/shared/error/error'
 
 export interface InputProps {
   type?: 'text' | 'number' | 'email' | 'password' | 'date' | 'time' | string
@@ -84,13 +85,7 @@ const Input: FC<InputProps> = ({
       <div className="min-h-[20px] transition-all duration-200">
         {' '}
         {/* Добавляем анимацию */}
-        {error && (
-          <p className="text-xs text-rose-500 dark:text-rose-400 animate-fade-in">
-            {' '}
-            {/* Добавляем анимацию появления */}
-            {error}
-          </p>
-        )}
+        {error && typeof error === 'string' && <ErrorComponent text={error} />}
       </div>
 
       {hint && (

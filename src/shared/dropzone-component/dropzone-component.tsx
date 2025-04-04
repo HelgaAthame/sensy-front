@@ -10,6 +10,7 @@ interface DropzoneComponentProps {
   title?: string
   description?: string
   cardWrapper?: boolean
+  uploadedFile: File[] | null
 }
 
 const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
@@ -26,6 +27,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
   title = 'Drag & Drop Files Here',
   description = 'Drag and drop your PNG, JPG, WebP, SVG images here or browse',
   cardWrapper = true,
+  uploadedFile,
 }) => {
   const onDrop = (acceptedFiles: File[]) => {
     onFileUploaded(acceptedFiles)
@@ -55,7 +57,11 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
         <div className="dz-message flex flex-col items-center m-0!">
           {/* Icon Container */}
           <div className="mb-6 flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
+            <div
+              className={`flex h-16 w-16 items-center justify-center rounded-full ${
+                uploadedFile ? 'bg-purple-100 dark:bg-purple-800' : 'dark:bg-gray-800 bg-gray-200'
+              } text-gray-700  dark:text-gray-400`}
+            >
               <svg
                 className="fill-current"
                 width="29"

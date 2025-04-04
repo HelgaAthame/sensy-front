@@ -10,6 +10,7 @@ import { Modal } from '@/shared/modal/modal'
 import DatePicker from '@/shared/date-picker/date-picker'
 import { useSortable } from '@/shared/hooks/use-sort'
 import { useRouter } from 'next/navigation'
+import { useGetMediaFilesQueryQuery } from '@/entities/mediafile/mediafile.api'
 
 interface TableRowData {
   id: string
@@ -159,6 +160,12 @@ export const CallsTable = (): JSX.Element => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const router = useRouter()
   const [selectedDictionary, setSelectedDictionary] = useState(['Словарь 1'])
+  const { data: calls } = useGetMediaFilesQueryQuery({
+    start: '2025-01-01',
+    end: '2025-12-31',
+    offset: 0,
+    limit: 40,
+  })
   const { sortedData, requestSort, getSortDirection } = useSortable<TableRowData>(tableRowData)
 
   const openFilterModal = () => {
@@ -319,6 +326,7 @@ export const CallsTable = (): JSX.Element => {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {/* {JSON.stringify(calls, null, 4)} */}
               {currentData.map(item => (
                 <TableRow
                   className={'cursor-pointer hover:bg-gray-100'}

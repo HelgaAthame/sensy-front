@@ -10,13 +10,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSelect } from '@/shared/select/controlled-select'
 import { ControlledTextField } from '@/shared/input/controlled-text-field'
 import { useEffect, useState } from 'react'
+import { ErrorComponent } from '@/shared/error/error'
+import { toast } from 'react-toastify'
 
 interface UploadFormProps {
   uploadedFile: File[] | null
 }
 
 export const UploadForm = ({ uploadedFile }: UploadFormProps) => {
-  const [createMediaFile] = useCreateMediaFileMutation()
+  const [createMediaFile, createMediafileResult] = useCreateMediaFileMutation()
   const [selectedDate, setSelectedDate] = useState<string>('')
 
   const {
@@ -40,6 +42,12 @@ export const UploadForm = ({ uploadedFile }: UploadFormProps) => {
       setValue('file', uploadedFile[0])
     }
   }, [uploadedFile, setValue])
+
+  useEffect(() => {
+    if (createMediafileResult.isSuccess) {
+      toast.success('Запись создана')
+    }
+  }, [createMediafileResult])
 
   const onSubmit = handleSubmit(async data => {
     if (!data.file) return
@@ -109,6 +117,11 @@ export const UploadForm = ({ uploadedFile }: UploadFormProps) => {
               />
             </div>
           </div>
+          {errors.file && (
+            <ErrorComponent
+              text={typeof errors.file.message === 'string' ? errors.file.message : ''}
+            />
+          )}
           <div className="col-span-full">
             <Button
               type="submit"

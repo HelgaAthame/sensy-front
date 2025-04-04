@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Label from '@/shared/label/label'
+import { ErrorComponent } from '@/shared/error/error'
 
 interface Option {
   value: string
@@ -60,7 +61,7 @@ const Select: React.FC<SelectProps> = ({
           </option>
         ))}
       </select>
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      {errorMessage && <ErrorComponent text={errorMessage}/>}
     </div>
   )
 }
