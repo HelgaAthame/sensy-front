@@ -1,101 +1,93 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
-
-type Notification = {
-  name: string
-  project: string
-  time: string
-}
+import { useGetChatMessagesQuery } from '@/entities/chat/chat.api'
+import { ChatMessage } from '@/entities/chat/chat.types'
+import { formatTimeAgo } from '@/shared/utils/date-utils'
 
 type NotificationItemProps = {
-  data: Notification
+  data: ChatMessage
   onClose: () => void
 }
 
-const notificationData: Notification[] = [
-  {
-    name: 'Terry Franci',
-    project: 'Project - Nganter App',
-    time: '5 min ago',
-  },
-  {
-    name: 'Alena Franci',
-    project: 'Project - Nganter App',
-    time: '8 min ago',
-  },
-  {
-    name: 'Jocelyn Kenter',
-    project: 'Project - Nganter App',
-    time: '15 min ago',
-  },
-  {
-    name: 'Brandon Philips',
-    project: 'Project - Nganter App',
-    time: '1 hr ago',
-  },
-  {
-    name: 'Terry Franci',
-    project: 'Project - Nganter App',
-    time: '5 min ago',
-  },
-  {
-    name: 'Alena Franci',
-    project: 'Project - Nganter App',
-    time: '8 min ago',
-  },
-  {
-    name: 'Jocelyn Kenter',
-    project: 'Project - Nganter App',
-    time: '15 min ago',
-  },
-  {
-    name: 'Brandon Philips',
-    project: 'Project - Nganter App',
-    time: '1 hr ago',
-  },
-]
+const NotificationItem = ({ data, onClose }: NotificationItemProps) => {
+  const formattedTime = formatTimeAgo(new Date(data.createDate))
 
-// Notification Item Component
-const NotificationItem = ({ data, onClose }: NotificationItemProps) => (
-  <li>
-    <DropdownItem
-      onItemClick={onClose}
-      className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-    >
-      <span className="block">
-        <span className="mb-1.5 block text-theme-sm text-gray-500 dark:text-gray-400 space-x-1">
-          <span className="font-medium text-gray-800 dark:text-white/90">{data.name}</span>
-          <span> requests permission to change</span>
-          <span className="font-medium text-gray-800 dark:text-white/90">{data.project}</span>
-        </span>
+  return (
+    <li>
+      <DropdownItem
+        onItemClick={onClose}
+        className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
+      >
+        <span className="block">
+          <span className="mb-1.5 block text-theme-sm text-gray-500 dark:text-gray-400 space-x-1">
+            <span className="font-medium text-gray-800 dark:text-white/90">
+              {data.text || 'New notification'}
+            </span>
+          </span>
 
-        <span className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400">
-          <span>Project</span>
-          <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-          <span>{data.time}</span>
+          <span className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400">
+            <span>
+              {data.attachmentsCount > 0
+                ? `${data.attachmentsCount} attachments`
+                : 'No attachments'}
+            </span>
+            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+            <span>{formattedTime}</span>
+          </span>
         </span>
-      </span>
-    </DropdownItem>
-  </li>
-)
+      </DropdownItem>
+    </li>
+  )
+}
 
 export const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [notifying, setNotifying] = useState(true)
+  const [notifying, setNotifying] = useState(false)
+  const [combinedMessages, setCombinedMessages] = useState<ChatMessage[]>([])
+  const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null)
 
-  function toggleDropdown() {
-    setIsOpen(!isOpen)
-  }
+  const { data: notificationMessages = [] } = useGetChatMessagesQuery(
+    {
+      chatType: 'Notification',
+    },
+    { pollingInterval: 60 * 60 * 1000 }
+  )
 
-  function closeDropdown() {
+  const { data: alertMessages = [] } = useGetChatMessagesQuery(
+    {
+      chatType: 'Alert',
+    },
+    { pollingInterval: 60 * 1000 }
+  )
+
+  useEffect(() => {
+    if (notificationMessages.length || alertMessages.length) {
+      const combined = [...notificationMessages, ...alertMessages].sort(
+        (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
+      )
+
+      setCombinedMessages(combined)
+
+      const hasUnseenMessages = combined.some(msg => !msg.seen)
+      setNotifying(hasUnseenMessages)
+
+      setLastFetchTime(new Date())
+    }
+  }, [notificationMessages, alertMessages])
+
+  const toggleDropdown = useCallback(() => {
+    setIsOpen(prev => !prev)
+  }, [])
+
+  const closeDropdown = useCallback(() => {
     setIsOpen(false)
-  }
+  }, [])
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     toggleDropdown()
     setNotifying(false)
-  }
+  }, [toggleDropdown])
 
   return (
     <div className="relative">
@@ -131,7 +123,7 @@ export const NotificationDropdown = () => {
         className="absolute -right-[240px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[361px] lg:right-0"
       >
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-700">
-          <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Notification</h5>
+          <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h5>
           <button
             onClick={toggleDropdown}
             className="text-gray-500 transition dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -152,10 +144,22 @@ export const NotificationDropdown = () => {
             </svg>
           </button>
         </div>
+        <div className="flex justify-between items-center px-1 mb-2 text-theme-sm">
+          <span className="text-gray-500">
+            {lastFetchTime ? `Last updated: ${formatTimeAgo(lastFetchTime)}` : 'Loading...'}
+          </span>
+          <span className="text-gray-500">
+            {combinedMessages.length} {combinedMessages.length === 1 ? 'message' : 'messages'}
+          </span>
+        </div>
         <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
-          {notificationData.map((notification, index) => (
-            <NotificationItem key={index} data={notification} onClose={closeDropdown} />
-          ))}
+          {combinedMessages.length > 0 ? (
+            combinedMessages.map(message => (
+              <NotificationItem key={message.id} data={message} onClose={closeDropdown} />
+            ))
+          ) : (
+            <li className="py-8 text-center text-gray-500">No new notifications</li>
+          )}
         </ul>
       </Dropdown>
     </div>
