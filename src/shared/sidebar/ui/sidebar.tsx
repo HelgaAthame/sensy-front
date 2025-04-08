@@ -58,10 +58,8 @@ export const Sidebar: React.FC = () => {
     [isActive]
   )
 
-  // Инициализируем открытые подменю, предварительно проверяя активные пути
   const [openSubmenus, setOpenSubmenus] = useState<number[]>([])
 
-  // Автоматически открываем подменю, если активен родительский пункт или дочерний элемент
   useEffect(() => {
     const newOpenSubmenus = navItems
       .map((item, index) => {
@@ -116,15 +114,15 @@ export const Sidebar: React.FC = () => {
                     <Link
                       href={nav.path || '#'}
                       onClick={e => {
-                        // Если нет пути или мы кликнули на шеврон, предотвращаем навигацию
                         if (!nav.path || (e.target as HTMLElement).closest('.chevron-icon')) {
                           e.preventDefault()
                         }
 
-                        // В любом случае переключаем подменю
                         handleSubmenuToggle(index)
                       }}
-                      className={`menu-item group flex items-center gap-3 px-4 py-3 w-[250px] h-[40px] rounded-full transition-all duration-200 
+                      className={`menu-item group flex items-center gap-3 px-4 py-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'w-full' : 'w-[56px]'
+                      } h-[40px] rounded-full transition-all duration-200 
                         ${isActive(nav.path || '') ? 'bg-purple-100 text-purple-900 font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
                       <span className="flex items-center justify-center">{nav.icon}</span>
