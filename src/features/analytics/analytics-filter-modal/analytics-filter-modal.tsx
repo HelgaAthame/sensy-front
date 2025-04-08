@@ -5,8 +5,8 @@ import Button from '@/shared/button/button'
 import { Modal } from '@/shared/modal/modal'
 import DatePicker from '@/shared/date-picker/date-picker'
 import { useGetVocabularyQuery } from '@/entities/dictionaries/dictionaries.api'
-
-import flatpickr from 'flatpickr'
+import Checkbox from '@/shared/checkbox/checkbox'
+import { formatEndDate, formatStartDate } from '@/shared/utils/date-utils'
 
 interface DateRange {
   start: string
@@ -49,8 +49,6 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
     onClose()
   }
 
-  // Преобразуем даты из строк ISO в строковый формат для defaultDate
-
   return (
     <Modal isOpen={isOpen} title={'Фильтр'} onClose={onClose} className="max-w-[410px] mx-auto">
       <div className="p-4">
@@ -58,12 +56,13 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
         <DatePicker
           id="date-range-picker"
           mode="range"
+          value={dateRange}
           placeholder="dd/mm/yyyy"
           onChange={(selectedDates, dateStr) => {
             if (selectedDates && selectedDates.length === 2) {
               setDateRange({
-                start: selectedDates[0].toISOString().split('T')[0] + 'T00:00:00Z',
-                end: selectedDates[1].toISOString().split('T')[0] + 'T23:59:59Z',
+                start: formatStartDate(selectedDates[0], 'Europe/Moscow') || '',
+                end: formatEndDate(selectedDates[1], 'Europe/Moscow') || '',
               })
             }
           }}
@@ -74,8 +73,7 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
           {vocabularyData &&
             Object.entries(vocabularyData).map(([id, name]) => (
               <div key={id} className="flex items-center">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id={`dictionary-${id}`}
                   checked={selectedDictionaries.includes(Number(id))}
                   onChange={() => handleDictionaryChange(Number(id))}
@@ -90,12 +88,15 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
 
         <div className="flex justify-between pt-4">
           <Button
-            className="px-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg"
+            className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
             onClick={onClose}
           >
             Отменить
           </Button>
-          <Button className="px-4 py-2 bg-purple-600 text-white rounded-lg" onClick={handleApply}>
+          <Button
+            className="px-2 py-2 bg-purple-900 text-white cursor-pointer hover:bg-purple-800 rounded-full"
+            onClick={handleApply}
+          >
             Применить
           </Button>
         </div>

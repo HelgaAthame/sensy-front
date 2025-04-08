@@ -30,13 +30,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
           <input
             id={id}
             type="checkbox"
-            className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
+            className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-purple-900 disabled:opacity-60 
             ${className}`}
             checked={checked}
             onChange={e => onChange(e.target.checked)}
             disabled={disabled}
           />
-          {checked && (
+          {checked && !disabled && (
             <svg
               className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none top-1/2 left-1/2"
               xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
               />
             </svg>
           )}
-          {disabled && (
+          {disabled && checked && (
             <svg
               className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none top-1/2 left-1/2"
               xmlns="http://www.w3.org/2000/svg"

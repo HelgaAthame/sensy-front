@@ -4,7 +4,7 @@ import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
 import { Sidebar } from '@/shared/sidebar/ui/sidebar'
 import Backdrop from '@/shared/backdrop/backdrop'
 import { Header } from '@/shared/header/header'
-import { ReactNode } from 'react'
+import { ReactNode, Suspense } from 'react'
 import { RootLayout } from '@/widgets/root-layout/root-layout'
 
 interface MainLayoutProps {
@@ -26,7 +26,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             isExpanded || isHovered ? 'lg:ml-[290px]' : 'lg:ml-[90px]'
           } ${isMobileOpen ? 'ml-0' : ''}`}
         >
-          <Header />
+          <Suspense
+            fallback={
+              <div className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800"></div>
+            }
+          >
+            <Header />
+          </Suspense>
           <main className="p-4 mx-auto max-w-[--breakpoint-2xl] md:p-6">{children}</main>
         </div>
       </div>

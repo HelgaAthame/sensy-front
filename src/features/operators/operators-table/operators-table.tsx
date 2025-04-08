@@ -86,7 +86,7 @@ export const OperatorsTable = <T extends Record<string, any>>({
                             alt={`${item.name} icon`}
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-white text-lg font-semibold">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-purple-900 text-white text-lg font-semibold">
                             {item.name?.charAt(0)}
                           </div>
                         )}

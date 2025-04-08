@@ -29,11 +29,11 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
 
     const values = sortedEntries.map(([_, value]) => value)
 
-    const colors = categories.map(category => {
-      if (category === '20-30%') {
+    const lastIndex = values.length - 1
+
+    const colors = categories.map((_, index) => {
+      if (index === lastIndex) {
         return '#5a2d76'
-      } else if (category === '70-80%') {
-        return '#3A86FF'
       }
       return '#F2F2F7'
     })
@@ -112,7 +112,7 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
     },
     yaxis: {
       min: 0,
-      max: max => Math.ceil(max / 200) * 200, // Round to nearest 200
+      max: max => Math.ceil(max / 200) * 200,
       tickAmount: 4,
       labels: {
         style: {
@@ -138,7 +138,6 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
     },
   }
 
-  // Define series in the correct format
   const series = [
     {
       name: 'Негатив',

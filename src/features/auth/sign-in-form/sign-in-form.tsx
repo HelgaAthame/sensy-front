@@ -12,13 +12,16 @@ import { appRoutes } from '@/shared/constants/routes'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { setToLocalStorage } from '@/shared/utils/common-utils'
+import { Loader } from '@/shared/loader/loader'
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { handleSubmit, control } = useSignInForm()
 
   const onSubmit = handleSubmit(async (data: any) => {
+    setIsLoading(true)
     try {
       const payload = {
         email: data.email,
@@ -38,6 +41,11 @@ export function SignInForm() {
 
       if (response.status === 200) {
         setToLocalStorage('accessToken', response.data.accessToken)
+
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 10000)
+
         router.push(appRoutes.private.dashboard)
       } else {
       }
@@ -47,6 +55,8 @@ export function SignInForm() {
       } else {
         toast.error('Ошибка авторизации')
       }
+    } finally {
+      setIsLoading(false)
     }
   })
 
@@ -117,9 +127,14 @@ export function SignInForm() {
 
               <Button
                 type="submit"
-                className="w-full bg-purple-900 hover:bg-purple-800 text-white py-2 px-4 rounded-full transition-colors cursor-pointer"
+                disabled={isLoading}
+                className={`w-full py-2 px-4 rounded-full transition-colors cursor-pointer ${
+                  isLoading
+                    ? 'bg-purple-700 cursor-not-allowed opacity-80'
+                    : 'bg-purple-900 hover:bg-purple-800 text-white'
+                }`}
               >
-                Войти
+                {isLoading ? <Loader message={'Выполняется вход...'} /> : 'Войти'}
               </Button>
             </div>
           </form>

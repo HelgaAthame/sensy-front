@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import ComponentCard from '@/shared/component-card/component-card'
 import { useDropzone } from 'react-dropzone'
 
@@ -11,6 +11,7 @@ interface DropzoneComponentProps {
   description?: string
   cardWrapper?: boolean
   uploadedFile: File[] | null
+  resetKey?: number
 }
 
 const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
@@ -24,23 +25,32 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
     'audio/ogg': [],
     'audio/aac': [],
   },
-  title = 'Drag & Drop Files Here',
-  description = 'Drag and drop your PNG, JPG, WebP, SVG images here or browse',
+  title = 'Поместите файл сюда',
+  description = 'Перетащите вашу аудиозапись в формате WAV, MP3 сюда или просмотрите',
   cardWrapper = true,
   uploadedFile,
+  resetKey = 0,
 }) => {
   const onDrop = (acceptedFiles: File[]) => {
     onFileUploaded(acceptedFiles)
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: acceptedFileTypes,
   })
 
+  useEffect(() => {
+    if (resetKey > 0) {
+      if (uploadedFile && uploadedFile.length > 0) {
+        onFileUploaded([])
+      }
+    }
+  }, [resetKey])
+
   const dropzoneContent = (
     <div className="transition border border-gray-300 border-dashed cursor-pointer dark:hover:border-brand-500 dark:border-gray-700 rounded-xl hover:border-brand-500">
-      <form
+      <div
         {...getRootProps()}
         className={`dropzone rounded-xl border-dashed border-gray-300 p-7 lg:p-10
           ${
@@ -59,7 +69,9 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
           <div className="mb-6 flex justify-center">
             <div
               className={`flex h-16 w-16 items-center justify-center rounded-full ${
-                uploadedFile ? 'bg-purple-100 dark:bg-purple-800' : 'dark:bg-gray-800 bg-gray-200'
+                uploadedFile && uploadedFile.length > 0
+                  ? 'bg-purple-200 dark:bg-purple-800'
+                  : 'dark:bg-gray-800 bg-gray-200'
               } text-gray-700  dark:text-gray-400`}
             >
               <svg
@@ -86,9 +98,17 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
             {description}
           </span>
 
-          <span className="font-medium underline text-sm text-brand-500">Browse File</span>
+          <span
+            className="font-medium text-blue-500 underline text-sm text-brand-500"
+            onClick={e => {
+              e.stopPropagation()
+              open()
+            }}
+          >
+            Просмотр файла
+          </span>
         </div>
-      </form>
+      </div>
     </div>
   )
 

@@ -15,6 +15,39 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
     }
   }
 
+  // Generate page numbers with ellipsis
+  const getPageNumbers = () => {
+    const pageNumbers = []
+
+    pageNumbers.push(1)
+
+    if (currentPage > 3) {
+      pageNumbers.push('ellipsis')
+    }
+
+    // Pages around current page
+    const startPage = Math.max(2, currentPage - 1)
+    const endPage = Math.min(totalPages - 1, currentPage + 1)
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i <= totalPages - 1 && i >= 2) {
+        pageNumbers.push(i)
+      }
+    }
+
+    // Show ellipsis before last page if needed
+    if (currentPage < totalPages - 2) {
+      pageNumbers.push('ellipsis')
+    }
+
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+      pageNumbers.push(totalPages)
+    }
+
+    return pageNumbers
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
@@ -22,32 +55,31 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
         <Button
           size="sm"
           variant="outline"
-          className="rounded-full cursor-pointer"
+          className="rounded-full cursor-pointer px-4 py-2 border border-gray-200"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <span className="hidden sm:inline">Назад</span>
+          <span className="text-sm font-medium">Назад</span>
         </Button>
 
-        {/* Page Info */}
-        <span className="block text-sm font-medium text-gray-700 dark:text-gray-400 sm:hidden">
-          Page {currentPage} of {totalPages}
-        </span>
-
         {/* Page Numbers */}
-        <ul className="hidden items-center gap-3 sm:flex">
-          {Array.from({ length: totalPages }).map((_, idx) => (
+        <ul className="hidden items-center gap-2 sm:flex">
+          {getPageNumbers().map((page, idx) => (
             <li key={idx}>
-              <Button
-                onClick={() => goToPage(idx + 1)}
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-theme-sm font-medium cursor-pointer ${
-                  currentPage === idx + 1
-                    ? 'bg-purple-900 text-white'
-                    : 'bg-gray-50 text-black hover:bg-purple-900 hover:text-white'
-                }`}
-              >
-                {idx + 1}
-              </Button>
+              {page === 'ellipsis' ? (
+                <span className="px-2 text-gray-500">...</span>
+              ) : (
+                <Button
+                  onClick={() => goToPage(Number(page))}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium cursor-pointer ${
+                    currentPage === page
+                      ? 'bg-purple-900 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </Button>
+              )}
             </li>
           ))}
         </ul>
@@ -57,10 +89,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
           onClick={() => goToPage(currentPage + 1)}
           size="sm"
           variant="outline"
-          className="rounded-full cursor-pointer"
+          className="rounded-full cursor-pointer px-4 py-2 border border-gray-200"
           disabled={currentPage === totalPages}
         >
-          <span className="hidden sm:inline">Вперёд</span>
+          <span className="text-sm font-medium">Вперёд</span>
         </Button>
       </div>
     </div>

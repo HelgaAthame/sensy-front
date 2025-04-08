@@ -23,7 +23,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <BarIcon />,
+    icon: <BarIcon width={24} height={24} />,
     name: 'Аналитика',
     path: appRoutes.private.dashboard,
   },
@@ -34,12 +34,12 @@ const navItems: NavItem[] = [
     subItems: [{ name: 'Загрузка записи', path: appRoutes.private.uploadingRecord }],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <UserCircleIcon width={24} height={24} />,
     name: 'Операторы',
     path: appRoutes.private.operators,
   },
   {
-    icon: <StarFatIcon />,
+    icon: <StarFatIcon width={24} height={24} />,
     name: 'Проекты',
     path: appRoutes.private.projects,
   },
@@ -120,8 +120,10 @@ export const Sidebar: React.FC = () => {
 
                         handleSubmenuToggle(index)
                       }}
-                      className={`menu-item group flex items-center gap-3 px-4 py-3 ${
-                        isExpanded || isHovered || isMobileOpen ? 'w-full' : 'w-[56px]'
+                      className={`menu-item group flex items-center gap-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
+                      } py-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'w-full' : 'w-full]'
                       } h-[40px] rounded-full transition-all duration-200 
                         ${isActive(nav.path || '') ? 'bg-purple-100 text-purple-900 font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
@@ -148,7 +150,9 @@ export const Sidebar: React.FC = () => {
                             <li key={subItem.name}>
                               <Link
                                 href={subItem.path}
-                                className={`py-3 px-4 h-[40px] flex items-center text-sm rounded-full ${
+                                className={`py-3 ${
+                                  isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
+                                } h-[40px] flex items-center text-sm rounded-full ${
                                   isActive(subItem.path)
                                     ? 'bg-purple-100 text-purple-900'
                                     : 'text-gray-700 hover:bg-gray-100'
@@ -166,15 +170,15 @@ export const Sidebar: React.FC = () => {
                   nav.path && (
                     <Link
                       href={nav.path}
-                      className={`menu-item group flex items-center gap-3 px-4 py-3 w-[250px] h-[40px] rounded-full transition-all duration-200 ${
+                      className={`menu-item group flex items-center gap-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
+                      } py-3 w-full h-[40px] rounded-full transition-all duration-200 ${
                         isActive(nav.path)
                           ? 'bg-purple-100 text-purple-900 font-semibold'
                           : 'hover:bg-gray-100 text-gray-700'
                       }`}
                     >
-                      <span className="w-[24px] h-[24px] flex items-center justify-center">
-                        {nav.icon}
-                      </span>
+                      <span className="flex items-center justify-center">{nav.icon}</span>
                       {(isExpanded || isHovered || isMobileOpen) && (
                         <span className="menu-item-text text-sm">{nav.name}</span>
                       )}

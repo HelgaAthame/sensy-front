@@ -17,29 +17,41 @@ export const showError = (error: ErrorWithData) => {
 }
 
 export function getFromLocalStorage<T>(key: string, initialData: T) {
-  const data = localStorage.getItem(key)
+  if (typeof window !== 'undefined') {
+    const data = localStorage.getItem(key)
 
-  if (!data) {
-    return initialData
+    if (!data) {
+      return initialData
+    }
+
+    return JSON.parse(data)
   }
 
-  return JSON.parse(data)
+  return initialData
 }
 
 export function getFromSessionStorage<T>(key: string, initialData: T) {
-  const data = sessionStorage.getItem(key)
+  if (typeof window !== 'undefined') {
+    const data = sessionStorage.getItem(key)
 
-  if (!data) {
-    return initialData
+    if (!data) {
+      return initialData
+    }
+
+    return JSON.parse(data)
   }
 
-  return JSON.parse(data)
+  return initialData
 }
 
-export const setToLocalStorage = <T>(key: string, value: T) => {
-  localStorage.setItem(key, JSON.stringify(value))
+export function setToLocalStorage<T>(key: string, value: T) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(key, JSON.stringify(value))
+  }
 }
 
-export const setToSessionStorage = <T>(key: string, value: T) => {
-  sessionStorage.setItem(key, JSON.stringify(value))
+export function setToSessionStorage<T>(key: string, value: T) {
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem(key, JSON.stringify(value))
+  }
 }

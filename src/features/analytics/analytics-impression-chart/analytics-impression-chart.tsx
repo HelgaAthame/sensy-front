@@ -1,4 +1,5 @@
 'use client'
+
 import { ApexOptions } from 'apexcharts'
 import dynamic from 'next/dynamic'
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
@@ -16,59 +17,86 @@ interface ImpressionChartProps {
 }
 
 export default function ImpressionChart({ data }: ImpressionChartProps) {
-  const russianMonths = [
-    'Янв',
-    'Фев',
-    'Март',
-    'Апр',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Авг',
-    'Сен',
-    'Окт',
-    'Нояб',
-    'Дек',
-  ]
+  const processHourlyData = (data: PlotDataItem[] | undefined) => {
+    if (!data || data.length === 0) return { categories: [], series: [] }
 
-  const emptyMonthsData = Array(12).fill(0)
+    const dailyData = new Map<
+      string,
+      {
+        negativeLevelExceedCount: number
+        keywordsExceedCount: number
+        maxSilenceDurationExceedCount: number
+        simultaneousSpeechExceedCount: number
+      }
+    >()
 
-  if (data && data.length > 0) {
     data.forEach(item => {
       const date = new Date(item.dateTime)
-      const monthIndex = date.getMonth()
+      const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD format
 
-      emptyMonthsData[monthIndex] = {
-        negativeLevelExceedCount: item.negativeLevelExceedCount || 0,
-        keywordsExceedCount: item.keywordsExceedCount || 0,
-        maxSilenceDurationExceedCount: item.maxSilenceDurationExceedCount || 0,
-        simultaneousSpeechExceedCount: item.simultaneousSpeechExceedCount || 0,
+      if (!dailyData.has(dateKey)) {
+        dailyData.set(dateKey, {
+          negativeLevelExceedCount: 0,
+          keywordsExceedCount: 0,
+          maxSilenceDurationExceedCount: 0,
+          simultaneousSpeechExceedCount: 0,
+        })
       }
+
+      const current = dailyData.get(dateKey)!
+      current.negativeLevelExceedCount += item.negativeLevelExceedCount || 0
+      current.keywordsExceedCount += item.keywordsExceedCount || 0
+      current.maxSilenceDurationExceedCount += item.maxSilenceDurationExceedCount || 0
+      current.simultaneousSpeechExceedCount += item.simultaneousSpeechExceedCount || 0
     })
+
+    const sortedDates = Array.from(dailyData.keys()).sort()
+
+    const formattedDates = sortedDates.map(dateStr => {
+      const date = new Date(dateStr)
+      return new Intl.DateTimeFormat('ru', { month: 'short', day: 'numeric' }).format(date)
+    })
+
+    const negativeLevelData = sortedDates.map(date => dailyData.get(date)!.negativeLevelExceedCount)
+    const keywordsData = sortedDates.map(date => dailyData.get(date)!.keywordsExceedCount)
+    const silenceData = sortedDates.map(date => dailyData.get(date)!.maxSilenceDurationExceedCount)
+    const speechData = sortedDates.map(date => dailyData.get(date)!.simultaneousSpeechExceedCount)
+
+    return {
+      categories: formattedDates,
+      series: [
+        {
+          name: 'Негатив',
+          data: negativeLevelData,
+          color: '#5A2D76',
+        },
+        {
+          name: 'Лексика',
+          data: keywordsData,
+          color: '#007AFF',
+        },
+        {
+          name: 'Паузы',
+          data: silenceData,
+          color: '#FF3B30',
+        },
+        {
+          name: 'Перебивания',
+          data: speechData,
+          color: '#FF9500',
+        },
+      ],
+    }
   }
 
-  // Extract data for each series
-  const negativeLevelData = emptyMonthsData.map(item =>
-    typeof item === 'number' ? 0 : item.negativeLevelExceedCount
-  )
-  const keywordsData = emptyMonthsData.map(item =>
-    typeof item === 'number' ? 0 : item.keywordsExceedCount
-  )
-  const silenceData = emptyMonthsData.map(item =>
-    typeof item === 'number' ? 0 : item.maxSilenceDurationExceedCount
-  )
-  const speechData = emptyMonthsData.map(item =>
-    typeof item === 'number' ? 0 : item.simultaneousSpeechExceedCount
-  )
+  const { categories, series } = processHourlyData(data)
 
-  // Options for the chart
   const options: ApexOptions = {
     legend: {
       show: true,
       position: 'top',
       horizontalAlign: 'left',
     },
-    colors: [],
     chart: {
       fontFamily: 'Outfit, sans-serif',
       height: 310,
@@ -116,7 +144,7 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
     },
     xaxis: {
       type: 'category',
-      categories: russianMonths,
+      categories: categories,
       axisBorder: {
         show: false,
       },
@@ -134,29 +162,6 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
     },
   }
 
-  const series = [
-    {
-      name: 'Негатив',
-      data: negativeLevelData,
-      color: '#5A2D76',
-    },
-    {
-      name: 'Лексика',
-      data: keywordsData,
-      color: '#007AFF',
-    },
-    {
-      name: 'Паузы',
-      data: silenceData,
-      color: '#FF3B30',
-    },
-    {
-      name: 'Перебивания',
-      data: speechData,
-      color: '#FF9500',
-    },
-  ]
-
   return (
     <div className="rounded-2xl border border-gray-100 bg-white px-5 pt-5 dark:border-gray-200 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
       <div className="flex flex-wrap items-start justify-between gap-5">
@@ -166,7 +171,13 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
       </div>
       <div className="max-w-full overflow-x-auto custom-scrollbar">
         <div className="-ml-5 min-w-[1300px] xl:min-w-full pl-2">
-          <Chart options={options} series={series} type="line" height={350} />
+          {series.length > 0 ? (
+            <Chart options={options} series={series} type="line" height={350} />
+          ) : (
+            <div className="flex h-64 items-center justify-center">
+              <p className="text-gray-500">Нет данных для отображения</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

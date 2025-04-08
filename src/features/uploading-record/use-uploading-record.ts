@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const MAX_FILE_SIZE = 3 * 1024 * 1024 // 3MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED_FILE_TYPES = ['audio/mpeg', 'audio/wav']
 
 const FileSchema =
@@ -8,7 +8,7 @@ const FileSchema =
     ? z
         .instanceof(File)
         .refine(file => file.size <= MAX_FILE_SIZE, {
-          message: 'Превышен допустимый размер файла (макс. 3MB)',
+          message: 'Превышен допустимый размер файла (макс. 10MB)',
         })
         .refine(file => ALLOWED_FILE_TYPES.includes(file.type), {
           message: 'Неверный формат файла. Разрешены: MP3, WAV',

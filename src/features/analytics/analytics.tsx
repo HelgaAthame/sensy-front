@@ -25,16 +25,13 @@ export const Analytics = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const defaultDateRange = getLast7DaysRange()
   const [filterParams, setFilterParams] = useState({
-    start: defaultDateRange.start,
-    end: defaultDateRange.end,
+    start: '2025-01-01T00:00:00Z',
+    end: '2025-12-31T00:00:00Z',
     filterByPhrasesCategoriesCommaSeparated: undefined,
     offset: 0,
     limit: 10,
-    operatorId: '1',
     topNKeywords: 5,
   })
-
-  console.log('filterParams', filterParams)
 
   const { data } = useGetAnalyticsDashboardQuery(filterParams)
 

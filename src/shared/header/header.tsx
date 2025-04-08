@@ -7,10 +7,14 @@ import { ThemeToggleButton } from '@/shared/theme-toggle-button/theme-toggle-but
 import { NotificationDropdown } from '@/shared/notification-dropdown/notification-dropdown'
 import UserDropdown from '@/shared/header/user-dropdown'
 import { Logo } from '@/../public/assets/svg-components/Logo'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { appRoutes } from '@/shared/constants/routes'
 
 export const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false)
-
+  const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState('')
+  const searchParams = useSearchParams()
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar()
 
   const handleToggle = () => {
@@ -28,6 +32,13 @@ export const Header = () => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    const searchFromUrl = searchParams.get('search')
+    if (searchFromUrl) {
+      setSearchTerm(searchFromUrl)
+    }
+  }, [searchParams])
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault()
@@ -42,8 +53,48 @@ export const Header = () => {
     }
   }, [])
 
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchTerm = e.target.value
+    setSearchTerm(newSearchTerm)
+
+    if (debounceTimer.current !== null) {
+      clearTimeout(debounceTimer.current)
+    }
+    debounceTimer.current = setTimeout(() => {
+      if (newSearchTerm.trim() !== searchParams.get('search')) {
+        const params = new URLSearchParams(searchParams.toString())
+
+        if (newSearchTerm.trim()) {
+          params.set('search', newSearchTerm.trim())
+        } else {
+          params.delete('search')
+        }
+
+        params.set('page', '1')
+        router.push(`${appRoutes.private.calls}?${params.toString()}`)
+      }
+    }, 500)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
+      }
+    }
+  }, [])
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchTerm.trim()) {
+      router.push(`${appRoutes.private.calls}?search=${encodeURIComponent(searchTerm.trim())}`)
+    }
+  }
+
   return (
-    <header className="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+    <header className="sticky top-0 flex w-full bg-white border-gray-200 z-9998 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
           <button
@@ -110,13 +161,15 @@ export const Header = () => {
           </button>
 
           <div className="hidden lg:block">
-            <form>
+            <form onSubmit={handleSearchSubmit}>
               <div className="relative">
                 <input
                   ref={inputRef}
                   type="text"
                   placeholder="Search or type command..."
                   className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pr-12 pl-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+                  value={searchTerm}
+                  onChange={handleChange}
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <svg
@@ -149,7 +202,6 @@ export const Header = () => {
             <ThemeToggleButton />
             {/* <!-- Dark Mode Toggler --> */}
             <NotificationDropdown />
-            {/* <!-- Notification Menu Area --> */}
           </div>
           {/* <!-- User Area --> */}
           <UserDropdown />
