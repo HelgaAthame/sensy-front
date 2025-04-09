@@ -15,6 +15,7 @@ import { toast } from 'react-toastify'
 import { Loader } from '@/shared/loader/loader'
 import { useGetProjectsQuery } from '@/entities/projects/projects.api'
 import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
+import { setToLocalStorage } from '@/shared/utils/common-utils'
 
 interface UploadFormProps {
   uploadedFile: File[] | null
@@ -71,10 +72,12 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
         },
       }).unwrap()
 
+      const uploadTimestamp = new Date().getTime()
+      setToLocalStorage('lastUploadTimestamp', uploadTimestamp.toString())
+
       toast.success('Запись создана')
       reset()
     } catch (error) {
-      console.error('Upload failed:', error)
       toast.error('Ошибка загрузки')
     }
   })
