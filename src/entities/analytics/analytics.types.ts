@@ -1,15 +1,14 @@
-export interface KeywordsFrequencyData {
-  [keyword: string]: number
+export interface KeywordFrequencyItem {
+  keyword: string
+  count: number
 }
 
 export interface PlotDataItem {
   dateTime: string
-  recordsCount: number
-  averageDuration: number
-  averageNegativeLevel: number
-  negativeKeywordsCount: number
-  maxSilenceDuration: number
-  simultaneousSpeechCount: number
+  keywordsExceedCount: number
+  maxSilenceDurationExceedCount: number
+  negativeLevelExceedCount: number
+  simultaneousSpeechExceedCount: number
 }
 
 export interface NegativeHistogramData {
@@ -35,17 +34,21 @@ export interface OperatorRatingDataItem {
   averageSimultaneousSpeechCount: number
 }
 
+export interface AnalyticsDashboardQueryParams {
+  start?: string
+  end?: string
+  offset?: number
+  limit?: number
+  operatorId?: string
+  topNKeywords?: number
+  filterByPhrasesCategoriesCommaSeparated?: string
+}
+
 export interface AnalyticsDashboardResponse {
-  keywordsFrequencyData: KeywordsFrequencyData
+  keywordsFrequencyData: KeywordFrequencyItem
   messageText: string
   plotData: PlotDataItem[]
   negativeHistogramData: NegativeHistogramData
   summaryData: SummaryData
   operatorRatingData: OperatorRatingDataItem[]
-}
-
-export interface AnalyticsDashboardQueryParams {
-  startDate?: string
-  endDate?: string
-  operatorId?: string
 }

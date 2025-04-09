@@ -2,12 +2,46 @@
 
 import { ApexOptions } from 'apexcharts'
 import dynamic from 'next/dynamic'
+import { useMemo } from 'react'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
-export default function AnalyticsBarChart() {
+interface NegativeHistogramChartProps {
+  data?: Record<string, number>
+}
+
+export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps) {
+  const { categories, values, colors } = useMemo(() => {
+    if (!data) {
+      return { categories: [], values: [], colors: [] }
+    }
+
+    const sortedEntries = Object.entries(data).sort((a, b) => {
+      return parseFloat(a[0]) - parseFloat(b[0])
+    })
+
+    const categories = sortedEntries.map(([key]) => {
+      const value = parseFloat(key)
+      const start = Math.floor(value * 100)
+      const end = Math.floor((value + 0.1) * 100)
+      return `${start}-${end}%`
+    })
+
+    const values = sortedEntries.map(([_, value]) => value)
+
+    const lastIndex = values.length - 1
+
+    const colors = categories.map((_, index) => {
+      if (index === lastIndex) {
+        return '#5a2d76'
+      }
+      return '#F2F2F7'
+    })
+
+    return { categories, values, colors }
+  }, [data])
+
   const options: ApexOptions = {
-    colors: ['#465fff'],
     chart: {
       fontFamily: 'Outfit, sans-serif',
       type: 'bar',
@@ -15,108 +49,111 @@ export default function AnalyticsBarChart() {
       toolbar: {
         show: false,
       },
+      background: 'transparent',
     },
+    colors: colors,
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: '45%',
-        borderRadius: 5,
-        borderRadiusApplication: 'end',
+        columnWidth: '70%',
+        borderRadius: 4,
+        distributed: true,
+        dataLabels: {
+          position: 'top',
+        },
       },
     },
     dataLabels: {
       enabled: false,
     },
-    stroke: {
-      show: true,
-      width: 4,
-      colors: ['transparent'],
-    },
-    xaxis: {
-      categories: [
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        '10',
-        '11',
-        '12',
-        '13',
-        '14',
-        '15',
-        '16',
-        '17',
-        '18',
-        '19',
-        '20',
-        '21',
-        '22',
-        '23',
-        '24',
-        '25',
-        '26',
-        '27',
-        '28',
-        '29',
-        '30',
-      ],
-      axisBorder: {
-        show: false,
+    states: {
+      hover: {
+        filter: {
+          type: 'none',
+        },
       },
-      axisTicks: {
-        show: false,
+      active: {
+        filter: {
+          type: 'none',
+        },
       },
-    },
-    legend: {
-      show: true,
-      position: 'top',
-      horizontalAlign: 'left',
-      fontFamily: 'Outfit',
     },
     grid: {
+      show: true,
+      borderColor: '#F2F2F7',
+      strokeDashArray: 4,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false,
+        },
+      },
       yaxis: {
         lines: {
           show: true,
         },
       },
     },
+    xaxis: {
+      categories,
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+      labels: {
+        style: {
+          colors: '#8E8E93',
+          fontSize: '12px',
+          fontFamily: 'Outfit, sans-serif',
+        },
+      },
+    },
+    yaxis: {
+      min: 0,
+      max: max => Math.ceil(max / 200) * 200,
+      tickAmount: 4,
+      labels: {
+        style: {
+          colors: '#8E8E93',
+          fontSize: '12px',
+          fontFamily: 'Outfit, sans-serif',
+        },
+        formatter: value => Math.round(value).toString(),
+      },
+    },
+    legend: {
+      show: false,
+    },
     fill: {
       opacity: 1,
     },
-
     tooltip: {
-      x: {
-        show: false,
-      },
+      enabled: true,
+      theme: 'light',
       y: {
-        formatter: (val: number) => `${val}`,
+        formatter: val => val.toString(),
       },
     },
   }
 
   const series = [
     {
-      name: 'Sales',
-      data: [
-        168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112, 123, 212, 270, 190, 310, 115,
-        90, 380, 112, 223, 292, 170, 290, 110, 115, 290, 380, 312,
-      ],
+      name: 'Негатив',
+      data: values,
     },
   ]
+
   return (
     <div className="rounded-2xl border border-gray-100 bg-white px-5 pt-5 dark:border-gray-200 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
-          <h3 className="mb-1 text-lg font-semibold text-neutral-900">Analytics</h3>
+          <h3 className="mb-1 text-lg font-semibold text-neutral-900">Негатив</h3>
         </div>
       </div>
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="-ml-5 min-w-[1300px] xl:min-w-full pl-2">
+      <div className="overflow-x-auto custom-scrollbar">
+        <div className="min-w-full">
           <Chart options={options} series={series} type="bar" height={354} />
         </div>
       </div>

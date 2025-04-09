@@ -2,22 +2,64 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { EyeCloseIcon, EyeIcon, Logo } from '../../../../public/assets/icons'
+import { EyeCloseIcon, EyeIcon, Logo } from '@/../public/assets/icons'
 import { useSignInForm } from '@/features/auth/sign-in-form/use-sign-in-form'
 import { ControlledTextField } from '@/shared/input/controlled-text-field'
 import { ControlledCheckbox } from '@/shared/checkbox/controlled-checkbox'
 import Button from '@/shared/button/button'
 import { useRouter } from 'next/navigation'
-import { appRoutes } from '../../../shared/constants/routes'
+import { appRoutes } from '@/shared/constants/routes'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { setToLocalStorage } from '@/shared/utils/common-utils'
+import { Loader } from '@/shared/loader/loader'
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { handleSubmit, control } = useSignInForm()
 
-  const onSubmit = (data: any) => {
-    router.push(appRoutes.private.dashboard)
-  }
+  const onSubmit = handleSubmit(async (data: any) => {
+    setIsLoading(true)
+    try {
+      const payload = {
+        email: data.email,
+        password: data.password,
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}auth/signin`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      )
+
+      if (response.status === 200) {
+        setToLocalStorage('accessToken', response.data.accessToken)
+        setToLocalStorage('userEmail', data.email)
+
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 10000)
+
+        router.push(appRoutes.private.dashboard)
+      } else {
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        toast.error('Неверный логин или пароль')
+      } else {
+        toast.error('Ошибка авторизации')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  })
 
   return (
     <div className="flex min-h-screen">
@@ -31,7 +73,7 @@ export function SignInForm() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={onSubmit}>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -86,9 +128,14 @@ export function SignInForm() {
 
               <Button
                 type="submit"
-                className="w-full bg-purple-900 hover:bg-purple-800 text-white py-2 px-4 rounded-full transition-colors cursor-pointer"
+                disabled={isLoading}
+                className={`w-full py-2 px-4 rounded-full transition-colors cursor-pointer ${
+                  isLoading
+                    ? 'bg-purple-700 cursor-not-allowed opacity-80'
+                    : 'bg-purple-900 hover:bg-purple-800 text-white'
+                }`}
               >
-                Войти
+                {isLoading ? <Loader message={'Выполняется вход...'} /> : 'Войти'}
               </Button>
             </div>
           </form>

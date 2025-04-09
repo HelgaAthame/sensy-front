@@ -18,7 +18,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     // This code will only run on the client side
-    const savedTheme = localStorage.getItem('theme') as Theme | null
+    const savedTheme = undefined //localStorage.getItem('theme') as Theme | null //РАСКОММЕНТИРОВАТЬ ПРИ ВНЕДРЕНИИ СМЕНЫ ТЕМЫ вместо undefined
     const initialTheme = savedTheme || 'light' // Default to light theme
 
     setTheme(initialTheme)

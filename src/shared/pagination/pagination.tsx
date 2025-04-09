@@ -15,53 +15,71 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
     }
   }
 
+  // Generate page numbers with ellipsis
+  const getPageNumbers = () => {
+    const pageNumbers = []
+
+    pageNumbers.push(1)
+
+    if (currentPage > 3) {
+      pageNumbers.push('ellipsis')
+    }
+
+    // Pages around current page
+    const startPage = Math.max(2, currentPage - 1)
+    const endPage = Math.min(totalPages - 1, currentPage + 1)
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i <= totalPages - 1 && i >= 2) {
+        pageNumbers.push(i)
+      }
+    }
+
+    // Show ellipsis before last page if needed
+    if (currentPage < totalPages - 2) {
+      pageNumbers.push('ellipsis')
+    }
+
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+      pageNumbers.push(totalPages)
+    }
+
+    return pageNumbers
+  }
+
   return (
-    <div className="px-6 py-4 border-t border-gray-200 dark:border-white/[0.05]">
-      <div className="flex items-center justify-between">
+    <div>
+      <div className="flex items-center justify-between gap-2">
         {/* Previous Button */}
         <Button
           size="sm"
           variant="outline"
+          className="rounded-full cursor-pointer px-4 py-2 border border-gray-200"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <svg
-            className="fill-current"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M2.58301 9.99868C2.58272 10.1909 2.65588 10.3833 2.80249 10.53L7.79915 15.5301C8.09194 15.8231 8.56682 15.8233 8.85981 15.5305C9.15281 15.2377 9.15297 14.7629 8.86018 14.4699L5.14009 10.7472L16.6675 10.7472C17.0817 10.7472 17.4175 10.4114 17.4175 9.99715C17.4175 9.58294 17.0817 9.24715 16.6675 9.24715L5.14554 9.24715L8.86017 5.53016C9.15297 5.23717 9.15282 4.7623 8.85983 4.4695C8.56684 4.1767 8.09197 4.17685 7.79917 4.46984L2.84167 9.43049C2.68321 9.568 2.58301 9.77087 2.58301 9.99715C2.58301 9.99766 2.58301 9.99817 2.58301 9.99868Z"
-              fill=""
-            />
-          </svg>
-          <span className="hidden sm:inline">Previous</span>
+          <span className="text-sm font-medium">Назад</span>
         </Button>
 
-        {/* Page Info */}
-        <span className="block text-sm font-medium text-gray-700 dark:text-gray-400 sm:hidden">
-          Page {currentPage} of {totalPages}
-        </span>
-
         {/* Page Numbers */}
-        <ul className="hidden items-center gap-0.5 sm:flex">
-          {Array.from({ length: totalPages }).map((_, idx) => (
+        <ul className="hidden items-center gap-2 sm:flex">
+          {getPageNumbers().map((page, idx) => (
             <li key={idx}>
-              <Button
-                onClick={() => goToPage(idx + 1)}
-                className={`flex h-10 w-10 items-center justify-center rounded-lg text-theme-sm font-medium cursor-pointer ${
-                  currentPage === idx + 1
-                    ? 'bg-purple-900 text-white'
-                    : 'bg-gray-50 text-black hover:bg-purple-900 hover:text-white'
-                }`}
-              >
-                {idx + 1}
-              </Button>
+              {page === 'ellipsis' ? (
+                <span className="px-2 text-gray-500">...</span>
+              ) : (
+                <Button
+                  onClick={() => goToPage(Number(page))}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium cursor-pointer ${
+                    currentPage === page
+                      ? 'bg-purple-900 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </Button>
+              )}
             </li>
           ))}
         </ul>
@@ -71,24 +89,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
           onClick={() => goToPage(currentPage + 1)}
           size="sm"
           variant="outline"
+          className="rounded-full cursor-pointer px-4 py-2 border border-gray-200"
           disabled={currentPage === totalPages}
         >
-          <span className="hidden sm:inline">Next</span>
-          <svg
-            className="fill-current"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M17.4175 9.9986C17.4178 10.1909 17.3446 10.3832 17.198 10.53L12.2013 15.5301C11.9085 15.8231 11.4337 15.8233 11.1407 15.5305C10.8477 15.2377 10.8475 14.7629 11.1403 14.4699L14.8604 10.7472L3.33301 10.7472C2.91879 10.7472 2.58301 10.4114 2.58301 9.99715C2.58301 9.58294 2.91879 9.24715 3.33301 9.24715L14.8549 9.24715L11.1403 5.53016C10.8475 5.23717 10.8477 4.7623 11.1407 4.4695C11.4336 4.1767 11.9085 4.17685 12.2013 4.46984L17.1588 9.43049C17.3173 9.568 17.4175 9.77087 17.4175 9.99715C17.4175 9.99763 17.4175 9.99812 17.4175 9.9986Z"
-              fill=""
-            />
-          </svg>
+          <span className="text-sm font-medium">Вперёд</span>
         </Button>
       </div>
     </div>

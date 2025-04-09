@@ -1,8 +1,7 @@
 @import '../shared/styles/_colors.css';
 @import '../shared/styles/fonts.css';
+@import '../shared/styles/react-toastify.css';
 @import 'tailwindcss';
-@tailwind base;
-@tailwind components;
 @tailwind utilities;
 @custom-variant dark (&:where(.dark, .dark *));
 

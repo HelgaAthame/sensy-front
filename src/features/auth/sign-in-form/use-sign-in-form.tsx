@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).*$/
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$/
 
 export const useSignInForm = () => {
   const loginFormSchema = z.object({

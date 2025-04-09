@@ -19,6 +19,7 @@ import ArrowRightIcon from './arrow-right.svg'
 import GroupIcon from './group.svg'
 import BoxIconLine from './box-line.svg'
 import ShootingStarIcon from './shooting-star.svg'
+import EditIcon from './edit-icon.svg'
 import DollarLineIcon from './dollar-line.svg'
 import TrashBinIcon from './trash.svg'
 import AngleUpIcon from './angle-up.svg'
@@ -76,6 +77,7 @@ export {
   BarIcon,
   AlertIcon,
   InfoIcon,
+  EditIcon,
   ErrorIcon,
   ArrowUpIcon,
   FolderIcon,

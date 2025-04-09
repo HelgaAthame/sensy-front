@@ -61,7 +61,14 @@ export const OperatorsTable = <T extends Record<string, any>>({
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {currentItems.map((item, index) => (
-                <TableRow key={index}>
+                <TableRow
+                  key={index}
+                  className={
+                    index === currentItems.length - 1
+                      ? 'border-b border-gray-100 dark:border-white/[0.05]'
+                      : ''
+                  }
+                >
                   <TableCell className="px-4 py-4 w-[90px]">
                     <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
                       {item.id}
@@ -70,13 +77,19 @@ export const OperatorsTable = <T extends Record<string, any>>({
                   <TableCell className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10">
-                        <img
-                          width={40}
-                          height={40}
-                          src={item.image}
-                          className="w-10 h-10 rounded-full object-cover"
-                          alt={`${item.name} icon`}
-                        />
+                        {item.image ? (
+                          <img
+                            width={40}
+                            height={40}
+                            src={item.image}
+                            className="w-10 h-10 rounded-full object-cover"
+                            alt={`${item.name} icon`}
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-purple-900 text-white text-lg font-semibold">
+                            {item.name?.charAt(0)}
+                          </div>
+                        )}
                       </div>
                       <div>
                         <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
@@ -93,13 +106,17 @@ export const OperatorsTable = <T extends Record<string, any>>({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+      <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
 }

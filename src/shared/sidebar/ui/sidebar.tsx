@@ -1,18 +1,18 @@
 'use client'
 
 import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   BarIcon,
   ChevronDownIcon,
   StarFatIcon,
   TelephoneIcon,
   UserCircleIcon,
-} from '../../../../public/assets/icons'
+} from '@/../public/assets/icons'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Logo } from '../../../../public/assets/svg-components/Logo'
-import { appRoutes } from '../../constants/routes'
+import { Logo } from '@/../public/assets/svg-components/Logo'
+import { appRoutes } from '@/shared/constants/routes'
 
 type NavItem = {
   name: string
@@ -23,22 +23,23 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <BarIcon />,
+    icon: <BarIcon width={24} height={24} />,
     name: 'Аналитика',
     path: appRoutes.private.dashboard,
   },
   {
     icon: <TelephoneIcon width={24} height={24} />,
     name: 'Звонки',
+    path: appRoutes.private.calls,
     subItems: [{ name: 'Загрузка записи', path: appRoutes.private.uploadingRecord }],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <UserCircleIcon width={24} height={24} />,
     name: 'Операторы',
     path: appRoutes.private.operators,
   },
   {
-    icon: <StarFatIcon />,
+    icon: <StarFatIcon width={24} height={24} />,
     name: 'Проекты',
     path: appRoutes.private.projects,
   },
@@ -48,12 +49,6 @@ export const Sidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
   const pathname = usePathname()
 
-  const [openSubmenus, setOpenSubmenus] = useState<number[]>(() =>
-    navItems
-      .map((item, index) => (item.subItems && item.subItems.length > 0 ? index : -1))
-      .filter(index => index !== -1)
-  )
-
   const isActive = useCallback((path: string) => pathname === path, [pathname])
 
   const hasActiveChild = useCallback(
@@ -62,6 +57,21 @@ export const Sidebar: React.FC = () => {
     },
     [isActive]
   )
+
+  const [openSubmenus, setOpenSubmenus] = useState<number[]>([])
+
+  useEffect(() => {
+    const newOpenSubmenus = navItems
+      .map((item, index) => {
+        if (item.subItems && (isActive(item.path || '') || hasActiveChild(item.subItems))) {
+          return index
+        }
+        return -1
+      })
+      .filter(index => index !== -1)
+
+    setOpenSubmenus(newOpenSubmenus)
+  }, [pathname, isActive, hasActiveChild])
 
   const handleSubmenuToggle = (index: number) => {
     setOpenSubmenus(prev =>
@@ -101,11 +111,21 @@ export const Sidebar: React.FC = () => {
               <li key={nav.name}>
                 {nav.subItems ? (
                   <>
-                    <button
-                      onClick={() => handleSubmenuToggle(index)}
-                      className={`menu-item group flex items-center gap-3 px-4 py-3 w-[250px] h-[40px] rounded-full transition-all duration-200 
-    ${hasActiveChild(nav.subItems) ? 'text-gray-900' : 'text-gray-700'}
-    hover:bg-gray-100`}
+                    <Link
+                      href={nav.path || '#'}
+                      onClick={e => {
+                        if (!nav.path || (e.target as HTMLElement).closest('.chevron-icon')) {
+                          e.preventDefault()
+                        }
+
+                        handleSubmenuToggle(index)
+                      }}
+                      className={`menu-item group flex items-center gap-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
+                      } py-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'w-full' : 'w-full]'
+                      } h-[40px] rounded-full transition-all duration-200 
+                        ${isActive(nav.path || '') ? 'bg-purple-100 text-purple-900 font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
                       <span className="flex items-center justify-center">{nav.icon}</span>
                       {(isExpanded || isHovered || isMobileOpen) && (
@@ -116,13 +136,13 @@ export const Sidebar: React.FC = () => {
                           <ChevronDownIcon
                             width={17.5}
                             height={17.5}
-                            className={`transition-transform duration-300 ${
+                            className={`chevron-icon transition-transform duration-300 ${
                               openSubmenus.includes(index) ? 'rotate-180' : 'rotate-0'
                             }`}
                           />
                         </>
                       )}
-                    </button>
+                    </Link>
                     {openSubmenus.includes(index) && (
                       <div className="overflow-hidden transition-all duration-300">
                         <ul className="mt-4 space-y-1 ml-10">
@@ -130,7 +150,9 @@ export const Sidebar: React.FC = () => {
                             <li key={subItem.name}>
                               <Link
                                 href={subItem.path}
-                                className={`py-3 px-4 h-[40px] flex items-center text-sm rounded-full ${
+                                className={`py-3 ${
+                                  isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
+                                } h-[40px] flex items-center text-sm rounded-full ${
                                   isActive(subItem.path)
                                     ? 'bg-purple-100 text-purple-900'
                                     : 'text-gray-700 hover:bg-gray-100'
@@ -148,15 +170,15 @@ export const Sidebar: React.FC = () => {
                   nav.path && (
                     <Link
                       href={nav.path}
-                      className={`menu-item group flex items-center gap-3 px-4 py-3 w-[250px] h-[40px] rounded-full transition-all duration-200 ${
+                      className={`menu-item group flex items-center gap-3 ${
+                        isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
+                      } py-3 w-full h-[40px] rounded-full transition-all duration-200 ${
                         isActive(nav.path)
                           ? 'bg-purple-100 text-purple-900 font-semibold'
                           : 'hover:bg-gray-100 text-gray-700'
                       }`}
                     >
-                      <span className="w-[24px] h-[24px] flex items-center justify-center">
-                        {nav.icon}
-                      </span>
+                      <span className="flex items-center justify-center">{nav.icon}</span>
                       {(isExpanded || isHovered || isMobileOpen) && (
                         <span className="menu-item-text text-sm">{nav.name}</span>
                       )}

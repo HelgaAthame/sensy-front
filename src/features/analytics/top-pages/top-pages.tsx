@@ -1,11 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { MoreDotIcon } from '../../../../public/assets/icons'
+import { MoreDotIcon } from '@/../public/assets/icons'
 import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
+import { KeywordFrequencyItem } from '@/entities/analytics/analytics.types'
 
-export default function TopPages() {
+interface TopPagesProps {
+  data?: KeywordFrequencyItem[]
+}
+
+export default function TopPages({ data = [] }: TopPagesProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   function toggleDropdown() {
@@ -15,11 +20,14 @@ export default function TopPages() {
   function closeDropdown() {
     setIsOpen(false)
   }
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-200 dark:bg-white/[0.03] md:p-6">
       <div className="flex items-start justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Частота упоминаний</h3>
-        <div className="relative inline-block">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          Частота упоминаний
+        </h3>
+        <div className="relative hidden ">
           <button className="dropdown-toggle" onClick={toggleDropdown}>
             <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
           </button>
@@ -42,33 +50,28 @@ export default function TopPages() {
 
       <div className="my-6">
         <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-200">
-          <span className="text-gray-400 text-theme-xs"> Source </span>
-          <span className="text-right text-gray-400 text-theme-xs"> Pageview </span>
+          <span className="text-gray-400 text-theme-xs">Слово</span>
+          <span className="text-right text-gray-400 text-theme-xs">Кол-во</span>
         </div>
 
-        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200">
-          <span className="text-gray-500 text-theme-sm dark:text-gray-400">tailadmin.com</span>
-          <span className="text-right text-gray-500 text-theme-sm dark:text-gray-400">4.7K</span>
-        </div>
-
-        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200">
-          <span className="text-gray-500 text-theme-sm dark:text-gray-400">
-            preview.tailadmin.com
-          </span>
-          <span className="text-right text-gray-500 text-theme-sm dark:text-gray-400">3.4K</span>
-        </div>
-
-        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200">
-          <span className="text-gray-500 text-theme-sm dark:text-gray-400">docs.tailadmin.com</span>
-          <span className="text-right text-gray-500 text-theme-sm dark:text-gray-400">2.9K</span>
-        </div>
-
-        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-200">
-          <span className="text-gray-500 text-theme-sm dark:text-gray-400">
-            tailadmin.com/componetns
-          </span>
-          <span className="text-right text-gray-500 text-theme-sm dark:text-gray-400">1.5K</span>
-        </div>
+        {data && data.length > 0 ? (
+          data.map((frequency, index) => (
+            <div key={index} className="py-3 border-b border-gray-100 dark:border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-gray-800 text-theme-sm dark:text-gray-300">
+                  {frequency.keyword}
+                </span>
+                <span className="text-right text-gray-500 text-theme-sm dark:text-gray-400">
+                  {frequency.count}
+                </span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="flex items-center justify-center py-8">
+            <span className="text-gray-400">Нет данных для отображения</span>
+          </div>
+        )}
       </div>
     </div>
   )
