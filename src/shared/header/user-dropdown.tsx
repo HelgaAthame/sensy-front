@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
 import Link from 'next/link'
 import { appRoutes } from '../constants/routes'
+import { getFromLocalStorage } from '@/shared/utils/common-utils'
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false)
-  const userEmail = 'VladimirFMR@gmail.com'
+  const [userEmail, setUserEmail] = useState('')
   const firstLetter = userEmail.charAt(0).toUpperCase()
 
   function toggleDropdown() {
@@ -16,6 +17,13 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false)
   }
+
+  useEffect(() => {
+    const emailFromStorage = getFromLocalStorage('userEmail', '')
+    if (emailFromStorage) {
+      setUserEmail(emailFromStorage)
+    }
+  }, [])
 
   return (
     <div className="relative">

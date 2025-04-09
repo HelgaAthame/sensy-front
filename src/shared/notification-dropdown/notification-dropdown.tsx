@@ -4,6 +4,7 @@ import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
 import { useGetChatMessagesQuery } from '@/entities/chat/chat.api'
 import { ChatMessage } from '@/entities/chat/chat.types'
 import { formatTimeAgo } from '@/shared/utils/date-utils'
+import { getFromLocalStorage, setToLocalStorage } from '@/shared/utils/common-utils'
 
 type NotificationItemProps = {
   data: ChatMessage
@@ -47,6 +48,16 @@ export const NotificationDropdown = () => {
   const [combinedMessages, setCombinedMessages] = useState<ChatMessage[]>([])
   const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null)
 
+  const [lastSeenCount, setLastSeenCountState] = useState(() => {
+    const stored = getFromLocalStorage('lastSeenCount', '')
+    return stored ? Number(stored) : 0
+  })
+
+  const setLastSeenCount = (count: number) => {
+    setLastSeenCountState(count)
+    setToLocalStorage('lastSeenCount', String(count))
+  }
+
   const { data: notificationMessages = [] } = useGetChatMessagesQuery(
     {
       chatType: 'Notification',
@@ -62,19 +73,18 @@ export const NotificationDropdown = () => {
   )
 
   useEffect(() => {
-    if (notificationMessages.length || alertMessages.length) {
-      const combined = [...notificationMessages, ...alertMessages].sort(
-        (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
-      )
+    const combined = [...notificationMessages, ...alertMessages].sort(
+      (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
+    )
 
-      setCombinedMessages(combined)
+    setCombinedMessages(combined)
 
-      const hasUnseenMessages = combined.some(msg => !msg.seen)
-      setNotifying(hasUnseenMessages)
-
-      setLastFetchTime(new Date())
+    if (combined.length > lastSeenCount) {
+      setNotifying(true)
     }
-  }, [notificationMessages, alertMessages])
+
+    setLastFetchTime(new Date())
+  }, [notificationMessages, alertMessages, lastSeenCount])
 
   const toggleDropdown = useCallback(() => {
     setIsOpen(prev => !prev)
@@ -87,7 +97,8 @@ export const NotificationDropdown = () => {
   const handleClick = useCallback(() => {
     toggleDropdown()
     setNotifying(false)
-  }, [toggleDropdown])
+    setLastSeenCount(combinedMessages.length)
+  }, [toggleDropdown, combinedMessages.length])
 
   return (
     <div className="relative">
@@ -117,6 +128,7 @@ export const NotificationDropdown = () => {
           />
         </svg>
       </button>
+
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}

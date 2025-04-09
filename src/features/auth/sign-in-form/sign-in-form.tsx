@@ -41,6 +41,7 @@ export function SignInForm() {
 
       if (response.status === 200) {
         setToLocalStorage('accessToken', response.data.accessToken)
+        setToLocalStorage('userEmail', data.email)
 
         setTimeout(() => {
           setIsLoading(false)

@@ -28,6 +28,7 @@ const baseQueryWithErrorHandling: BaseQueryFn<
   if (result.error) {
     if (result.error.status === 401) {
       localStorage.removeItem('accessToken')
+      localStorage.removeItem('userEmail')
       if (typeof window !== 'undefined') {
         window.location.href = appRoutes.auth.signIn
       }
