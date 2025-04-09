@@ -15,6 +15,7 @@ import WaveSurfer from 'wavesurfer.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
 import { formatDates } from '@/shared/utils/date-utils'
+import './calls.css'
 
 enum CallTab {
   Transcript = 'transcript',
@@ -167,7 +168,6 @@ export const Call = () => {
     })
 
     wavesurferRef.current = wavesurfer
-
     // Инициализируем плагин регионов и сохраняем ссылку на него
     regionsPluginRef.current = wavesurfer.registerPlugin(RegionsPlugin.create())
 
@@ -374,7 +374,11 @@ export const Call = () => {
             )}
           </button>
 
-          <div className={`ml-10 ${hasMultipleChannels ? 'h-40' : 'h-24'}`} ref={containerRef}>
+          <div
+            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-40' : 'h-24'}`}
+            ref={containerRef}
+            id="waveform"
+          >
             {isAudioLoading && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-700 rounded-full animate-spin"></div>
@@ -410,7 +414,7 @@ export const Call = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-start items-center">
+        <div className="flex items-center justify-start">
           <Tab items={tabs} onChange={handleTabChange} />
         </div>
 
@@ -421,10 +425,7 @@ export const Call = () => {
         <div>
           {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
           {activeTab === CallTab.Transcript && (
-            <Transcript
-              sttData={mediaFileResult?.stt}
-              currentPlayerTime={currentTime}
-            />
+            <Transcript sttData={mediaFileResult?.stt} currentPlayerTime={currentTime} />
           )}
           {activeTab === CallTab.Checklists && <Checklist checklistData={checklistData} />}
         </div>

@@ -58,33 +58,70 @@ export const NotificationDropdown = () => {
     setToLocalStorage('lastSeenCount', String(count))
   }
 
-  const { data: notificationMessages = [] } = useGetChatMessagesQuery(
-    {
-      chatType: 'Notification',
-    },
-    { pollingInterval: 60 * 60 * 1000 }
-  )
+  const { data: notificationMessages = [], isSuccess: isNotificationMessagesSuccess } =
+    useGetChatMessagesQuery(
+      {
+        chatType: 'Notification',
+      },
+      { pollingInterval: 60 * 60 * 1000 }
+    )
 
-  const { data: alertMessages = [] } = useGetChatMessagesQuery(
+  const { data: alertMessages = [], isSuccess: isAlertMessagesSuccess } = useGetChatMessagesQuery(
     {
       chatType: 'Alert',
     },
     { pollingInterval: 60 * 1000 }
   )
 
-  useEffect(() => {
+  const updateCombinedMessages = useCallback(() => {
     const combined = [...notificationMessages, ...alertMessages].sort(
       (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
     )
-
     setCombinedMessages(combined)
-
     if (combined.length > lastSeenCount) {
       setNotifying(true)
     }
 
     setLastFetchTime(new Date())
-  }, [notificationMessages, alertMessages, lastSeenCount])
+  }, [alertMessages, lastSeenCount, notificationMessages])
+
+  useEffect(() => {
+    if (isNotificationMessagesSuccess) {
+      updateCombinedMessages()
+    }
+  }, [
+    isNotificationMessagesSuccess,
+    notificationMessages,
+    alertMessages,
+    setCombinedMessages,
+    updateCombinedMessages,
+  ])
+
+  useEffect(() => {
+    if (isAlertMessagesSuccess) {
+      updateCombinedMessages()
+    }
+  }, [
+    isAlertMessagesSuccess,
+    notificationMessages,
+    alertMessages,
+    setCombinedMessages,
+    updateCombinedMessages,
+  ])
+
+  // useEffect(() => {
+  //   const combined = [...notificationMessages, ...alertMessages].sort(
+  //     (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
+  //   )
+
+  //   setCombinedMessages(combined)
+
+  //   if (combined.length > lastSeenCount) {
+  //     setNotifying(true)
+  //   }
+
+  //   setLastFetchTime(new Date())
+  // }, [notificationMessages, alertMessages, lastSeenCount])
 
   const toggleDropdown = useCallback(() => {
     setIsOpen(prev => !prev)
