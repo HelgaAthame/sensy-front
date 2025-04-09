@@ -1,4 +1,13 @@
+import { ru } from 'date-fns/locale'
 import { formatInTimeZone } from 'date-fns-tz'
+
+export const formatDates = (date: Date | null): string | undefined => {
+  if (!date) {
+    return undefined
+  }
+
+  return formatInTimeZone(date, 'UTC', 'dd.MM.yyyy', { locale: ru })
+}
 
 export const getLast7DaysRange = () => {
   const end = new Date()

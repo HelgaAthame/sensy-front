@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Tab } from '@/shared/tab/tab'
 import PageBreadcrumb from '@/shared/page-breadcrumb/page-breadcrumb'
-import { MessageType, Transcript } from '@/features/calls/call/transcript/transcript'
+import { Transcript } from './transcript/transcript'
 import { Checklist, ChecklistGroup } from '@/features/calls/call/checklists/checklists'
 import { Summary } from '@/features/calls/call/summary/summary'
 import {
@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation'
 import WaveSurfer from 'wavesurfer.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
+import { formatDates } from '@/shared/utils/date-utils'
 
 enum CallTab {
   Transcript = 'transcript',
@@ -38,10 +39,13 @@ export const Call = () => {
   const token = getFromLocalStorage('accessToken', null)
   const [isAudioLoading, setIsAudioLoading] = useState(true)
   const wavesurferRef = useRef<WaveSurfer | null>(null)
+  const regionsPluginRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [wavesurferReady, setWavesurferReady] = useState(false)
+  const regionsAddedRef = useRef(false)
 
   const { data: mediaFileById, isLoading } = useGetMediaFileByIdQuery({ id })
 
@@ -95,11 +99,53 @@ export const Call = () => {
   const numChannels = mediaFileById?.numChannels ?? 0
   const hasMultipleChannels = numChannels > 1
 
+  // Функция для создания регионов
+  const createRegions = () => {
+    if (!wavesurferRef.current || !regionsPluginRef.current || regionsAddedRef.current) return
+
+    // Создаем регионы для каждого индикатора
+    audioIndicators.forEach(indicator => {
+      if (!indicator.regions) return
+
+      indicator.regions.forEach(region => {
+        // Преобразуем цвета классов в реальные цвета
+        let actualColor
+        switch (indicator.color) {
+          case 'bg-red-400':
+            actualColor = 'rgba(255, 157, 157, 0.3)' // Негатив
+            break
+          case 'bg-blue-400':
+            actualColor = 'rgba(157, 174, 255, 0.3)' // Лексика
+            break
+          case 'bg-yellow-400':
+            actualColor = 'rgba(255, 213, 98, 0.3)' // Паузы
+            break
+          case 'bg-red-500':
+            actualColor = 'rgba(255, 59, 48, 0.3)' // Перебивания
+            break
+          default:
+            actualColor = 'rgba(107, 33, 168, 0.1)'
+        }
+
+        regionsPluginRef.current.addRegion({
+          start: region.start,
+          end: region.end,
+          color: actualColor,
+          drag: false,
+          resize: false,
+        })
+      })
+    })
+
+    regionsAddedRef.current = true
+  }
+
   useEffect(() => {
     if (!containerRef.current || !mediaFileById) return
 
     if (wavesurferRef.current) {
       wavesurferRef.current.destroy()
+      regionsAddedRef.current = false
     }
 
     const wavesurfer = WaveSurfer.create({
@@ -122,7 +168,8 @@ export const Call = () => {
 
     wavesurferRef.current = wavesurfer
 
-    const regionsPlugin = wavesurfer.registerPlugin(RegionsPlugin.create())
+    // Инициализируем плагин регионов и сохраняем ссылку на него
+    regionsPluginRef.current = wavesurfer.registerPlugin(RegionsPlugin.create())
 
     const audioUrl = `http://86.57.195.162:5187/api/mediafile/${mediaFileById.id}/stream`
     wavesurfer.load(audioUrl)
@@ -131,48 +178,21 @@ export const Call = () => {
       setIsAudioLoading(true)
     })
 
-    // Add event listeners
+    // Добавляем обработчики событий
     wavesurfer.on('ready', () => {
       setDuration(wavesurfer.getDuration())
       setIsAudioLoading(false)
-
-      // Create regions for each indicator type
-      audioIndicators.forEach(indicator => {
-        if (indicator.regions && regionsPlugin) {
-          indicator.regions.forEach((region, i) => {
-            // Map color classes to actual color values
-            let actualColor
-            switch (indicator.color) {
-              case 'bg-red-400':
-                actualColor = 'rgba(248, 113, 113, 0.3)' // Негатив
-                break
-              case 'bg-blue-400':
-                actualColor = 'rgba(96, 165, 250, 0.3)' // Лексика
-                break
-              case 'bg-yellow-400':
-                actualColor = 'rgba(250, 204, 21, 0.3)' // Паузы
-                break
-              case 'bg-red-500':
-                actualColor = 'rgba(239, 68, 68, 0.3)' // Перебивания
-                break
-              default:
-                actualColor = 'rgba(107, 33, 168, 0.1)'
-            }
-
-            regionsPlugin.addRegion({
-              start: region.start,
-              end: region.end,
-              color: actualColor,
-              drag: false,
-              resize: false,
-            })
-          })
-        }
-      })
+      setWavesurferReady(true)
     })
 
     wavesurfer.on('audioprocess', () => {
-      setCurrentTime(wavesurfer.getCurrentTime())
+      const time = wavesurfer.getCurrentTime()
+      setCurrentTime(prevTime => {
+        if (Math.abs(prevTime - time) > 0.1) {
+          return time
+        }
+        return prevTime
+      })
     })
 
     wavesurfer.on('seeking', () => {
@@ -194,7 +214,14 @@ export const Call = () => {
     }
   }, [mediaFileById, hasMultipleChannels, numChannels])
 
-  // Handle playback rate change
+  // Обработчик для создания регионов при изменении данных и готовности wavesurfer
+  useEffect(() => {
+    if (wavesurferReady && mediaFileResult && !regionsAddedRef.current) {
+      createRegions()
+    }
+  }, [wavesurferReady, mediaFileResult])
+
+  // Обработчик изменения скорости воспроизведения
   useEffect(() => {
     if (wavesurferRef.current) {
       const rate = parseFloat(playbackRate.replace('x', ''))
@@ -229,43 +256,9 @@ export const Call = () => {
   const callInfo = {
     name: mediaFileById?.operatorName || 'Lindsay Curtis',
     phone: mediaFileById?.additionalMetadata?.clientNumber || '+123 (45) 678-91-01',
-    date: '22.03.2025',
+    date: formatDates(mediaFileById?.createDate ? new Date(mediaFileById.createDate) : null),
     duration: `${formatTime(currentTime)} / ${formatTime(duration)}`,
   }
-
-  // The rest of your component code remains unchanged
-  const transcriptMessages: MessageType[] = [
-    {
-      text: "If don't like something, I'll stay away from it.",
-      sender: 'customer',
-      time: '00:00',
-    },
-    {
-      text: "If don't like something, I'll stay away from it.",
-      sender: 'agent',
-      time: '00:21',
-    },
-    {
-      text: 'I want more detailed information.',
-      sender: 'customer',
-      time: '00:35',
-    },
-    {
-      text: "If don't like something, I'll stay away from it.",
-      sender: 'agent',
-      time: '05:21',
-    },
-    {
-      text: 'They got there early, and got really good seats.',
-      sender: 'agent',
-      time: '05:21',
-    },
-    {
-      text: 'Please preview the image',
-      sender: 'customer',
-      time: '07:41',
-    },
-  ]
 
   const generateChecklistData = (): ChecklistGroup[] => {
     const baseGroup = {
@@ -317,7 +310,7 @@ export const Call = () => {
 
   const summaryContent =
     mediaFileResult?.gptSummary ||
-    `В рамках спецификации современных стандартов, непосредственные участники технического прогресса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть описаны максимально подробно. Есть над чем задуматься: явления, рассмотренные исключительно в разрезе маркетинговых и финансовых предпосылок, ограничены исключительно образом мышления, при которой перспективные подготовки выбирают популярные продукты, тем самым, должны быть преданы социально-демократической анафеме. Приятно, граждане, наблюдать, как многие известные личности, превозмогая сложившуюся непростую экономическую ситуацию, объективно рассмотрены соответствующими инстанциями. Значимость этих проблем настолько очевидна, что социально-экономическое развитие не оставляет шанса для модернизации. Господа, сплочённость команды профессионалов гарантирует процесс внедрения и модернизации направлений развития. В рамках спецификации современных стандартов, тщательные исследования конкурентов формируют глобальную экономическую сеть и при этом — предприняты целой серией независимых исследований. Учитывая ключевые сценарии поведения, дальнейшее развитие различных форм деятельности позволяет оценить значение существующих финансовых и административных условий. Следует отметить, что глубокий уровень погружения, в своём классическом представлении, допускает внедрение как самодостаточных, так и внешне зависимых концептуальных решений. С учётом сложившейся международной обстановки, существующая теория, вопреки классическим представлениям, допускает внедрение позиций, занимаемых участниками в отношении поставленных задач. Ясность нашей позиции очевидна: укрепление и развитие внутренней.`
+    `В рамках спецификации современных стандартов, непосредственные участники технического прогресса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть описаны максимально подробно.`
 
   if (isLoading) {
     return (
@@ -337,29 +330,19 @@ export const Call = () => {
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            {/* Display circle with first letter or number based on design */}
             <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center text-white font-bold">
-              {
-                hasMultipleChannels
-                  ? callInfo.name.charAt(0).toUpperCase()
-                  : '1' /* Use number for single channel as in second screenshot */
-              }
+              {hasMultipleChannels ? callInfo.name.charAt(0).toUpperCase() : '1'}
             </div>
             <div className="ml-4">
-              {hasMultipleChannels ? (
-                <>
-                  <p className="font-medium">{callInfo.name}</p>
-                  <p className="text-gray-500 text-sm">{callInfo.phone}</p>
-                </>
-              ) : (
-                <p className="font-medium">52464563</p> // Display ID number for single channel as in second screenshot
-              )}
+              <>
+                <p className="font-medium">{callInfo.name}</p>
+                <p className="text-gray-500 text-sm">{callInfo.phone}</p>
+              </>
             </div>
           </div>
           <div className="text-gray-500 text-sm">{callInfo.date}</div>
         </div>
 
-        {/* Waveform container with conditional styling */}
         <div
           className={`bg-purple-50 rounded-xl p-4 mb-4 relative ${hasMultipleChannels ? 'h-48' : 'h-24'}`}
         >
@@ -391,7 +374,6 @@ export const Call = () => {
             )}
           </button>
 
-          {/* Adjust container height based on number of channels */}
           <div className={`ml-10 ${hasMultipleChannels ? 'h-40' : 'h-24'}`} ref={containerRef}>
             {isAudioLoading && (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -438,7 +420,12 @@ export const Call = () => {
 
         <div>
           {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
-          {activeTab === CallTab.Transcript && <Transcript messages={transcriptMessages} />}
+          {activeTab === CallTab.Transcript && (
+            <Transcript
+              sttData={mediaFileResult?.stt}
+              currentPlayerTime={currentTime}
+            />
+          )}
           {activeTab === CallTab.Checklists && <Checklist checklistData={checklistData} />}
         </div>
       </div>
