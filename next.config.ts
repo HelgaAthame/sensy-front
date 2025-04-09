@@ -1,7 +1,17 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
+  // Добавляем эту секцию для отключения LightningCSS
+  experimental: {
+    turbo: {
+      rules: {
+        // Принудительно используем PostCSS вместо LightningCSS
+        '*.css': ['postcss'],
+      },
+    },
+  },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -18,19 +28,19 @@ const nextConfig: NextConfig = {
                   name: 'preset-default',
                   params: {
                     overrides: {
-                      removeViewBox: false
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ]
-    });
+                      removeViewBox: false,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    })
 
-    return config;
-  }
-};
+    return config
+  },
+}
 
-export default nextConfig;
+export default nextConfig
