@@ -1,5 +1,6 @@
 import { ru } from 'date-fns/locale'
 import { formatInTimeZone } from 'date-fns-tz'
+import { subDays, endOfDay, startOfDay } from 'date-fns'
 
 export const formatDates = (date: Date | null): string | undefined => {
   if (!date) {
@@ -9,15 +10,19 @@ export const formatDates = (date: Date | null): string | undefined => {
   return formatInTimeZone(date, 'UTC', 'dd.MM.yyyy', { locale: ru })
 }
 
-export const getLast7DaysRange = () => {
+export const getDateRange = (days = 7) => {
   const end = new Date()
-  const start = new Date()
-  start.setDate(end.getDate() - 7)
+  const start = subDays(end, days)
+
   return {
-    start: start.toISOString().split('T')[0] + 'T00:00:00Z',
-    end: end.toISOString().split('T')[0] + 'T23:59:59Z',
+    start: formatInTimeZone(startOfDay(start), 'UTC', "yyyy-MM-dd'T'00:00:00'Z'"),
+    end: formatInTimeZone(endOfDay(end), 'UTC', "yyyy-MM-dd'T'23:59:59'Z'"),
   }
 }
+
+export const getLast7DaysRange = () => getDateRange(7)
+
+export const getLast30DaysRange = () => getDateRange(30)
 
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
@@ -90,4 +95,26 @@ export const formatEndDate = (
   }
 
   return formatInTimeZone(date, timeZone, "yyyy-MM-dd'T'00:00:00.000'Z'")
+}
+
+export const formatDateWithLocalTimeZone = (selectedDate: string | null): string => {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  let dateToFormat: Date
+
+  if (selectedDate) {
+    const selectedDateObj = new Date(selectedDate)
+    const now = new Date()
+
+    selectedDateObj.setHours(
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    )
+    dateToFormat = selectedDateObj
+  } else {
+    dateToFormat = new Date()
+  }
+
+  return formatInTimeZone(dateToFormat, timeZone, "yyyy-MM-dd'T'HH:mm:ss.SSS")
 }

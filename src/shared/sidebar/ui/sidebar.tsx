@@ -1,7 +1,7 @@
 'use client'
 
 import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import {
   BarIcon,
   ChevronDownIcon,
@@ -45,9 +45,12 @@ const navItems: NavItem[] = [
   },
 ]
 
+const CALLS_MENU_INDEX = navItems.findIndex(item => item.name === 'Звонки')
+
 export const Sidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
   const pathname = usePathname()
+  const initialRenderRef = useRef(true)
 
   const isActive = useCallback((path: string) => pathname === path, [pathname])
 
@@ -58,9 +61,16 @@ export const Sidebar: React.FC = () => {
     [isActive]
   )
 
-  const [openSubmenus, setOpenSubmenus] = useState<number[]>([])
+  const [openSubmenus, setOpenSubmenus] = useState<number[]>(() => {
+    return CALLS_MENU_INDEX !== -1 ? [CALLS_MENU_INDEX] : []
+  })
 
   useEffect(() => {
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false
+      return
+    }
+
     const newOpenSubmenus = navItems
       .map((item, index) => {
         if (item.subItems && (isActive(item.path || '') || hasActiveChild(item.subItems))) {
@@ -70,7 +80,19 @@ export const Sidebar: React.FC = () => {
       })
       .filter(index => index !== -1)
 
-    setOpenSubmenus(newOpenSubmenus)
+    const hasCallsMenuOpen = openSubmenus.includes(CALLS_MENU_INDEX)
+    const wouldCallsMenuOpen = newOpenSubmenus.includes(CALLS_MENU_INDEX)
+
+    const shouldUpdate =
+      JSON.stringify(newOpenSubmenus.sort()) !== JSON.stringify(openSubmenus.sort())
+
+    if (shouldUpdate) {
+      if (hasCallsMenuOpen && !wouldCallsMenuOpen) {
+        newOpenSubmenus.push(CALLS_MENU_INDEX)
+      }
+
+      setOpenSubmenus(newOpenSubmenus)
+    }
   }, [pathname, isActive, hasActiveChild])
 
   const handleSubmenuToggle = (index: number) => {
@@ -123,7 +145,7 @@ export const Sidebar: React.FC = () => {
                       className={`menu-item group flex items-center gap-3 ${
                         isExpanded || isHovered || isMobileOpen ? 'px-4' : 'px-2'
                       } py-3 ${
-                        isExpanded || isHovered || isMobileOpen ? 'w-full' : 'w-full]'
+                        isExpanded || isHovered || isMobileOpen ? 'w-full' : 'w-full'
                       } h-[40px] rounded-full transition-all duration-200 
                         ${isActive(nav.path || '') ? 'bg-purple-100 text-purple-900 font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
                     >

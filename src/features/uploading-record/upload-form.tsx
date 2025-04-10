@@ -16,6 +16,8 @@ import { Loader } from '@/shared/loader/loader'
 import { useGetProjectsQuery } from '@/entities/projects/projects.api'
 import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
 import { setToLocalStorage } from '@/shared/utils/common-utils'
+import { formatInTimeZone } from 'date-fns-tz'
+import { formatDateWithLocalTimeZone } from '@/shared/utils/date-utils'
 
 interface UploadFormProps {
   uploadedFile: File[] | null
@@ -26,7 +28,15 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
   const [createMediaFile, { isLoading }] = useCreateMediaFileMutation()
   const { data: projectsData } = useGetProjectsQuery()
   const { data: operatorsData } = useGetOperatorsQuery()
-  const [selectedDate, setSelectedDate] = useState<string>('')
+
+  const today = new Date()
+  const formattedToday = formatInTimeZone(
+    today,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    'yyyy-MM-dd'
+  )
+
+  const [selectedDate, setSelectedDate] = useState<string>(today.toISOString())
 
   const {
     control,
@@ -53,13 +63,13 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
   const reset = () => {
     hookFormReset()
     onFileUploaded([])
-    setSelectedDate('')
+    setSelectedDate(today.toISOString())
   }
 
   const onSubmit = handleSubmit(async data => {
     if (!data.file) return
 
-    const createDate = selectedDate || new Date().toISOString()
+    const createDate = formatDateWithLocalTimeZone(selectedDate)
 
     try {
       await createMediaFile({
@@ -115,6 +125,7 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
                 label="Дата"
                 placeholder="Выберите дату"
                 value={selectedDate}
+                minDate={formattedToday}
                 onChange={(dates, currentDateString) => {
                   if (currentDateString) {
                     const date = new Date(currentDateString)

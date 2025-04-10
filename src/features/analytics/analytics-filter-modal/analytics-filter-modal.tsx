@@ -19,7 +19,7 @@ interface AnalyticsFilterModalProps {
   onApply: (params: {
     start: string
     end: string
-    filterByPhrasesCategoriesCommaSeparated: string
+    filterByPhrasesCategoriesCommaSeparated?: string
   }) => void
 }
 
@@ -41,11 +41,20 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
   }
 
   const handleApply = () => {
-    onApply({
+    const params: {
+      start: string
+      end: string
+      filterByPhrasesCategoriesCommaSeparated?: string
+    } = {
       start: dateRange?.start ?? '',
       end: dateRange?.end ?? '',
-      filterByPhrasesCategoriesCommaSeparated: selectedDictionaries.join(','),
-    })
+    }
+
+    if (selectedDictionaries.length > 0) {
+      params.filterByPhrasesCategoriesCommaSeparated = selectedDictionaries.join(',')
+    }
+
+    onApply(params)
     onClose()
   }
 

@@ -14,12 +14,17 @@ interface PlotDataItem {
 
 interface ImpressionChartProps {
   data?: PlotDataItem[]
+  dateRange?: { start: string; end: string }
 }
 
-export default function ImpressionChart({ data }: ImpressionChartProps) {
-  const processHourlyData = (data: PlotDataItem[] | undefined) => {
+export default function ImpressionChart({ data, dateRange }: ImpressionChartProps) {
+  const processHourlyData = (
+    data: PlotDataItem[] | undefined,
+    dateRange?: { start: string; end: string }
+  ) => {
     if (!data || data.length === 0) return { categories: [], series: [] }
 
+    // Create a map to store daily aggregated data
     const dailyData = new Map<
       string,
       {
@@ -30,9 +35,27 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
       }
     >()
 
+    const allDates: string[] = []
+    if (dateRange) {
+      const start = new Date(dateRange.start)
+      const end = new Date(dateRange.end)
+
+      for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+        const dateKey = dt.toISOString().split('T')[0]
+        allDates.push(dateKey)
+
+        dailyData.set(dateKey, {
+          negativeLevelExceedCount: 0,
+          keywordsExceedCount: 0,
+          maxSilenceDurationExceedCount: 0,
+          simultaneousSpeechExceedCount: 0,
+        })
+      }
+    }
+
     data.forEach(item => {
       const date = new Date(item.dateTime)
-      const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD format
+      const dateKey = date.toISOString().split('T')[0]
 
       if (!dailyData.has(dateKey)) {
         dailyData.set(dateKey, {
@@ -50,17 +73,23 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
       current.simultaneousSpeechExceedCount += item.simultaneousSpeechExceedCount || 0
     })
 
-    const sortedDates = Array.from(dailyData.keys()).sort()
+    const sortedDates = allDates.length > 0 ? allDates : Array.from(dailyData.keys()).sort()
 
     const formattedDates = sortedDates.map(dateStr => {
       const date = new Date(dateStr)
       return new Intl.DateTimeFormat('ru', { month: 'short', day: 'numeric' }).format(date)
     })
 
-    const negativeLevelData = sortedDates.map(date => dailyData.get(date)!.negativeLevelExceedCount)
-    const keywordsData = sortedDates.map(date => dailyData.get(date)!.keywordsExceedCount)
-    const silenceData = sortedDates.map(date => dailyData.get(date)!.maxSilenceDurationExceedCount)
-    const speechData = sortedDates.map(date => dailyData.get(date)!.simultaneousSpeechExceedCount)
+    const negativeLevelData = sortedDates.map(
+      date => dailyData.get(date)?.negativeLevelExceedCount || 0
+    )
+    const keywordsData = sortedDates.map(date => dailyData.get(date)?.keywordsExceedCount || 0)
+    const silenceData = sortedDates.map(
+      date => dailyData.get(date)?.maxSilenceDurationExceedCount || 0
+    )
+    const speechData = sortedDates.map(
+      date => dailyData.get(date)?.simultaneousSpeechExceedCount || 0
+    )
 
     return {
       categories: formattedDates,
@@ -89,7 +118,7 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
     }
   }
 
-  const { categories, series } = processHourlyData(data)
+  const { categories, series } = processHourlyData(data, dateRange)
 
   const options: ApexOptions = {
     legend: {
@@ -166,7 +195,7 @@ export default function ImpressionChart({ data }: ImpressionChartProps) {
     <div className="rounded-2xl border border-gray-100 bg-white px-5 pt-5 dark:border-gray-200 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
-          <h3 className="mb-1 text-lg font-semibold text-neutral-900">Analytics</h3>
+          <h3 className="mb-1 text-lg font-semibold text-neutral-900">Тренды</h3>
         </div>
       </div>
       <div className="max-w-full overflow-x-auto custom-scrollbar">

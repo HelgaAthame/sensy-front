@@ -55,5 +55,5 @@ export const commonApi = createApi({
     }
   },
   reducerPath: 'commonApi',
-  tagTypes: ['ANALYTICS_DASHBOARD', 'OPERATORS', 'PROJECTS', 'VOCAB', 'MEDIAFILE', 'CHAT'],
+  tagTypes: ['ANALYTICS_DASHBOARD', 'OPERATORS', 'PROJECTS', 'VOCAB', 'MEDIAFILE', 'CHAT', 'AUTH'],
 })

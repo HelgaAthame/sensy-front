@@ -9,6 +9,7 @@ export type MessageType = {
   startTime: number
   endTime: number
   id: string
+  isMono?: boolean
 }
 
 interface STTChunk {
@@ -47,35 +48,59 @@ export const processSTTData = (sttData: STTData): MessageType[] => {
   const isConversation = hasChannel0 && hasChannel1
 
   const messages: MessageType[] = []
-  let currentMessage: MessageType | null = null
 
-  sttData.chunks.forEach((chunk, index) => {
-    const minutes = Math.floor(chunk.startTime / 60)
-    const seconds = Math.floor(chunk.startTime % 60)
-    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  if (isConversation) {
+    let currentMessage: MessageType | null = null
 
-    const sender = isConversation ? (chunk.channel === 0 ? 'customer' : 'agent') : 'customer'
+    sttData.chunks.forEach((chunk, index) => {
+      const minutes = Math.floor(chunk.startTime / 60)
+      const seconds = Math.floor(chunk.startTime % 60)
+      const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 
-    const shouldCombineWithPrevious =
-      currentMessage &&
-      currentMessage.sender === sender &&
-      Math.abs(currentMessage.endTime - chunk.startTime) < 2
+      const sender = chunk.channel === 0 ? 'customer' : 'agent'
 
-    if (shouldCombineWithPrevious && currentMessage) {
-      currentMessage.text += ' ' + chunk.text.trim()
-      currentMessage.endTime = chunk.endTime
-    } else {
-      currentMessage = {
+      const shouldCombineWithPrevious =
+        currentMessage &&
+        currentMessage.sender === sender &&
+        Math.abs(currentMessage.endTime - chunk.startTime) < 2
+
+      if (shouldCombineWithPrevious && currentMessage) {
+        currentMessage.text += ' ' + chunk.text.trim()
+        currentMessage.endTime = chunk.endTime
+      } else {
+        currentMessage = {
+          text: chunk.text.trim(),
+          sender,
+          time: formattedTime,
+          startTime: chunk.startTime,
+          endTime: chunk.endTime,
+          id: `message-${index}-${Date.now()}`,
+          isMono: false,
+        }
+        messages.push(currentMessage)
+      }
+    })
+  } else {
+    sttData.chunks.forEach((chunk, index) => {
+      const minutes = Math.floor(chunk.startTime / 60)
+      const seconds = Math.floor(chunk.startTime % 60)
+      const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+
+      const sender = (index % 2 === 0 ? 'customer' : 'agent') as 'customer' | 'agent'
+
+      const message = {
         text: chunk.text.trim(),
         sender,
         time: formattedTime,
         startTime: chunk.startTime,
         endTime: chunk.endTime,
         id: `message-${index}-${Date.now()}`,
+        isMono: true,
       }
-      messages.push(currentMessage)
-    }
-  })
+
+      messages.push(message)
+    })
+  }
 
   return messages
 }
@@ -118,39 +143,47 @@ export const Transcript: React.FC<TranscriptProps> = ({ sttData, currentPlayerTi
   return (
     <div ref={containerRef} className="h-[530px] overflow-y-auto">
       <div className="flex flex-col gap-6 p-4">
-        {messages.map(message => (
-          <div
-            key={message.id}
-            ref={el => {
-              messageRefs.current[message.id] = el
-            }}
-            className={`flex ${message.sender === 'agent' ? 'justify-end' : 'justify-start'} 
-                       transition-opacity duration-300 ${activeMessageId === message.id ? 'opacity-200' : 'opacity-200'}`}
-          >
+        {messages.map(message => {
+          const isRightAligned = !message.isMono && message.sender === 'agent'
+
+          return (
             <div
-              className={`max-w-md ${activeMessageId === message.id ? 'transform transition-transform duration-300 scale-102' : ''}`}
+              key={message.id}
+              ref={el => {
+                messageRefs.current[message.id] = el
+              }}
+              className={`flex ${isRightAligned ? 'justify-end' : 'justify-start'} 
+                          transition-opacity duration-300 ${activeMessageId === message.id ? 'opacity-200' : 'opacity-200'}`}
             >
               <div
-                className={`py-2 px-4 rounded-2xl ${
-                  message.sender === 'agent'
-                    ? 'bg-purple-700 text-white'
-                    : 'bg-purple-100 text-purple-900'
-                } ${activeMessageId === message.id ? 'ring-2 ring-purple-400' : ''}`}
+                className={`max-w-md ${activeMessageId === message.id ? 'transform transition-transform duration-300 scale-102' : ''}`}
               >
-                <p>{message.text}</p>
-              </div>
-              <div
-                className={`text-xs text-gray-500 mt-1 ${
-                  message.sender === 'agent' ? 'text-right' : 'text-left'
-                }`}
-              >
-                {message.sender === 'agent'
-                  ? `Оператор, ${message.time}`
-                  : `Абонент, ${message.time}`}
+                <div
+                  className={`py-2 px-4 rounded-2xl ${
+                    message.isMono
+                      ? 'bg-purple-100 text-purple-900'
+                      : message.sender === 'agent'
+                        ? 'bg-purple-700 text-white'
+                        : 'bg-purple-100 text-purple-900'
+                  } ${activeMessageId === message.id ? 'ring-2 ring-purple-400' : ''}`}
+                >
+                  <p>{message.text}</p>
+                </div>
+                <div
+                  className={`text-xs text-gray-500 mt-1 ${
+                    isRightAligned ? 'text-right' : 'text-left'
+                  }`}
+                >
+                  {message.isMono
+                    ? message.time
+                    : message.sender === 'agent'
+                      ? `Оператор, ${message.time}`
+                      : `Абонент, ${message.time}`}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

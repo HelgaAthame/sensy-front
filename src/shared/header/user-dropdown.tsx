@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
-import Link from 'next/link'
 import { appRoutes } from '../constants/routes'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
+import Button from '@/shared/button/button'
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false)
@@ -16,6 +16,14 @@ export default function UserDropdown() {
 
   function closeDropdown() {
     setIsOpen(false)
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('userEmail')
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('lastUploadTimestamp')
+    localStorage.removeItem('lastSeenCount')
+    window.location.href = appRoutes.auth.signIn
   }
 
   useEffect(() => {
@@ -122,9 +130,10 @@ export default function UserDropdown() {
             </DropdownItem>
           </li>
         </ul>
-        <Link
-          href={appRoutes.auth.signIn}
-          className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+        <Button
+          onClick={handleLogout}
+          variant={'primary'}
+          className="flex items-start justify-start cursor-pointer gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg
             className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"
@@ -142,7 +151,7 @@ export default function UserDropdown() {
             />
           </svg>
           Выйти
-        </Link>
+        </Button>
       </Dropdown>
     </div>
   )

@@ -10,23 +10,14 @@ import { useGetAnalyticsDashboardQuery } from '@/entities/analytics/analytics.ap
 import Button from '@/shared/button/button'
 import { FilterIcon } from '@/../public/assets/icons'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
-
-const getLast7DaysRange = () => {
-  const end = new Date()
-  const start = new Date()
-  start.setDate(end.getDate() - 7)
-  return {
-    start: start.toISOString().split('T')[0] + 'T00:00:00Z',
-    end: end.toISOString().split('T')[0] + 'T23:59:59Z',
-  }
-}
+import { getLast30DaysRange } from '@/shared/utils/date-utils'
 
 export const Analytics = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
-  const defaultDateRange = getLast7DaysRange()
+  const defaultDateRange = getLast30DaysRange()
   const [filterParams, setFilterParams] = useState({
-    start: '2025-01-01T00:00:00Z',
-    end: '2025-12-31T00:00:00Z',
+    start: defaultDateRange.start,
+    end: defaultDateRange.end,
     filterByPhrasesCategoriesCommaSeparated: undefined,
     offset: 0,
     limit: 10,
@@ -41,6 +32,11 @@ export const Analytics = () => {
   const applyFilters = (params: any) => {
     setFilterParams({ ...filterParams, ...params })
     closeFilterModal()
+  }
+
+  const currentDateRange = {
+    start: filterParams.start,
+    end: filterParams.end,
   }
 
   return (
@@ -62,7 +58,7 @@ export const Analytics = () => {
           <AnalyticsMetrics data={data?.summaryData} />
         </div>
         <div className="col-span-12 md:col-span-6">
-          <ImpressionChart data={data?.plotData} />
+          <ImpressionChart data={data?.plotData} dateRange={currentDateRange} />
         </div>
         <div className="col-span-12 md:col-span-6">
           <AnalyticsBarChart data={data?.negativeHistogramData} />

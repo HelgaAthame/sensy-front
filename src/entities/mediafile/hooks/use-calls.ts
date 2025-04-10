@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatDate, formatDuration, getLast7DaysRange } from '@/shared/utils/date-utils'
+import { formatDate, formatDuration, getLast30DaysRange } from '@/shared/utils/date-utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useGetMediaFilesQueryQuery,
@@ -34,7 +34,7 @@ export const useCalls = () => {
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const currentPage = Number(searchParams.get('page') || 1)
-  const defaultDateRange = getLast7DaysRange()
+  const defaultDateRange = getLast30DaysRange()
   const router = useRouter()
   const [selectedDictionary, setSelectedDictionary] = useState(['Словарь 1'])
   const [totalEntries, setTotalEntries] = useState<number>(0)
@@ -44,8 +44,8 @@ export const useCalls = () => {
   const [endDate, setEndDate] = useState<string>('2025-12-31')
 
   const [filterParams, setFilterParams] = useState<FilterParams>({
-    start: '2025-01-01T00:00:00Z',
-    end: '2025-12-31T23:59:59Z',
+    start: defaultDateRange.start,
+    end: defaultDateRange.end,
     filterByPhrasesCategoriesCommaSeparated: undefined,
   })
 
@@ -85,9 +85,6 @@ export const useCalls = () => {
 
     return params
   }
-
-  // start: defaultDateRange.start,
-  //   end: defaultDateRange.end,
 
   const queryParams = {
     start: filterParams.start || startDate,

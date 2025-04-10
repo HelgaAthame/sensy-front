@@ -83,45 +83,13 @@ export const NotificationDropdown = () => {
     }
 
     setLastFetchTime(new Date())
-  }, [alertMessages, lastSeenCount, notificationMessages])
+  }, [lastSeenCount, notificationMessages, alertMessages])
 
   useEffect(() => {
-    if (isNotificationMessagesSuccess) {
+    if (isNotificationMessagesSuccess && isAlertMessagesSuccess) {
       updateCombinedMessages()
     }
-  }, [
-    isNotificationMessagesSuccess,
-    notificationMessages,
-    alertMessages,
-    setCombinedMessages,
-    updateCombinedMessages,
-  ])
-
-  useEffect(() => {
-    if (isAlertMessagesSuccess) {
-      updateCombinedMessages()
-    }
-  }, [
-    isAlertMessagesSuccess,
-    notificationMessages,
-    alertMessages,
-    setCombinedMessages,
-    updateCombinedMessages,
-  ])
-
-  // useEffect(() => {
-  //   const combined = [...notificationMessages, ...alertMessages].sort(
-  //     (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
-  //   )
-
-  //   setCombinedMessages(combined)
-
-  //   if (combined.length > lastSeenCount) {
-  //     setNotifying(true)
-  //   }
-
-  //   setLastFetchTime(new Date())
-  // }, [notificationMessages, alertMessages, lastSeenCount])
+  }, [isNotificationMessagesSuccess, isAlertMessagesSuccess, updateCombinedMessages])
 
   const toggleDropdown = useCallback(() => {
     setIsOpen(prev => !prev)
@@ -140,7 +108,7 @@ export const NotificationDropdown = () => {
   return (
     <div className="relative">
       <button
-        className="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full dropdown-toggle hover:text-gray-700 h-11 w-11 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="relative flex items-center cursor-pointer justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full dropdown-toggle hover:text-gray-700 h-11 w-11 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
         onClick={handleClick}
       >
         <span
