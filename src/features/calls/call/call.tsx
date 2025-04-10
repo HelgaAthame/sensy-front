@@ -170,7 +170,8 @@ export const Call = () => {
     wavesurferRef.current = wavesurfer
     regionsPluginRef.current = wavesurfer.registerPlugin(RegionsPlugin.create())
 
-    const audioUrl = `http://86.57.195.162:5187/api/mediafile/${mediaFileById.id}/stream`
+    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`
+
     wavesurfer.load(audioUrl)
 
     wavesurfer.on('loading', percent => {
