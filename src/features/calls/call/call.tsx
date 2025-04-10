@@ -113,19 +113,19 @@ export const Call = () => {
         let actualColor
         switch (indicator.color) {
           case 'bg-red-400':
-            actualColor = 'rgba(255, 157, 157, 0.3)' // Негатив
+            actualColor = 'rgba(227, 11, 92, 0.4)' // Негатив
             break
           case 'bg-blue-400':
-            actualColor = 'rgba(157, 174, 255, 0.3)' // Лексика
+            actualColor = 'rgba(157, 174, 255, 0.4)' // Лексика
             break
           case 'bg-yellow-400':
-            actualColor = 'rgba(255, 213, 98, 0.3)' // Паузы
+            actualColor = 'rgba(255, 213, 98, 0.4)' // Паузы
             break
           case 'bg-red-500':
-            actualColor = 'rgba(255, 59, 48, 0.3)' // Перебивания
+            actualColor = 'rgba(255,0,0,0.4)' // Перебивания
             break
           default:
-            actualColor = 'rgba(107, 33, 168, 0.1)'
+            actualColor = 'rgba(107, 33, 168, 0.5)'
         }
 
         regionsPluginRef.current.addRegion({
@@ -168,7 +168,6 @@ export const Call = () => {
     })
 
     wavesurferRef.current = wavesurfer
-    // Инициализируем плагин регионов и сохраняем ссылку на него
     regionsPluginRef.current = wavesurfer.registerPlugin(RegionsPlugin.create())
 
     const audioUrl = `http://86.57.195.162:5187/api/mediafile/${mediaFileById.id}/stream`
@@ -178,7 +177,6 @@ export const Call = () => {
       setIsAudioLoading(true)
     })
 
-    // Добавляем обработчики событий
     wavesurfer.on('ready', () => {
       setDuration(wavesurfer.getDuration())
       setIsAudioLoading(false)
@@ -214,14 +212,12 @@ export const Call = () => {
     }
   }, [mediaFileById, hasMultipleChannels, numChannels])
 
-  // Обработчик для создания регионов при изменении данных и готовности wavesurfer
   useEffect(() => {
     if (wavesurferReady && mediaFileResult && !regionsAddedRef.current) {
       createRegions()
     }
   }, [wavesurferReady, mediaFileResult])
 
-  // Обработчик изменения скорости воспроизведения
   useEffect(() => {
     if (wavesurferRef.current) {
       const rate = parseFloat(playbackRate.replace('x', ''))
@@ -427,7 +423,9 @@ export const Call = () => {
           {activeTab === CallTab.Transcript && (
             <Transcript sttData={mediaFileResult?.stt} currentPlayerTime={currentTime} />
           )}
-          {activeTab === CallTab.Checklists && <Checklist checklistData={checklistData} />}
+          {activeTab === CallTab.Checklists && (
+            <Checklist checklistData={checklistData} gptChecklist={mediaFileResult?.gptChecklist} />
+          )}
         </div>
       </div>
     </div>

@@ -44,8 +44,8 @@ export const useCalls = () => {
   const [endDate, setEndDate] = useState<string>('2025-12-31')
 
   const [filterParams, setFilterParams] = useState<FilterParams>({
-    start: defaultDateRange.start,
-    end: defaultDateRange.end,
+    start: '2025-01-01T00:00:00Z',
+    end: '2025-12-31T23:59:59Z',
     filterByPhrasesCategoriesCommaSeparated: undefined,
   })
 
@@ -85,6 +85,9 @@ export const useCalls = () => {
 
     return params
   }
+
+  // start: defaultDateRange.start,
+  //   end: defaultDateRange.end,
 
   const queryParams = {
     start: filterParams.start || startDate,

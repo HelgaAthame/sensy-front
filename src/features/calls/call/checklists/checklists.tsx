@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/table/table'
+import { ChecklistSummary } from './checklist-summary'
 
 type ChecklistItem = {
   criteriaGroup: string
@@ -20,11 +21,14 @@ export type ChecklistGroup = {
 
 interface ChecklistProps {
   checklistData: ChecklistGroup[]
+  gptChecklist?: string | null
 }
 
-export const Checklist: React.FC<ChecklistProps> = ({ checklistData }) => {
+export const Checklist: React.FC<ChecklistProps> = ({ checklistData, gptChecklist }) => {
   return (
     <div className="text-gray-700 space-y-8">
+      {gptChecklist && <ChecklistSummary checklist={gptChecklist} />}
+
       {checklistData.map((group, groupIndex) => (
         <div key={groupIndex} className="border border-gray-200 rounded-lg overflow-hidden">
           <Table className="w-full">
@@ -79,26 +83,7 @@ export const Checklist: React.FC<ChecklistProps> = ({ checklistData }) => {
                     className="py-4 px-6 text-sm text-gray-900"
                     borders={{ right: true, bottom: true }}
                   >
-                    <div className="flex items-center">
-                      {item.criteria}
-                      {/*<button className="ml-2 opacity-70 hover:opacity-100">*/}
-                      {/*  <svg*/}
-                      {/*    width="16"*/}
-                      {/*    height="16"*/}
-                      {/*    viewBox="0 0 16 16"*/}
-                      {/*    fill="none"*/}
-                      {/*    xmlns="http://www.w3.org/2000/svg"*/}
-                      {/*  >*/}
-                      {/*    <path*/}
-                      {/*      d="M11.3335 2.33398C11.5086 2.15885 11.7163 2.02025 11.9452 1.92712C12.1741 1.83399 12.4198 1.78772 12.6668 1.78998C12.9139 1.78772 13.1595 1.83399 13.3884 1.92712C13.6173 2.02025 13.825 2.15885 14.0002 2.33398C14.1753 2.50911 14.3139 2.7168 14.407 2.9457C14.5002 3.1746 14.5464 3.4203 14.5441 3.66731C14.5464 3.91433 14.5002 4.16003 14.407 4.38893C14.3139 4.61783 14.1753 4.82552 14.0002 5.00065L5.00016 14.0006L1.3335 14.6673L2.00016 11.0006L11.0002 2.00065L11.3335 2.33398Z"*/}
-                      {/*      stroke="#6B7280"*/}
-                      {/*      strokeWidth="1.33333"*/}
-                      {/*      strokeLinecap="round"*/}
-                      {/*      strokeLinejoin="round"*/}
-                      {/*    />*/}
-                      {/*  </svg>*/}
-                      {/*</button>*/}
-                    </div>
+                    <div className="flex items-center">{item.criteria}</div>
                   </TableCell>
                   <TableCell
                     className="py-4 px-6 text-center whitespace-nowrap text-sm"
