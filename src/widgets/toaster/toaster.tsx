@@ -1,10 +1,9 @@
-import { CloseButton, ToastContainer } from 'react-toastify'
+import { ToastContainer } from 'react-toastify'
 
 export const Toaster = () => {
   return (
     <ToastContainer
       autoClose={2500}
-      closeButton={CloseButton}
       closeOnClick
       draggable
       hideProgressBar
