@@ -2,7 +2,6 @@
 import ComponentCard from '@/shared/component-card/component-card'
 import Form from '@/shared/form/form'
 import Button from '@/shared/button/button'
-import DatePicker from '@/shared/date-picker/date-picker'
 import { useCreateMediaFileMutation } from '@/entities/mediafile/api/mediafile.api'
 import { useForm } from 'react-hook-form'
 import { MediaFileData, MediaFileSchema } from '@/features/uploading-record/use-uploading-record'
@@ -16,8 +15,11 @@ import { Loader } from '@/shared/loader/loader'
 import { useGetProjectsQuery } from '@/entities/projects/projects.api'
 import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
 import { setToLocalStorage } from '@/shared/utils/common-utils'
-import { formatInTimeZone } from 'date-fns-tz'
 import { formatDateWithLocalTimeZone } from '@/shared/utils/date-utils'
+import 'react-multi-date-picker/styles/backgrounds/bg-gray.css'
+import 'react-multi-date-picker/styles/colors/purple.css'
+import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css'
+import { DateTimePicker } from '@/shared/date-picker/date-picker'
 
 interface UploadFormProps {
   uploadedFile: File[] | null
@@ -30,13 +32,8 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
   const { data: operatorsData } = useGetOperatorsQuery()
 
   const today = new Date()
-  const formattedToday = formatInTimeZone(
-    today,
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    'yyyy-MM-dd'
-  )
 
-  const [selectedDate, setSelectedDate] = useState<string>(today.toISOString())
+  const [selectedDate, setSelectedDate] = useState<Date>(today)
 
   const {
     control,
@@ -63,13 +60,13 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
   const reset = () => {
     hookFormReset()
     onFileUploaded([])
-    setSelectedDate(today.toISOString())
+    setSelectedDate(today)
   }
 
   const onSubmit = handleSubmit(async data => {
     if (!data.file) return
 
-    const createDate = formatDateWithLocalTimeZone(selectedDate)
+    const createDate = formatDateWithLocalTimeZone(selectedDate.toISOString())
 
     try {
       await createMediaFile({
@@ -120,18 +117,15 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
               />
             </div>
             <div className="w-full">
-              <DatePicker
-                id="dob-picker"
-                label="Дата"
-                placeholder="Выберите дату"
-                value={selectedDate}
-                minDate={formattedToday}
-                onChange={(dates, currentDateString) => {
-                  if (currentDateString) {
-                    const date = new Date(currentDateString)
-                    setSelectedDate(date.toISOString())
+              <DateTimePicker
+                value={new Date(selectedDate)}
+                onChange={date => {
+                  if (date) {
+                    setSelectedDate(Array.isArray(date) ? date[0] : date)
                   }
                 }}
+                label="Дата и время"
+                withTime={true}
               />
             </div>
             <div className="col-span-1 sm:col-span-2 flex gap-5">

@@ -1,99 +1,167 @@
 'use client'
-import React, { useRef } from 'react'
-import flatpickr from 'flatpickr'
-import 'flatpickr/dist/flatpickr.css'
-import Label from '@/shared/label/label'
-import { CalenderIcon } from '@/../public/assets/icons'
 
-interface DateRange {
-  start: string
-  end: string
-}
+import { Calendar, DateObject } from 'react-multi-date-picker'
+import TimePicker from 'react-multi-date-picker/plugins/analog_time_picker'
+import 'react-multi-date-picker/styles/colors/purple.css'
+import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css'
+import './date-picker.css'
 
-type DatePickerProps = {
-  id: string
-  value: string | DateRange | undefined
-  onChange: (dates: Date[], dateStr: string) => void
-  mode?: 'single' | 'multiple' | 'range' | 'time'
+import { useState, useRef, useEffect } from 'react'
+
+interface DateTimePickerProps {
+  value: Date | Date[] | null
+  onChange: (date: Date | Date[] | null) => void
   label?: string
+  withTime?: boolean
+  format?: string
+  disabled?: boolean
   placeholder?: string
-  minDate?: string
+  className?: string
+  range?: boolean
 }
 
-export default function DatePicker({
-  id,
+export const DateTimePicker = ({
   value,
   onChange,
-  mode = 'single',
   label,
-  placeholder,
-  minDate,
-}: DatePickerProps) {
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  withTime = true,
+  format,
+  disabled = false,
+  className,
+  placeholder = 'Выберите дату',
+  range = false, // По умолчанию режим выбора диапазона выключен
+}: DateTimePickerProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const calendarContainerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const prevValueRef = useRef<Date | Date[] | null>(null)
 
-  const getDefaultDate = (): string | string[] | undefined => {
-    if (!value) return undefined
-    if (typeof value === 'string') return value
-    if ('start' in value && 'end' in value) {
-      // Extract just the date part for flatpickr
-      const startDate = value.start.split('T')[0]
-      const endDate = value.end.split('T')[0]
-      return [startDate, endDate]
-    }
-    return undefined
-  }
-
-  const getDisplayValue = (): string => {
+  const getFormattedValue = () => {
     if (!value) return ''
-    if (typeof value === 'string') return value
-    if ('start' in value && 'end' in value) {
-      const startDate = value.start.split('T')[0]
-      const endDate = value.end.split('T')[0]
-      return `${startDate} to ${endDate}`
+
+    const dateFormat = format ?? (withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD')
+
+    if (Array.isArray(value)) {
+      if (value.length === 0) return ''
+      if (value.length === 1) {
+        return new DateObject(value[0]).format(dateFormat)
+      }
+      return `${new DateObject(value[0]).format(dateFormat)} — ${new DateObject(value[1]).format(dateFormat)}`
+    } else {
+      return new DateObject(value).format(dateFormat)
     }
-    return ''
   }
 
-  const initFlatpickr = (node: HTMLInputElement | null) => {
-    if (node) {
-      flatpickr(node, {
-        mode,
-        dateFormat: 'Y-m-d',
-        defaultDate: getDefaultDate(),
-        onChange,
-        minDate: minDate,
-        disableMobile: true,
-      })
-      inputRef.current = node
+  const formattedValue = getFormattedValue()
+  const now = new Date()
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        calendarContainerRef.current &&
+        !calendarContainerRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  const isOnlyTimeChanged = (newDate: any, oldDate: any): boolean => {
+    if (!withTime || !newDate || !oldDate) return false
+
+    if (Array.isArray(newDate) && Array.isArray(oldDate)) {
+      if (newDate.length !== oldDate.length) return false
+
+      for (let i = 0; i < newDate.length; i++) {
+        const newD = new DateObject(newDate[i])
+        const oldD = new DateObject(oldDate[i])
+
+        if (
+          newD.day !== oldD.day ||
+          newD.month.number !== oldD.month.number ||
+          newD.year !== oldD.year
+        ) {
+          return false
+        }
+      }
+      return true
+    } else if (!Array.isArray(newDate) && !Array.isArray(oldDate)) {
+      const newD = new DateObject(newDate)
+      const oldD = new DateObject(oldDate)
+
+      return (
+        newD.day === oldD.day &&
+        newD.month.number === oldD.month.number &&
+        newD.year === oldD.year &&
+        (newD.hour !== oldD.hour || newD.minute !== oldD.minute)
+      )
+    }
+
+    return false
+  }
+
+  const handleDateChange = (date: any) => {
+    const timeOnlyChanged = isOnlyTimeChanged(date, prevValueRef.current)
+
+    if (date) {
+      prevValueRef.current = Array.isArray(date)
+        ? (date.map(d => d?.toDate?.() ?? null).filter(Boolean) as Date[])
+        : (date?.toDate?.() ?? null)
+    } else {
+      prevValueRef.current = null
+    }
+
+    if (!date) {
+      onChange(null)
+    } else if (Array.isArray(date)) {
+      const dateArray = date.map(d => d?.toDate?.() ?? null).filter(Boolean) as Date[]
+      onChange(dateArray.length > 0 ? dateArray : null)
+    } else {
+      const d = date?.toDate?.() ?? null
+      onChange(d)
+    }
+
+    if (range && Array.isArray(date) && date.length >= 2) {
+      setIsOpen(false)
     }
   }
 
   return (
-    <div>
-      {label && <Label htmlFor={id}>{label}</Label>}
-      <div className="relative">
-        <input
-          id={id}
-          ref={initFlatpickr}
-          key={JSON.stringify(value) + (minDate || '')}
-          defaultValue={getDisplayValue()}
-          placeholder={placeholder}
-          className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
-        />
-        <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-          <CalenderIcon className="size-6" />
-        </span>
-      </div>
+    <div className="w-full relative">
+      {label && <label className="block mb-1 text-sm font-medium text-gray-700">{label}</label>}
 
-      <style jsx global>{`
-        .flatpickr-day.selected,
-        .flatpickr-day.startRange,
-        .flatpickr-day.endRange {
-          background-color: #5a2d76 !important;
-          border-color: #5a2d76 !important;
-          color: white !important;
-        }
-      `}</style>
+      <input
+        ref={inputRef}
+        type="text"
+        value={formattedValue}
+        readOnly
+        placeholder={placeholder}
+        className={`h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-gray-400 focus:outline-hidden focus:ring-1 focus:ring-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-gray-500 ${value ? 'text-gray-800 dark:text-white/90' : 'text-gray-400 dark:text-gray-400'} ${className}`}
+        disabled={disabled}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      />
+
+      {isOpen && (
+        <div ref={calendarContainerRef} className="absolute z-50 mt-2">
+          <Calendar
+            value={value}
+            onChange={handleDateChange}
+            format={format ?? (withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD')}
+            plugins={[...(withTime ? [<TimePicker key="time-picker" />] : [])]}
+            maxDate={now}
+            className="bg-opacity-90 purple"
+            range={range}
+            rangeHover={range}
+          />
+        </div>
+      )}
     </div>
   )
 }

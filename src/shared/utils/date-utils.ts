@@ -7,7 +7,7 @@ export const formatDates = (date: Date | null): string | undefined => {
     return undefined
   }
 
-  return formatInTimeZone(date, 'UTC', 'dd.MM.yyyy', { locale: ru })
+  return formatInTimeZone(date, 'UTC', 'dd.MM.yyyy HH:mm', { locale: ru })
 }
 
 export const getDateRange = (days = 7) => {
@@ -102,16 +102,7 @@ export const formatDateWithLocalTimeZone = (selectedDate: string | null): string
   let dateToFormat: Date
 
   if (selectedDate) {
-    const selectedDateObj = new Date(selectedDate)
-    const now = new Date()
-
-    selectedDateObj.setHours(
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds()
-    )
-    dateToFormat = selectedDateObj
+    dateToFormat = new Date(selectedDate)
   } else {
     dateToFormat = new Date()
   }

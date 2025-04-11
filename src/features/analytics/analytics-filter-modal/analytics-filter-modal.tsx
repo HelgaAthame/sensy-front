@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import Button from '@/shared/button/button'
 import { Modal } from '@/shared/modal/modal'
-import DatePicker from '@/shared/date-picker/date-picker'
 import { useGetVocabularyQuery } from '@/entities/dictionaries/dictionaries.api'
 import Checkbox from '@/shared/checkbox/checkbox'
 import { formatEndDate, formatStartDate } from '@/shared/utils/date-utils'
+import { DateTimePicker } from '@/shared/date-picker/date-picker'
 
 interface DateRange {
   start: string
@@ -30,7 +30,7 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
 
   useEffect(() => {
     if (vocabularyData) {
-      setSelectedDictionaries([]) // Reset when vocab changes
+      setSelectedDictionaries([])
     }
   }, [vocabularyData])
 
@@ -61,23 +61,24 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
   return (
     <Modal isOpen={isOpen} title={'Фильтр'} onClose={onClose} className="max-w-[410px] mx-auto">
       <div className="p-4">
-        <h3 className="text-sm font-semibold mb-2">Выберите диапазон</h3>
-        <DatePicker
-          id="date-range-picker"
-          mode="range"
-          value={dateRange}
-          placeholder="dd/mm/yyyy"
-          onChange={(selectedDates, dateStr) => {
-            if (selectedDates && selectedDates.length === 2) {
+        <h3 className="text-sm font-semibold mb-2">Выберите период</h3>
+        <DateTimePicker
+          value={dateRange ? [new Date(dateRange.start), new Date(dateRange.end)] : null}
+          onChange={value => {
+            if (Array.isArray(value) && value.length === 2 && value[0] && value[1]) {
+              const [start, end] = value
               setDateRange({
-                start: formatStartDate(selectedDates[0], 'Europe/Moscow') || '',
-                end: formatEndDate(selectedDates[1], 'Europe/Moscow') || '',
+                start: formatStartDate(start)!,
+                end: formatEndDate(end)!,
               })
+            } else {
+              setDateRange(undefined)
             }
           }}
+          withTime={false}
+          range={true}
         />
-
-        <h3 className="text-sm font-medium mt-4 mb-2">Словари</h3>
+        <h3 className="text-sm font-semibold mt-4 mb-2">Словари</h3>
         <div className="space-y-2">
           {vocabularyData &&
             Object.entries(vocabularyData).map(([id, name]) => (

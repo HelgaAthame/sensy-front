@@ -123,8 +123,14 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
   const options: ApexOptions = {
     legend: {
       show: true,
-      position: 'top',
-      horizontalAlign: 'left',
+      position: 'bottom',
+      horizontalAlign: 'center',
+      offsetY: 10,
+      itemMargin: {
+        horizontal: 10,
+        vertical: 0,
+      },
+      fontSize: '14px',
     },
     chart: {
       fontFamily: 'Outfit, sans-serif',
@@ -192,8 +198,10 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
   }
 
   return (
-    <div className="rounded-2xl h-full border border-gray-100 bg-white px-5 pt-5 
-    dark:border-gray-200 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
+    <div
+      className="rounded-2xl h-full border border-gray-100 bg-white px-5 pt-5 
+    dark:border-gray-200 dark:bg-white/[0.03] sm:px-6 sm:pt-6"
+    >
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
           <h3 className="mb-1 text-lg font-semibold text-neutral-900">Тренды</h3>

@@ -26,7 +26,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
     'audio/aac': [],
   },
   title = 'Поместите файл сюда',
-  description = 'Перетащите вашу аудиозапись в формате WAV, MP3 сюда или просмотрите',
+  description = 'Перетащите вашу аудиозапись в формате WAV, MP3 сюда или выберите на вашем устройстве',
   cardWrapper = true,
   uploadedFile,
   resetKey = 0,
@@ -105,7 +105,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
               open()
             }}
           >
-            Просмотр файла
+            Выбрать файл
           </span>
         </div>
       </div>

@@ -1,1 +1,1 @@
-export * from "./AuthGate"
+export * from './AuthGate'

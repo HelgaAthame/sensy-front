@@ -1,15 +1,19 @@
 'use client'
 
-import { CallsTable } from '@/entities/mediafile/ui/calls-table'
 import Pagination from '@/shared/pagination/pagination'
+import { ReactNode, useEffect, useState } from 'react'
 import { useCalls } from '@/entities/mediafile/hooks/use-calls'
-import { useEffect, useState } from 'react'
-import { UploadAlert } from '@/shared/upload-alert/upload-alert'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
+import { UploadAlert } from '@/shared/upload-alert/upload-alert'
 
-export const Calls = () => {
+interface CallsFeatureWrapperProps {
+  children: ReactNode
+}
+
+export const CallsFeatureWrapper = ({ children }: CallsFeatureWrapperProps) => {
   const { handlePageChange, totalPages, currentPage, totalEntries, startIndex, endIndex } =
     useCalls()
+
   const [showUploadAlert, setShowUploadAlert] = useState(false)
 
   useEffect(() => {
@@ -52,13 +56,15 @@ export const Calls = () => {
           title={'Внимание! Загруженная запись обрабатывается и будет доступна скоро.'}
         />
       )}
-      <CallsTable />
+      {children}
       <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
           <div className="pb-3 xl:pb-0">
-            <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
-              Отображаются от {startIndex + 1} до {endIndex} из {totalEntries} записей
-            </p>
+            {totalEntries > 0 && (
+              <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
+                Отображаются от {startIndex + 1} до {endIndex} из {totalEntries} записей
+              </p>
+            )}
           </div>
           {totalPages > 1 && (
             <Pagination

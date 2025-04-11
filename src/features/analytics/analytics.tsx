@@ -70,10 +70,12 @@ export const Analytics = () => {
           <TopPages
             data={
               data?.keywordsFrequencyData
-                ? Object.entries(data.keywordsFrequencyData).map(([keyword, count]) => ({
-                    keyword,
-                    count,
-                  }))
+                ? Object.entries(data.keywordsFrequencyData)
+                    .map(([keyword, count]) => ({
+                      keyword,
+                      count,
+                    }))
+                    .sort((a, b) => b.count - a.count)
                 : []
             }
           />

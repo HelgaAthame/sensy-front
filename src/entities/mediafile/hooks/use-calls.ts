@@ -7,8 +7,9 @@ import {
 } from '@/entities/mediafile/api/mediafile.api'
 import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
 import { toast } from 'react-toastify'
+import { useSortable } from '@/shared/hooks/use-sort'
 
-interface TableRowData {
+export interface TableRowData {
   id: string
   date: string
   operator: string
@@ -20,12 +21,6 @@ interface TableRowData {
   interruptions: number
   silence: string
   silenceSeconds: number
-}
-
-interface FilterParams {
-  start: string
-  end: string
-  filterByPhrasesCategoriesCommaSeparated?: string
 }
 
 export const useCalls = () => {
@@ -40,44 +35,52 @@ export const useCalls = () => {
   const [totalEntries, setTotalEntries] = useState<number>(0)
 
   const searchTerm = searchParams.get('search') || ''
-  const [startDate, setStartDate] = useState<string>('2025-01-01')
-  const [endDate, setEndDate] = useState<string>('2025-12-31')
+  const startDate = searchParams.get('start') || defaultDateRange.start
+  const endDate = searchParams.get('end') || defaultDateRange.end
+  const filterByCategories =
+    searchParams.get('filterByPhrasesCategoriesCommaSeparated') || undefined
 
-  const [filterParams, setFilterParams] = useState<FilterParams>({
-    start: '2025-01-01T00:00:00Z',
-    end: '2025-12-31T23:59:59Z',
-    filterByPhrasesCategoriesCommaSeparated: undefined,
-  })
+  const filterParams = {
+    start: startDate,
+    end: endDate,
+    filterByPhrasesCategoriesCommaSeparated: filterByCategories,
+  }
 
-  const [sortColumn, setSortColumn] = useState<string | null>(null)
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const handleSortChange = (key: keyof TableRowData | null, isActive: boolean) => {
+    updateSortParams(key as string, isActive)
+  }
+
+  const { sortConfig, requestSort, getSortState } = useSortable<TableRowData>(
+    null,
+    handleSortChange
+  )
 
   const getSortParams = () => {
-    if (!sortColumn) return {}
+    if (!sortConfig.key || !sortConfig.isActive) return {}
 
     const params: Record<string, boolean> = {}
 
-    switch (sortColumn) {
+    switch (sortConfig.key) {
       case 'operator':
-        params.orderByDescOperatorName = sortOrder === 'desc'
+        params.orderByDescOperatorName = true
         break
       case 'date':
-        params.orderByDescCreateDate = sortOrder === 'desc'
+        params.orderByDescCreateDate = true
         break
       case 'phone':
-        params.orderByDescClientNumber = sortOrder === 'desc'
+        params.orderByDescClientNumber = true
         break
       case 'duration':
-        params.orderByDescDuration = sortOrder === 'desc'
+        params.orderByDescDuration = true
         break
       case 'negative':
-        params.orderByDescNegativeLevel = sortOrder === 'desc'
+        params.orderByDescNegativeLevel = true
         break
       case 'lexis':
-        params.orderByDescPhrasesCount = sortOrder === 'desc'
+        params.orderByDescPhrasesCount = true
         break
       case 'silence':
-        params.orderByDescMaxSimultaneousSilence = sortOrder === 'desc'
+        params.orderByDescMaxSimultaneousSilence = true
         break
       default:
         break
@@ -86,8 +89,49 @@ export const useCalls = () => {
     return params
   }
 
-  // start: defaultDateRange.start,
-  //   end: defaultDateRange.end,
+  const updateSortParams = (key: string | null, isActive: boolean) => {
+    ;[
+      'orderByDescOperatorName',
+      'orderByDescCreateDate',
+      'orderByDescClientNumber',
+      'orderByDescDuration',
+      'orderByDescNegativeLevel',
+      'orderByDescPhrasesCount',
+      'orderByDescMaxSimultaneousSilence',
+    ].forEach(param => {
+      params.delete(param)
+    })
+
+    if (key && isActive) {
+      switch (key) {
+        case 'operator':
+          params.set('orderByDescOperatorName', 'true')
+          break
+        case 'date':
+          params.set('orderByDescCreateDate', 'true')
+          break
+        case 'phone':
+          params.set('orderByDescClientNumber', 'true')
+          break
+        case 'duration':
+          params.set('orderByDescDuration', 'true')
+          break
+        case 'negative':
+          params.set('orderByDescNegativeLevel', 'true')
+          break
+        case 'lexis':
+          params.set('orderByDescPhrasesCount', 'true')
+          break
+        case 'silence':
+          params.set('orderByDescMaxSimultaneousSilence', 'true')
+          break
+      }
+    }
+
+    params.set('page', '1')
+
+    router.push(`?${params.toString()}`)
+  }
 
   const queryParams = {
     start: filterParams.start || startDate,
@@ -155,11 +199,16 @@ export const useCalls = () => {
   }
 
   const handleDateRangeChange = (dates: Date[]) => {
+    const params = new URLSearchParams(searchParams)
+
     if (dates[0]) {
-      setStartDate(dates[0].toISOString().split('T')[0])
+      const formattedStartDate = dates[0].toISOString().split('T')[0]
+      params.set('start', formattedStartDate)
     }
+
     if (dates[1]) {
-      setEndDate(dates[1].toISOString().split('T')[0])
+      const formattedEndDate = dates[1].toISOString().split('T')[0]
+      params.set('end', formattedEndDate)
     }
   }
 
@@ -187,24 +236,12 @@ export const useCalls = () => {
   }
 
   const handleSort = (key: keyof TableRowData) => {
-    const column = columnConfig.find(col => col.key === key)
-    if (!column?.sortable) return
-
-    if (sortColumn === key) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortColumn(key)
-      setSortOrder('asc')
-    }
-
-    params.set('page', '1')
-
-    refetch()
+    requestSort(key, columnConfig)
   }
 
   const getSortDirection = (key: string): string => {
-    if (key !== sortColumn) return ''
-    return sortOrder === 'asc' ? 'ascending' : 'descending'
+    const state = getSortState(key as keyof TableRowData)
+    return state === 'active' ? 'ascending' : ''
   }
 
   const handleDownload = async () => {
@@ -224,9 +261,23 @@ export const useCalls = () => {
     }
   }
 
-  const applyFilters = (params: any) => {
-    setFilterParams({ ...filterParams, ...params })
+  const applyFilters = (newParams: any) => {
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value as string)
+      } else {
+        params.delete(key)
+      }
+    })
+
+    params.set('page', '1')
+    router.push(`?${params.toString()}`)
     closeFilterModal()
+  }
+
+  const handleResetFilters = () => {
+    const newParams = new URLSearchParams()
+    router.push(`?${newParams.toString()}`)
   }
 
   return {
@@ -238,16 +289,16 @@ export const useCalls = () => {
     totalPages,
     startIndex,
     endIndex,
-    sortColumn,
-    sortOrder,
+    sortConfig,
     selectedDictionary,
     isFilterModalOpen,
     startDate,
     endDate,
     router,
 
-    // Методы
+    // Methods
     handlePageChange,
+    handleResetFilters,
     applyFilters,
     handleRowsPerPageChange,
     handleSort,

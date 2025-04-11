@@ -152,7 +152,7 @@ export const Call = () => {
     const wavesurfer = WaveSurfer.create({
       container: containerRef.current,
       waveColor: '#5A2D76',
-      progressColor: '#6B21A8',
+      progressColor: 'bg-gray-500',
       height: hasMultipleChannels ? 80 : 64,
       cursorColor: '#6B21A8',
       splitChannels: hasMultipleChannels ? new Array(numChannels).fill({}) : undefined,
@@ -343,33 +343,35 @@ export const Call = () => {
         <div
           className={`bg-purple-50 rounded-xl p-4 mb-4 relative ${hasMultipleChannels ? 'h-48' : 'h-24'}`}
         >
-          <button
-            className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white rounded-full cursor-pointer flex items-center justify-center ${isPlaying ? 'text-purple-700' : ''}`}
-            onClick={togglePlayPause}
-          >
-            {isPlaying ? (
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect x="2" y="2" width="4" height="10" rx="1" fill="currentColor" />
-                <rect x="8" y="2" width="4" height="10" rx="1" fill="currentColor" />
-              </svg>
-            ) : (
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M3 2L12 7L3 12V2Z" fill="currentColor" />
-              </svg>
-            )}
-          </button>
+          {!isAudioLoading && (
+            <button
+              className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gray-100 hover:bg-purple-200 rounded-full cursor-pointer flex items-center justify-center ${isPlaying ? 'text-purple-700' : ''}`}
+              onClick={togglePlayPause}
+            >
+              {isPlaying ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect x="2" y="2" width="4" height="10" rx="1" fill="currentColor" />
+                  <rect x="8" y="2" width="4" height="10" rx="1" fill="currentColor" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M3 2L12 7L3 12V2Z" fill="currentColor" />
+                </svg>
+              )}
+            </button>
+          )}
 
           <div
             className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-40' : 'h-24'}`}

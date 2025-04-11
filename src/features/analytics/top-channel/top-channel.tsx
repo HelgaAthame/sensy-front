@@ -21,6 +21,8 @@ export default function TopChannel({ data = [] }: TopChannelProps) {
     setIsOpen(false)
   }
 
+  const sortedData = [...data].sort((a, b) => (b.recordsCount || 0) - (a.recordsCount || 0))
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-200 dark:bg-white/[0.03] md:p-6">
       <div className="flex items-start justify-between">
@@ -54,8 +56,8 @@ export default function TopChannel({ data = [] }: TopChannelProps) {
           <span className="text-right text-gray-400 text-theme-xs">Показатели</span>
         </div>
 
-        {data && data.length > 0 ? (
-          data.map((operator, index) => (
+        {sortedData && sortedData.length > 0 ? (
+          sortedData.map((operator, index) => (
             <div key={index} className="py-3 border-b border-gray-100 dark:border-gray-200">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-800 text-theme-sm dark:text-gray-300">

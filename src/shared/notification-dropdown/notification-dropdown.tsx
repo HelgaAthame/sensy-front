@@ -3,7 +3,7 @@ import { Dropdown } from '@/shared/dropdown/dropdown'
 import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
 import { useGetChatMessagesQuery } from '@/entities/chat/chat.api'
 import { ChatMessage } from '@/entities/chat/chat.types'
-import { formatTimeAgo } from '@/shared/utils/date-utils'
+import { formatDates, formatTimeAgo } from '@/shared/utils/date-utils'
 import { getFromLocalStorage, setToLocalStorage } from '@/shared/utils/common-utils'
 
 type NotificationItemProps = {
@@ -12,8 +12,6 @@ type NotificationItemProps = {
 }
 
 const NotificationItem = ({ data, onClose }: NotificationItemProps) => {
-  const formattedTime = formatTimeAgo(new Date(data.createDate))
-
   return (
     <li>
       <DropdownItem
@@ -28,13 +26,12 @@ const NotificationItem = ({ data, onClose }: NotificationItemProps) => {
           </span>
 
           <span className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400">
-            <span>
+            <span className={'hidden'}>
               {data.attachmentsCount > 0
                 ? `${data.attachmentsCount} attachments`
                 : 'No attachments'}
             </span>
-            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-            <span>{formattedTime}</span>
+            <span>{formatDates(data.createDate ? new Date(data?.createDate) : null)}</span>
           </span>
         </span>
       </DropdownItem>
@@ -140,7 +137,7 @@ export const NotificationDropdown = () => {
         className="absolute -right-[240px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[361px] lg:right-0"
       >
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-700">
-          <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Notifications</h5>
+          <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Уведомления</h5>
           <button
             onClick={toggleDropdown}
             className="text-gray-500 transition dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -162,11 +159,11 @@ export const NotificationDropdown = () => {
           </button>
         </div>
         <div className="flex justify-between items-center px-1 mb-2 text-theme-sm">
-          <span className="text-gray-500">
+          <span className="text-gray-500 hidden">
             {lastFetchTime ? `Last updated: ${formatTimeAgo(lastFetchTime)}` : 'Loading...'}
           </span>
           <span className="text-gray-500">
-            {combinedMessages.length} {combinedMessages.length === 1 ? 'message' : 'messages'}
+            {combinedMessages.length} {combinedMessages.length === 1 ? 'сообщений' : 'сообщений'}
           </span>
         </div>
         <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
