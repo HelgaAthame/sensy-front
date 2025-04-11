@@ -1,11 +1,12 @@
 import '@/app/globals.css'
 import Providers from '@/app/providers'
+import { AuthGate } from "@/shared/AuthGate";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
+    return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers><AuthGate>{children}</AuthGate></Providers>
       </body>
     </html>
   )
