@@ -151,7 +151,7 @@ export const Call = () => {
 
     const wavesurfer = WaveSurfer.create({
       container: containerRef.current,
-      waveColor: '#9370DB',
+      waveColor: '#5A2D76',
       progressColor: '#6B21A8',
       height: hasMultipleChannels ? 80 : 64,
       cursorColor: '#6B21A8',
