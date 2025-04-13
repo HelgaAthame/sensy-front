@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import GridShape from '@/shared/grid-shape/grid-shape'
 import ThemeTogglerTwo from '@/shared/theme-toggler-two/theme-toggler-two'
-import { Logo } from '@/../public/assets/svg-components/Logo'
+import { LogoIcon } from '@/../public/assets/svg-components'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <GridShape />
             <div className="flex flex-col items-center max-w-xs">
               <Link href="/" className="block mb-4">
-                <Logo />
+                <LogoIcon />
               </Link>
               <p className="text-center text-gray-400 dark:text-white/60">
                 Free and Open-Source Tailwind CSS Admin Dashboard Template

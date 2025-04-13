@@ -1,28 +1,28 @@
 'use client'
 
-import { useAuthCheck } from '@/shared/hooks/useAuthCheck'
 import { Loader } from '@/shared/loader'
 import { usePathname } from 'next/navigation'
 import { Fragment, type ReactNode } from 'react'
-import { appRoutes } from '@/shared/constants/routes'
 import { useMinWidth } from '@/shared/hooks/useMinWidth'
+import { isAuthRoute, isPrivateRoute, useAuthRedirect } from '@/shared/hooks/use-auth-redirect'
 
 export const AuthGate = ({ children }: { children: ReactNode }) => {
-  const { loading, isLoggedIn } = useAuthCheck()
-  const pathName = usePathname()
-  const showLoader = loading || (!isLoggedIn && pathName !== appRoutes.auth.signIn)
-
+  const { isLoggedIn, loading } = useAuthRedirect()
+  const pathname = usePathname()
   const isWideEnough = useMinWidth(1024)
+
+  const showLoader = loading || (!isLoggedIn && isPrivateRoute(pathname) && !isAuthRoute(pathname))
+
   return (
     <Fragment>
       {showLoader && <Loader bgColor="bg-white" textColor="text-gray-800" />}
-      {isWideEnough ? (
-        children
-      ) : (
+      {!showLoader && !isWideEnough ? (
         <div className="p-6 text-lg h-screen flex items-center justify-center">
           Это приложение доступно только на экранах шириной от 1024px
         </div>
-      )}
+      ) : !showLoader ? (
+        children
+      ) : null}
     </Fragment>
   )
 }

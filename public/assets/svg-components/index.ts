@@ -1,0 +1,6 @@
+export * from './download-icon-svg'
+export * from './bar-icon-svg'
+export * from './telephone-icon-svg'
+export * from './user-circle-icon-svg'
+export * from './star-fat-icon-svg'
+export * from './logo-icon-svg'

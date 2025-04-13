@@ -57,7 +57,7 @@ export default function TopChannel({ data = [] }: TopChannelProps) {
         </div>
 
         {sortedData && sortedData.length > 0 ? (
-          sortedData.map((operator, index) => (
+          sortedData.slice(0, 5).map((operator, index) => (
             <div key={index} className="py-3 border-b border-gray-100 dark:border-gray-200">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-800 text-theme-sm dark:text-gray-300">

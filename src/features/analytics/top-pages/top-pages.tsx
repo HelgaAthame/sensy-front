@@ -55,7 +55,7 @@ export default function TopPages({ data = [] }: TopPagesProps) {
         </div>
 
         {data && data.length > 0 ? (
-          data.map((frequency, index) => (
+          data.slice(0, 5).map((frequency, index) => (
             <div key={index} className="py-3 border-b border-gray-100 dark:border-gray-200">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-800 text-theme-sm dark:text-gray-300">

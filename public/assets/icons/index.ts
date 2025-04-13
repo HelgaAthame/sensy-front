@@ -7,14 +7,12 @@ import InfoIcon from './info.svg'
 import ErrorIcon from './info-error.svg'
 import BoltIcon from './bolt.svg'
 import ArrowUpIcon from './arrow-up.svg'
-import BarIcon from './bar.svg'
 import ArrowDownIcon from './arrow-down.svg'
 import FolderIcon from './folder.svg'
 import VideoIcon from './videos.svg'
 import AudioIcon from './audio.svg'
 import GridIcon from './grid.svg'
 import FileIcon from './file.svg'
-import DownloadIcon from './download.svg'
 import ResetFilters from './reset-filters.svg'
 import ArrowRightIcon from './arrow-right.svg'
 import GroupIcon from './group.svg'
@@ -35,13 +33,11 @@ import LockIcon from './lock.svg'
 import EnvelopeIcon from './envelope.svg'
 import UserIcon from './user-line.svg'
 import CalenderIcon from './calender-line.svg'
-import TelephoneIcon from './telephone.svg'
 import EyeIcon from './eye.svg'
 import EyeCloseIcon from './eye-close.svg'
 import TimeIcon from './time.svg'
 import CopyIcon from './copy.svg'
 import ChevronLeftIcon from './chevron-left.svg'
-import UserCircleIcon from './user-circle.svg'
 import FilterIcon from './filter.svg'
 import TaskIcon from './task-icon.svg'
 import ListIcon from './list.svg'
@@ -58,24 +54,20 @@ import MoreDotIcon from './moredot.svg'
 import AlertHexaIcon from './alert-hexa.svg'
 import ErrorHexaIcon from './info-hexa.svg'
 import Logo from './logo.svg'
-import StarFatIcon from './star-fat.svg'
 
 export {
   ErrorHexaIcon,
   AlertHexaIcon,
   MoreDotIcon,
-  DownloadIcon,
   FileIcon,
   GridIcon,
   AudioIcon,
-  StarFatIcon,
   VideoIcon,
   BoltIcon,
   PlusIcon,
   BoxIcon,
   CloseIcon,
   CheckCircleIcon,
-  BarIcon,
   AlertIcon,
   InfoIcon,
   EditIcon,
@@ -89,7 +81,6 @@ export {
   FilterIcon,
   ShootingStarIcon,
   DollarLineIcon,
-  TelephoneIcon,
   TrashBinIcon,
   AngleUpIcon,
   AngleDownIcon,
@@ -108,7 +99,6 @@ export {
   TimeIcon,
   CopyIcon,
   ChevronLeftIcon,
-  UserCircleIcon,
   TaskIcon,
   ListIcon,
   TableIcon,

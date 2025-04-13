@@ -20,6 +20,30 @@ interface DateTimePickerProps {
   range?: boolean
 }
 
+const months = [
+  ['январь'],
+  ['февраль'],
+  ['март'],
+  ['апрель'],
+  ['май'],
+  ['июнь'],
+  ['июль'],
+  ['август'],
+  ['сентябрь'],
+  ['октябрь'],
+  ['ноябрь'],
+  ['декабрь'],
+]
+const weekDays = [
+  ['вос', 'вс'],
+  ['пон', 'пн'],
+  ['втр', 'вт'],
+  ['сре', 'ср'],
+  ['чет', 'чт'],
+  ['пят', 'пт'],
+  ['суб', 'сб'],
+]
+
 export const DateTimePicker = ({
   value,
   onChange,
@@ -152,11 +176,13 @@ export const DateTimePicker = ({
         <div ref={calendarContainerRef} className="absolute z-50 mt-2">
           <Calendar
             value={value}
+            months={months}
+            weekDays={weekDays}
             onChange={handleDateChange}
             format={format ?? (withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD')}
             plugins={[...(withTime ? [<TimePicker key="time-picker" />] : [])]}
             maxDate={now}
-            className="bg-opacity-90 purple"
+            className="bg-opacity-90 bg-purple-900"
             range={range}
             rangeHover={range}
           />

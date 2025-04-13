@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { ThemeToggleButton } from '@/shared/theme-toggle-button/theme-toggle-button'
 import { NotificationDropdown } from '@/shared/notification-dropdown/notification-dropdown'
 import UserDropdown from '@/shared/header/user-dropdown'
-import { Logo } from '@/../public/assets/svg-components/Logo'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { appRoutes } from '@/shared/constants/routes'
+import { LogoIcon } from '@/../public/assets/svg-components'
 
 export const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false)
@@ -137,7 +137,7 @@ export const Header = () => {
           </button>
 
           <Link href="/" className="lg:hidden">
-            <Logo />
+            <LogoIcon />
           </Link>
 
           <button

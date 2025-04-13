@@ -157,7 +157,7 @@ export default function AnalyticsBarChart({ data }: NegativeHistogramChartProps)
       </div>
       <div className="overflow-x-auto custom-scrollbar">
         <div className="min-w-full">
-          <Chart options={options} series={series} type="bar" height={354} />
+          <Chart options={options} series={series} type="bar" height={350} />
         </div>
       </div>
     </div>

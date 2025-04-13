@@ -3,7 +3,7 @@
 import { JSX } from 'react'
 import Button from '@/shared/button/button'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/table/table'
-import { DownloadIcon, FilterIcon, ResetFilters } from '@/../public/assets/icons'
+import { FilterIcon, ResetFilters } from '@/../public/assets/icons'
 import { appRoutes } from '@/shared/constants/routes'
 import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
 import { useCalls } from '@/entities/mediafile/hooks/use-calls'
@@ -14,6 +14,7 @@ import {
 } from '@/shared/lib/color/get-color-class'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
 import { Loader } from '@/shared/loader/loader'
+import { DownloadIcon } from '@/../public/assets/svg-components'
 
 export const CallsTable = (): JSX.Element => {
   const {
@@ -97,7 +98,7 @@ export const CallsTable = (): JSX.Element => {
               onClick={handleDownload}
             >
               <span>Скачать</span>
-              <DownloadIcon width={20} height={20} />
+              <DownloadIcon width={16} height={16} />
             </Button>
           </div>
         </div>
