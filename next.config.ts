@@ -2,7 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  images: {
+    unoptimized: true, // важно для Next 13+ и `next export`
+  },
   // Добавляем эту секцию для отключения LightningCSS
   experimental: {
     turbo: {
