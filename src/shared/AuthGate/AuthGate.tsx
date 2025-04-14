@@ -12,11 +12,20 @@ export const AuthGate = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname()
   const isWideEnough = useMinWidth(1024)
 
-  const showLoader = loading || (!isLoggedIn && isPrivateRoute(pathname) && !isAuthRoute(pathname))
+  // const showLoader = loading || (!isLoggedIn && isPrivateRoute(pathname) && !isAuthRoute(pathname))
+  const showLoader =
+    loading ||
+    (!isLoggedIn && !Object.values(appRoutes.auth).includes(pathname.toLocaleLowerCase()))
 
-  const loaderBgColor = pathname === appRoutes.private.dashboard ? 'bg-white' : 'bg-black/10'
-
-  const loaderTextColor = pathname === appRoutes.private.dashboard ? 'text-gray-800' : 'text-white'
+  let loaderBgColor
+  let loaderTextColor
+  if (appRoutes.private.dashboard.includes(pathname.toLocaleLowerCase())) {
+    loaderBgColor = 'bg-white'
+    loaderTextColor = 'text-gray-800'
+  } else {
+    loaderBgColor = 'bg-black/10'
+    loaderTextColor = 'text-white'
+  }
 
   return (
     <Fragment>
