@@ -12,39 +12,69 @@ type ChecklistSummaryItem = {
 
 interface ChecklistSummaryProps {
   checklist: string | null
+  defaultMaxScore?: number
 }
 
-export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({ checklist }) => {
+export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({
+  checklist,
+  defaultMaxScore = 5,
+}) => {
   const parsedItems = useMemo(() => {
     if (!checklist) return []
 
     const items: ChecklistSummaryItem[] = []
-    const lines = checklist.split('\n')
+    const lines = checklist.split('\n').filter(line => line.trim())
 
     lines.forEach(line => {
-      let match = line.match(/\d+\.\s+\*\*([^*]+)\*\*:\s+(\d+)\/(\d+)\s+\(([^)]+)\)/)
+      const withoutNumber = line.replace(/^\d+\.\s*/, '')
 
-      if (!match) {
-        match = line.match(/\d+\.\s+([^:]+):\s+(\d+)\/(\d+)(?:\s+\(([^)]+)\))?/)
-      }
+      const parts = withoutNumber.split(':')
 
-      if (match) {
-        const score = parseInt(match[2])
-        const maxScore = parseInt(match[3])
-        const description = match[4] ? match[4].trim() : ''
+      if (parts.length >= 2) {
+        const title = parts[0].replace(/\*\*/g, '').trim()
+        const valueAndDescription = parts.slice(1).join(':').trim()
+
+        let score
+        let maxScore = defaultMaxScore
+        let description = ''
+
+        const fractionMatch = valueAndDescription.match(/(\d+)\/(\d+)(?:\s+\(([^)]+)\))?/)
+
+        if (fractionMatch) {
+          score = parseInt(fractionMatch[1])
+          maxScore = parseInt(fractionMatch[2])
+          description = fractionMatch[3] ? fractionMatch[3].trim() : ''
+        } else {
+          const simpleMatch = valueAndDescription.match(/(\d+)(?:\s+\(([^)]+)\))?/)
+
+          if (simpleMatch) {
+            score = parseInt(simpleMatch[1])
+            description = simpleMatch[2] ? simpleMatch[2].trim() : ''
+          } else {
+            const numberMatch = valueAndDescription.match(/(\d+)/)
+            if (numberMatch) {
+              score = parseInt(numberMatch[1])
+
+              const descMatch = valueAndDescription.match(/\(([^)]+)\)/)
+              description = descMatch ? descMatch[1].trim() : ''
+            } else {
+              return
+            }
+          }
+        }
 
         items.push({
-          title: match[1].trim(),
-          score: score,
-          maxScore: maxScore,
-          description: description,
+          title,
+          score,
+          maxScore,
+          description,
           percentage: (score / maxScore) * 100,
         })
       }
     })
 
     return items.sort((a, b) => b.percentage - a.percentage)
-  }, [checklist])
+  }, [checklist, defaultMaxScore])
 
   const totalScore = useMemo(
     () => parsedItems.reduce((sum, item) => sum + item.score, 0),

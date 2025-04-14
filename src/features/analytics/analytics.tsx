@@ -87,6 +87,7 @@ export const Analytics = () => {
         isOpen={isFilterModalOpen}
         onClose={closeFilterModal}
         onApply={applyFilters}
+        storagePrefix="_analytics"
       />
     </div>
   )

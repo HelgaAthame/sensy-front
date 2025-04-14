@@ -21,9 +21,17 @@ interface AnalyticsFilterModalProps {
     end: string
     filterByPhrasesCategoriesCommaSeparated?: string
   }) => void
+  storagePrefix: string
+  filtersReset?: boolean
 }
 
-export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilterModalProps) => {
+export const AnalyticsFilterModal = ({
+  isOpen,
+  onClose,
+  onApply,
+  storagePrefix,
+  filtersReset,
+}: AnalyticsFilterModalProps) => {
   const { data: vocabularyData } = useGetVocabularyQuery()
   const [selectedDictionaries, setSelectedDictionaries] = useState<number[]>([])
   const [dateRange, setDateRange] = useState<DateRange>()
@@ -33,6 +41,34 @@ export const AnalyticsFilterModal = ({ isOpen, onClose, onApply }: AnalyticsFilt
       setSelectedDictionaries([])
     }
   }, [vocabularyData])
+
+  useEffect(() => {
+    if (filtersReset) {
+      setSelectedDictionaries([])
+      setDateRange(undefined)
+    }
+  }, [filtersReset])
+
+  useEffect(() => {
+    if (isOpen) {
+      const storedStart = localStorage.getItem(`${storagePrefix}_filter-start`)
+      const storedEnd = localStorage.getItem(`${storagePrefix}_filter-end`)
+      const storedCategories = localStorage.getItem(
+        `${storagePrefix}_filter-filterByPhrasesCategoriesCommaSeparated`
+      )
+
+      if (storedStart && storedEnd) {
+        setDateRange({
+          start: storedStart,
+          end: storedEnd,
+        })
+      }
+
+      if (storedCategories) {
+        setSelectedDictionaries(storedCategories.split(',').map(str => Number(str)))
+      }
+    }
+  }, [isOpen, storagePrefix])
 
   const handleDictionaryChange = (dictionaryId: number): void => {
     setSelectedDictionaries(prev =>

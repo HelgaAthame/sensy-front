@@ -13,7 +13,6 @@ import VideoIcon from './videos.svg'
 import AudioIcon from './audio.svg'
 import GridIcon from './grid.svg'
 import FileIcon from './file.svg'
-import ResetFilters from './reset-filters.svg'
 import ArrowRightIcon from './arrow-right.svg'
 import GroupIcon from './group.svg'
 import BoxIconLine from './box-line.svg'
@@ -88,7 +87,6 @@ export {
   CheckLineIcon,
   CloseLineIcon,
   ChevronDownIcon,
-  ResetFilters,
   PaperPlaneIcon,
   EnvelopeIcon,
   LockIcon,

@@ -109,6 +109,7 @@ export interface MediaFileResultResponse {
   }
   simultaneousSpeech: {
     regions: {
+      actorByChannel: number
       actor: number
       startTime: number
       endTime: number
@@ -127,6 +128,7 @@ export interface MediaFileResultResponse {
       endChar: number
       startTime: number
       endTime: number
+      channel: number
     }[]
   }
 }

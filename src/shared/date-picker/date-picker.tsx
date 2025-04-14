@@ -53,7 +53,7 @@ export const DateTimePicker = ({
   disabled = false,
   className,
   placeholder = 'Выберите дату',
-  range = false, // По умолчанию режим выбора диапазона выключен
+  range = false,
 }: DateTimePickerProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const calendarContainerRef = useRef<HTMLDivElement>(null)
@@ -63,7 +63,7 @@ export const DateTimePicker = ({
   const getFormattedValue = () => {
     if (!value) return ''
 
-    const dateFormat = format ?? (withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD')
+    const dateFormat = format ?? (withTime ? 'DD.MM.YYYY HH:mm' : 'DD.MM.YYYY')
 
     if (Array.isArray(value)) {
       if (value.length === 0) return ''
@@ -159,7 +159,7 @@ export const DateTimePicker = ({
 
   return (
     <div className="w-full relative">
-      {label && <label className="block mb-1 text-sm font-medium text-gray-700">{label}</label>}
+      {label && <label className="block mb-1.5 text-sm font-medium text-gray-700">{label}</label>}
 
       <input
         ref={inputRef}
@@ -179,7 +179,7 @@ export const DateTimePicker = ({
             months={months}
             weekDays={weekDays}
             onChange={handleDateChange}
-            format={format ?? (withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD')}
+            format={format ?? (withTime ? 'DD-MM-YYYY HH:mm' : 'DD-MM-YYYY')}
             plugins={[...(withTime ? [<TimePicker key="time-picker" />] : [])]}
             maxDate={now}
             className="bg-opacity-90 bg-purple-900"

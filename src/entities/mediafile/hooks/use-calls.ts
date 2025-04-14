@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { formatDate, formatDuration, getLast30DaysRange } from '@/shared/utils/date-utils'
+import { useCallback, useEffect, useState } from 'react'
+import { getLast30DaysRange } from '@/shared/utils/date-utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useGetMediaFilesQueryQuery,
@@ -24,32 +24,17 @@ export interface TableRowData {
 }
 
 export const useCalls = () => {
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
-  const currentPage = Number(searchParams.get('page') || 1)
+  const [filtersReset, setFiltersReset] = useState(false)
   const defaultDateRange = getLast30DaysRange()
   const router = useRouter()
   const [selectedDictionary, setSelectedDictionary] = useState(['Словарь 1'])
   const [totalEntries, setTotalEntries] = useState<number>(0)
-
-  const searchTerm = searchParams.get('search') || ''
-  const startDate = searchParams.get('start') || defaultDateRange.start
-  const endDate = searchParams.get('end') || defaultDateRange.end
-  const filterByCategories =
-    searchParams.get('filterByPhrasesCategoriesCommaSeparated') || undefined
-
-  const filterParams = {
-    start: startDate,
-    end: endDate,
-    filterByPhrasesCategoriesCommaSeparated: filterByCategories,
-  }
-
   const handleSortChange = (key: keyof TableRowData | null, isActive: boolean) => {
     updateSortParams(key as string, isActive)
   }
-
   const { sortConfig, requestSort, getSortState } = useSortable<TableRowData>(
     null,
     handleSortChange
@@ -89,6 +74,90 @@ export const useCalls = () => {
     return params
   }
 
+  const getPrefix = () => {
+    return window.location.pathname.replace(/\//g, '_')
+  }
+
+  const getFilterKey = useCallback((key: string) => `${getPrefix()}_filter-${key}`, [getPrefix])
+
+  const getParamOrStorage = (paramName: string) => {
+    const filterKey = getFilterKey(paramName)
+
+    return searchParams.get(paramName) || localStorage.getItem(filterKey) || ''
+  }
+
+  const searchTerm = getParamOrStorage('search') || ''
+  const startDate = getParamOrStorage('start') || defaultDateRange.start
+  const endDate = getParamOrStorage('end') || defaultDateRange.end
+  const currentPage = Number(getParamOrStorage('page') || 1)
+  const filterByCategories =
+    getParamOrStorage('filterByPhrasesCategoriesCommaSeparated') || undefined
+  const initialRowsPerPage = Number(getParamOrStorage('limit')) || 10
+  const [rowsPerPage, setRowsPerPage] = useState<number>(initialRowsPerPage)
+
+  const queryParams = {
+    start: startDate,
+    end: endDate,
+    offset: (currentPage - 1) * rowsPerPage,
+    limit: rowsPerPage,
+    searchPhrase: searchTerm,
+    filterByPhrasesCategoriesCommaSeparated: filterByCategories,
+    ...getSortParams(),
+  }
+
+  const { data: mediaFilesData, refetch } = useGetMediaFilesQueryQuery(queryParams)
+  const [downloadUrl] = useLazyGetDownloadFileExcelQuery()
+
+  const mediaFilesDataTable = mediaFilesData?.mediaFile || []
+  const totalCount = mediaFilesData?.totalCount || 0
+
+  useEffect(() => {
+    if (mediaFilesData) {
+      setTotalEntries(mediaFilesData.totalCount || 0)
+    }
+  }, [mediaFilesData])
+
+  const updateSearchParams = (newParams: Partial<Record<string, string | undefined>>) => {
+    const params = new URLSearchParams(searchParams)
+    let hasChanges = false
+
+    Object.entries(newParams).forEach(([key, value]) => {
+      const filterKey = getFilterKey(key)
+
+      if (value === undefined || value === '') {
+        if (params.has(key)) {
+          params.delete(key)
+          hasChanges = true
+        }
+        localStorage.removeItem(filterKey)
+      } else {
+        if (params.get(key) !== value) {
+          params.set(key, value)
+          hasChanges = true
+        }
+        localStorage.setItem(filterKey, value)
+      }
+    })
+
+    if (hasChanges) {
+      router.push(`?${params.toString()}`)
+    }
+  }
+
+  const [filtersActive, setFiltersActive] = useState<boolean>(false)
+
+  useEffect(() => {
+    const isDefaultDateRange =
+      startDate === defaultDateRange.start && endDate === defaultDateRange.end
+
+    const datesActive = startDate && endDate && !isDefaultDateRange
+
+    const active = Boolean(searchTerm || datesActive || filterByCategories)
+
+    setFiltersActive(active)
+    localStorage.setItem(getFilterKey('_calls_filter-filtersActive'), JSON.stringify(active))
+  }, [searchTerm, startDate, endDate, filterByCategories, defaultDateRange])
+
   const updateSortParams = (key: string | null, isActive: boolean) => {
     ;[
       'orderByDescOperatorName',
@@ -127,60 +196,10 @@ export const useCalls = () => {
           break
       }
     }
-
-    params.set('page', '1')
+    updateSearchParams({ page: '1' })
 
     router.push(`?${params.toString()}`)
   }
-
-  const queryParams = {
-    start: filterParams.start || startDate,
-    end: filterParams.end || endDate,
-    offset: (currentPage - 1) * rowsPerPage,
-    limit: rowsPerPage,
-    searchPhrase: searchTerm,
-    filterByPhrasesCategoriesCommaSeparated: filterParams.filterByPhrasesCategoriesCommaSeparated,
-    ...getSortParams(),
-  }
-
-  const { data: mediaFilesData, isLoading, refetch } = useGetMediaFilesQueryQuery(queryParams)
-  const [downloadUrl] = useLazyGetDownloadFileExcelQuery()
-
-  const mediaFiles = mediaFilesData?.mediaFile || []
-  const totalCount = mediaFilesData?.totalCount || 0
-
-  useEffect(() => {
-    if (mediaFilesData) {
-      setTotalEntries(mediaFilesData.totalCount || 0)
-    }
-  }, [mediaFilesData])
-
-  const tableData = useMemo(() => {
-    if (!mediaFiles) return []
-
-    return mediaFiles.map((file): TableRowData => {
-      const summaryAnalyserResult = file.summaryAnalyserResult || {}
-      const additionalMetadata = file.additionalMetadata || {}
-
-      const negativeValue = Math.round((summaryAnalyserResult.negativeLevelOverall || 0) * 100)
-
-      const silenceSeconds = summaryAnalyserResult.maxSimultaneousSilenceDuration || 0
-
-      return {
-        id: file.id.toString(),
-        date: formatDate(file.createDate),
-        operator: file.operatorName || 'Неизвестно',
-        phone: additionalMetadata.clientNumber || 'Неизвестно',
-        duration: formatDuration(file.duration || 0),
-        negative: `${negativeValue}%`,
-        negativeValue: negativeValue,
-        lexis: Object.keys(summaryAnalyserResult.keywordsSearchCounter || {}).length,
-        interruptions: summaryAnalyserResult.simultaneousSpeechCount || 0,
-        silence: formatDuration(silenceSeconds),
-        silenceSeconds: silenceSeconds,
-      }
-    })
-  }, [mediaFiles])
 
   const openFilterModal = () => {
     setIsFilterModalOpen(true)
@@ -199,17 +218,19 @@ export const useCalls = () => {
   }
 
   const handleDateRangeChange = (dates: Date[]) => {
-    const params = new URLSearchParams(searchParams)
+    if (!dates[0] && !dates[1]) return
+
+    const newParams: Record<string, string> = {}
 
     if (dates[0]) {
-      const formattedStartDate = dates[0].toISOString().split('T')[0]
-      params.set('start', formattedStartDate)
+      newParams.start = dates[0].toISOString().split('T')[0]
     }
 
     if (dates[1]) {
-      const formattedEndDate = dates[1].toISOString().split('T')[0]
-      params.set('end', formattedEndDate)
+      newParams.end = dates[1].toISOString().split('T')[0]
     }
+
+    updateSearchParams({ ...newParams, page: '1' })
   }
 
   const handleApplyFilter = () => {
@@ -222,17 +243,22 @@ export const useCalls = () => {
   const startIndex = (currentPage - 1) * rowsPerPage
   const endIndex = Math.min(startIndex + rowsPerPage, totalEntries)
 
-  const handlePageChange = (page: number): void => {
+  const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      params.set('page', page.toString())
-      router.push(`?${params.toString()}`)
+      updateSearchParams({ page: page.toString() })
     }
   }
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const newRowsPerPage = parseInt(e.target.value, 10)
     setRowsPerPage(newRowsPerPage)
-    params.set('page', '1')
+
+    updateSearchParams({
+      page: '1',
+      limit: newRowsPerPage.toString(),
+    })
+
+    refetch()
   }
 
   const handleSort = (key: keyof TableRowData) => {
@@ -261,28 +287,47 @@ export const useCalls = () => {
     }
   }
 
-  const applyFilters = (newParams: any) => {
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value as string)
-      } else {
-        params.delete(key)
-      }
+  const applyFilters = (newParams: Record<string, string>) => {
+    updateSearchParams({
+      ...newParams,
+      page: '1',
     })
+    setIsFilterModalOpen(false)
+  }
 
-    params.set('page', '1')
-    router.push(`?${params.toString()}`)
-    closeFilterModal()
+  const resetSearchParams = () => {
+    const params = new URLSearchParams(searchParams)
+    params.forEach((_, key) => {
+      params.delete(key)
+    })
+    router.push(window.location.pathname)
   }
 
   const handleResetFilters = () => {
-    const newParams = new URLSearchParams()
-    router.push(`?${newParams.toString()}`)
+    resetSearchParams()
+    const prefixKey = getPrefix()
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(`${prefixKey}_filter-`)) {
+        localStorage.removeItem(key)
+      }
+    })
+
+    setFiltersReset(true)
+
+    setTimeout(() => {
+      setFiltersReset(false)
+    }, 100)
+  }
+
+  const handleRefresh = () => {
+    refetch()
+    toast.success('Данные успешно обновлены')
   }
 
   return {
-    tableData,
-    isLoading,
+    filtersReset,
+    mediaFilesDataTable,
+    filtersActive,
     currentPage,
     rowsPerPage,
     totalEntries,
@@ -297,7 +342,10 @@ export const useCalls = () => {
     router,
 
     // Methods
+    getParamOrStorage,
+    getFilterKey,
     handlePageChange,
+    handleRefresh,
     handleResetFilters,
     applyFilters,
     handleRowsPerPageChange,

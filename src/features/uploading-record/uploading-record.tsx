@@ -14,7 +14,6 @@ export const UploadingRecord = () => {
 
   return (
     <div className="space-y-6">
-      <PageBreadcrumb pageTitle="Загрузка записи" />
       <DropzoneComponent onFileUploaded={handleFileUploaded} uploadedFile={uploadedFile} />
       <UploadForm uploadedFile={uploadedFile} onFileUploaded={handleFileUploaded} />
     </div>

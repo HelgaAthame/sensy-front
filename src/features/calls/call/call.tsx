@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Tab } from '@/shared/tab/tab'
 import PageBreadcrumb from '@/shared/page-breadcrumb/page-breadcrumb'
 import { Transcript } from './transcript/transcript'
@@ -16,6 +16,7 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
 import { formatDates } from '@/shared/utils/date-utils'
 import './calls.css'
+import { appRoutes } from '@/shared/constants/routes'
 
 enum CallTab {
   Transcript = 'transcript',
@@ -31,7 +32,12 @@ type TabItem = {
 type AudioIndicator = {
   type: string
   color: string
-  regions?: { start: number; end: number }[]
+  regions?: {
+    start: number
+    end: number
+    channel?: number
+    actorByChannel?: number
+  }[]
 }
 
 export const Call = () => {
@@ -66,7 +72,11 @@ export const Call = () => {
       regions:
         mediaFileResult?.tonal?.regions
           ?.filter(region => region.type === 1)
-          ?.map(region => ({ start: region.startTime, end: region.endTime })) || [],
+          ?.map(region => ({
+            start: region.startTime,
+            end: region.endTime,
+            channel: region.channel,
+          })) || [],
     },
     {
       type: 'Лексика',
@@ -75,6 +85,7 @@ export const Call = () => {
         mediaFileResult?.keywordsSearchResult?.regions?.map(region => ({
           start: region.startTime,
           end: region.endTime,
+          channel: region.channel !== undefined ? region.channel : 0,
         })) || [],
     },
     {
@@ -93,6 +104,7 @@ export const Call = () => {
         mediaFileResult?.simultaneousSpeech?.regions?.map(region => ({
           start: region.startTime,
           end: region.endTime,
+          channel: region.actorByChannel !== undefined ? region.actorByChannel : 0,
         })) || [],
     },
   ]
@@ -100,46 +112,87 @@ export const Call = () => {
   const numChannels = mediaFileById?.numChannels ?? 0
   const hasMultipleChannels = numChannels > 1
 
-  // Функция для создания регионов
-  const createRegions = () => {
+  const createRegions = useCallback(() => {
     if (!wavesurferRef.current || !regionsPluginRef.current || regionsAddedRef.current) return
 
-    // Создаем регионы для каждого индикатора
+    regionsPluginRef.current.clearRegions()
+
     audioIndicators.forEach(indicator => {
       if (!indicator.regions) return
 
       indicator.regions.forEach(region => {
-        // Преобразуем цвета классов в реальные цвета
+        const isCircleMarker = indicator.type === 'Перебивания' || indicator.type === 'Лексика'
         let actualColor
+
         switch (indicator.color) {
           case 'bg-red-400':
-            actualColor = 'rgba(227, 11, 92, 0.4)' // Негатив
+            actualColor = '#ff6467' // Более заметный красный для негатива
             break
           case 'bg-blue-400':
-            actualColor = 'rgba(157, 174, 255, 0.4)' // Лексика
+            actualColor = '#639fe5' // Более заметный синий для лексики
             break
           case 'bg-yellow-400':
-            actualColor = 'rgba(255, 213, 98, 0.4)' // Паузы
+            actualColor = '#fce8c0' // Желтый для пауз
             break
           case 'bg-red-500':
-            actualColor = 'rgba(255,0,0,0.4)' // Перебивания
+            actualColor = '#fb2c36' // Зеленоватый для перебиваний
             break
           default:
-            actualColor = 'rgba(107, 33, 168, 0.5)'
+            actualColor = 'rgba(107, 33, 168, 0.5)' // Фиолетовый по умолчанию
         }
 
-        regionsPluginRef.current.addRegion({
-          start: region.start,
-          end: region.end,
-          color: actualColor,
-          drag: false,
-          resize: false,
-        })
+        if (isCircleMarker) {
+          const regionId = `marker-${indicator.type}-${region.start}-${region.channel || 0}`
+
+          const markerRegion = regionsPluginRef.current.addRegion({
+            id: regionId,
+            start: region.start,
+            end: region.start + 0.01,
+            color: 'rgba(0,0,0,0)',
+            drag: false,
+            resize: false,
+            channelIdx: region.channel,
+            channel: region.channel,
+            markerType: indicator.type,
+          })
+
+          if (markerRegion && markerRegion.element) {
+            markerRegion.element.style.zIndex = '100'
+
+            const circle = document.createElement('div')
+            circle.className = 'marker-circle'
+            circle.style.position = 'absolute'
+            circle.style.width = '15px'
+            circle.style.height = '15px'
+            circle.style.border = '1px solid rgba(0, 0, 0, 0.3)'
+            circle.style.borderRadius = '50%'
+            circle.style.backgroundColor = actualColor
+            circle.style.top = '50%'
+            circle.style.left = '0' // Позиционируем в начале региона
+            circle.style.transform = 'translate(-50%, -50%)'
+            circle.setAttribute(
+              'style',
+              circle.getAttribute('style') + '; z-index: 100 !important;'
+            )
+
+            markerRegion.setContent(circle)
+          }
+        } else {
+          regionsPluginRef.current.addRegion({
+            start: region.start,
+            end: region.end,
+            color: actualColor,
+            drag: false,
+            resize: false,
+            channelIdx: region.channel,
+            channel: region.channel,
+          })
+        }
       })
     })
 
     regionsAddedRef.current = true
-  }
+  }, [audioIndicators])
 
   useEffect(() => {
     if (!containerRef.current || !mediaFileById) return
@@ -309,20 +362,13 @@ export const Call = () => {
     mediaFileResult?.gptSummary ||
     `В рамках спецификации современных стандартов, непосредственные участники технического прогресса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть описаны максимально подробно.`
 
-  if (isLoading) {
-    return (
-      <div className="p-4 min-h-screen">
-        <PageBreadcrumb pageTitle="Звонок" />
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 flex justify-center items-center h-96">
-          <div className="text-gray-500">Загрузка данных...</div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="p-4 min-h-screen">
-      <PageBreadcrumb pageTitle="Звонок" />
+      <PageBreadcrumb
+        pageTitle={callInfo.name}
+        backTitle="Звонки"
+        backHref={appRoutes.private.calls}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">

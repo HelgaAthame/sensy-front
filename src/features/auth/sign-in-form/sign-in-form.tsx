@@ -10,12 +10,10 @@ import Button from '@/shared/button/button'
 import { appRoutes } from '@/shared/constants/routes'
 import { toast } from 'react-toastify'
 import { setToLocalStorage } from '@/shared/utils/common-utils'
-import { Loader } from '@/shared/loader/loader'
 import { useSignInMutation } from '@/entities/auth/auth.api'
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
-  const [isRedirecting, setIsRedirecting] = useState(false)
   const { handleSubmit, control } = useSignInForm()
   const [signIn, { isLoading }] = useSignInMutation()
 
@@ -26,8 +24,6 @@ export function SignInForm() {
         password: data.password,
       }
 
-      setIsRedirecting(true)
-
       const response = await signIn(payload).unwrap()
 
       setToLocalStorage('accessToken', response.accessToken)
@@ -35,7 +31,6 @@ export function SignInForm() {
 
       window.location.href = appRoutes.private.dashboard
     } catch (error: any) {
-      setIsRedirecting(false)
       if (error.status === 401) {
         toast.error('Неверный логин или пароль')
       } else {
@@ -46,7 +41,6 @@ export function SignInForm() {
 
   return (
     <>
-      {(isLoading || isRedirecting) && <Loader message={'Выполняется вход...'} />}
       <div className="flex min-h-screen">
         {/* Left side - Authorization form */}
         <div className="w-full lg:w-1/2 p-8 flex items-center justify-center">
@@ -116,9 +110,9 @@ export function SignInForm() {
 
                 <Button
                   type="submit"
-                  disabled={isLoading || isRedirecting}
+                  disabled={isLoading}
                   className={`w-full py-2 px-4 rounded-full transition-colors cursor-pointer flex items-center justify-center ${
-                    isLoading || isRedirecting
+                    isLoading
                       ? 'bg-purple-700 cursor-not-allowed opacity-80 text-white'
                       : 'bg-purple-900 hover:bg-purple-800 text-white'
                   }`}

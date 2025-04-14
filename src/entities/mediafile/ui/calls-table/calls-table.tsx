@@ -3,7 +3,7 @@
 import { JSX } from 'react'
 import Button from '@/shared/button/button'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/table/table'
-import { FilterIcon, ResetFilters } from '@/../public/assets/icons'
+import { FilterIcon } from '@/../public/assets/icons'
 import { appRoutes } from '@/shared/constants/routes'
 import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
 import { useCalls } from '@/entities/mediafile/hooks/use-calls'
@@ -13,8 +13,9 @@ import {
   getValueColorClass,
 } from '@/shared/lib/color/get-color-class'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
-import { Loader } from '@/shared/loader/loader'
-import { DownloadIcon } from '@/../public/assets/svg-components'
+import { DownloadIcon, ResetFiltersActive, ResetFilters } from '@/../public/assets/svg-components'
+import { formatDates, formatDuration } from '@/shared/utils/date-utils'
+import Pagination from '@/shared/pagination/pagination'
 
 export const CallsTable = (): JSX.Element => {
   const {
@@ -24,25 +25,32 @@ export const CallsTable = (): JSX.Element => {
     handleDownload,
     handleSort,
     getSortDirection,
-    isLoading,
-    tableData,
+    filtersReset,
+    mediaFilesDataTable,
     closeFilterModal,
     isFilterModalOpen,
     handleResetFilters,
+    handleRefresh,
     applyFilters,
     router,
+    filtersActive,
+    handlePageChange,
+    totalPages,
+    currentPage,
+    totalEntries,
+    startIndex,
+    endIndex,
   } = useCalls()
 
   return (
     <>
-      {isLoading && <Loader message={'Загрузка звонков...'} />}
       <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03]">
         <div className="flex flex-col gap-2 px-4 py-4 border border-b-0 border-gray-100 dark:border-white/[0.05] rounded-t-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <div className="flex items-center gap-3">
             <span className="text-gray-500 dark:text-gray-400">Показывать</span>
             <div className="relative z-20 bg-transparent">
               <select
-                className="w-[66px] py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-full appearance-none h-9 bg-none shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                className="w-[66px] py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-full appearance-none h-9 shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={rowsPerPage}
                 onChange={handleRowsPerPageChange}
               >
@@ -56,7 +64,7 @@ export const CallsTable = (): JSX.Element => {
                   5
                 </option>
               </select>
-              <span className="absolute z-30 text-gray-500 -translate-y-1/2 right-2 top-1/2 dark:text-gray-400">
+              <span className="absolute z-10 text-gray-500 -translate-y-1/2 right-2 top-1/2 pointer-events-none dark:text-gray-400">
                 <svg
                   className="stroke-current"
                   width="16"
@@ -87,17 +95,28 @@ export const CallsTable = (): JSX.Element => {
               <FilterIcon width={20} height={20} />
             </Button>
             <Button
-              className="h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
+              className={`h-[44px] border border-gray-200 rounded-full ${filtersActive ? 'hover:bg-gray-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'} flex items-center gap-2`}
               onClick={handleResetFilters}
+              disabled={!filtersActive}
             >
               <span>Сброс</span>
-              <ResetFilters width={20} height={20} />
+              {filtersActive ? (
+                <ResetFiltersActive width={20} height={20} />
+              ) : (
+                <ResetFilters width={20} height={20} />
+              )}
             </Button>
             <Button
-              className="w-[116px] h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
+              className="h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
+              onClick={handleRefresh}
+            >
+              <span>Обновить</span>
+            </Button>
+            <Button
+              className="w-[150px] h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
               onClick={handleDownload}
             >
-              <span>Скачать</span>
+              <span>Скачать XLS</span>
               <DownloadIcon width={16} height={16} />
             </Button>
           </div>
@@ -152,56 +171,58 @@ export const CallsTable = (): JSX.Element => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columnConfig.length}
-                      className="px-4 py-4 text-center border border-gray-100"
-                    >
-                      Загрузка данных...
-                    </TableCell>
-                  </TableRow>
-                ) : tableData.length > 0 ? (
-                  tableData.map(item => (
-                    <TableRow
-                      className="cursor-pointer hover:bg-gray-100"
-                      key={item.id}
-                      onClick={() => router.push(appRoutes.private.call(item.id))}
-                    >
-                      <TableCell className="px-4 py-4 border-b border-l border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
-                        {item.date}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
-                        {item.operator}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                        {item.phone}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                        {item.duration}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                        <span
-                          className={`text-sm font-normal ${getNegativeColorClass(item.negativeValue)}`}
-                        >
-                          {item.negative}
-                        </span>
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                        <span className={`${getValueColorClass(item.lexis)}`}>{item.lexis}</span>
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                        <span className={`${getValueColorClass(item.interruptions)}`}>
-                          {item.interruptions}
-                        </span>
-                      </TableCell>
-                      <TableCell className="px-4 py-4 border-b border-r border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                        <span className={`${getSilenceColorClass(item.silenceSeconds)}`}>
-                          {item.silence}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                {mediaFilesDataTable.length > 0 ? (
+                  mediaFilesDataTable.map(item => {
+                    const summaryAnalyserResult = item.summaryAnalyserResult || {}
+                    const negativeValue = Math.round(
+                      (summaryAnalyserResult.negativeLevelOverall || 0) * 100
+                    )
+                    const silenceSeconds = summaryAnalyserResult.maxSimultaneousSilenceDuration || 0
+                    const lexis = Object.keys(
+                      summaryAnalyserResult.keywordsSearchCounter || {}
+                    ).length
+                    const interruptions = summaryAnalyserResult.simultaneousSpeechCount || 0
+                    return (
+                      <TableRow
+                        className="cursor-pointer hover:bg-gray-100"
+                        key={item.id}
+                        onClick={() => router.push(appRoutes.private.call(String(item.id)))}
+                      >
+                        <TableCell className="px-4 py-4 border-b border-l border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
+                          {formatDates(item.createDate ? new Date(item.createDate) : null)}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
+                          {item.operatorName}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                          {item.additionalMetadata.clientNumber}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                          {formatDuration(item.duration)}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span
+                            className={`text-sm font-normal ${getNegativeColorClass(negativeValue)}`}
+                          >
+                            {`${negativeValue}%`}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span className={`${getValueColorClass(lexis)}`}>{lexis}</span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span className={`${getValueColorClass(interruptions)}`}>
+                            {interruptions}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-r border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span className={`${getSilenceColorClass(silenceSeconds)}`}>
+                            {formatDuration(silenceSeconds)}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 ) : (
                   <TableRow>
                     <TableCell
@@ -220,7 +241,27 @@ export const CallsTable = (): JSX.Element => {
           isOpen={isFilterModalOpen}
           onClose={closeFilterModal}
           onApply={applyFilters}
+          storagePrefix="_calls"
+          filtersReset={filtersReset}
         />
+        <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
+            <div className="pb-3 xl:pb-0">
+              {totalEntries > 0 && (
+                <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
+                  Отображаются от {startIndex + 1} до {endIndex} из {totalEntries} записей
+                </p>
+              )}
+            </div>
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </>
   )

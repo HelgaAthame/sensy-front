@@ -91,7 +91,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
           </div>
 
           <h4 className="mb-3 font-semibold text-gray-800 text-lg dark:text-white/90">
-            {isDragActive ? 'Drop Files Here' : title}
+            {isDragActive ? 'Поместите файл сюда' : title}
           </h4>
 
           <span className="text-center mb-5 block w-full max-w-sm text-sm text-gray-700 dark:text-gray-400">

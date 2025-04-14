@@ -1,4 +1,17 @@
 #waveform ::part(canvases) {
   position: relative;
-  z-index: 10;
+  z-index: 6;
 }
+
+/*#waveform [part*="marker-Лексика"] {*/
+/*  z-index: 100 !important;*/
+/*}*/
+
+/*#waveform [part*="marker-Перебивания"] {*/
+/*  z-index: 100 !important;*/
+/*}*/
+
+/*!* Для всех маркеров *!*/
+/*#waveform [part*="marker"] {*/
+/*  z-index: 100 !important;*/
+/*}*/
