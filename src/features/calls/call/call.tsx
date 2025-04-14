@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Tab } from '@/shared/tab/tab'
 import PageBreadcrumb from '@/shared/page-breadcrumb/page-breadcrumb'
 import { Transcript } from './transcript/transcript'
@@ -65,49 +65,51 @@ export const Call = () => {
   const [activeTab, setActiveTab] = useState(CallTab.Transcript)
   const [playbackRate, setPlaybackRate] = useState('1x')
 
-  const audioIndicators: AudioIndicator[] = [
-    {
-      type: 'Негатив',
-      color: 'bg-red-400',
-      regions:
-        mediaFileResult?.tonal?.regions
-          ?.filter(region => region.type === 1)
-          ?.map(region => ({
+  const audioIndicators: AudioIndicator[] = useMemo(() => {
+    return [
+      {
+        type: 'Негатив',
+        color: 'bg-red-400',
+        regions:
+          mediaFileResult?.tonal?.regions
+            ?.filter(region => region.type === 1)
+            ?.map(region => ({
+              start: region.startTime,
+              end: region.endTime,
+              channel: region.channel,
+            })) || [],
+      },
+      {
+        type: 'Лексика',
+        color: 'bg-blue-400',
+        regions:
+          mediaFileResult?.keywordsSearchResult?.regions?.map(region => ({
             start: region.startTime,
             end: region.endTime,
-            channel: region.channel,
+            channel: region.channel !== undefined ? region.channel : 0,
           })) || [],
-    },
-    {
-      type: 'Лексика',
-      color: 'bg-blue-400',
-      regions:
-        mediaFileResult?.keywordsSearchResult?.regions?.map(region => ({
-          start: region.startTime,
-          end: region.endTime,
-          channel: region.channel !== undefined ? region.channel : 0,
-        })) || [],
-    },
-    {
-      type: 'Паузы',
-      color: 'bg-yellow-400',
-      regions:
-        mediaFileResult?.simultaneousSilence?.regions?.map(region => ({
-          start: region.startTime,
-          end: region.endTime,
-        })) || [],
-    },
-    {
-      type: 'Перебивания',
-      color: 'bg-red-500',
-      regions:
-        mediaFileResult?.simultaneousSpeech?.regions?.map(region => ({
-          start: region.startTime,
-          end: region.endTime,
-          channel: region.actorByChannel !== undefined ? region.actorByChannel : 0,
-        })) || [],
-    },
-  ]
+      },
+      {
+        type: 'Паузы',
+        color: 'bg-yellow-400',
+        regions:
+          mediaFileResult?.simultaneousSilence?.regions?.map(region => ({
+            start: region.startTime,
+            end: region.endTime,
+          })) || [],
+      },
+      {
+        type: 'Перебивания',
+        color: 'bg-red-500',
+        regions:
+          mediaFileResult?.simultaneousSpeech?.regions?.map(region => ({
+            start: region.startTime,
+            end: region.endTime,
+            channel: region.actorByChannel !== undefined ? region.actorByChannel : 0,
+          })) || [],
+      },
+    ]
+  }, [mediaFileResult])
 
   const numChannels = mediaFileById?.numChannels ?? 0
   const hasMultipleChannels = numChannels > 1
@@ -222,6 +224,8 @@ export const Call = () => {
 
     wavesurferRef.current = wavesurfer
     regionsPluginRef.current = wavesurfer.registerPlugin(RegionsPlugin.create())
+
+    regionsPluginRef.current.regionsContainer.style.position = 'static'
 
     const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`
 
