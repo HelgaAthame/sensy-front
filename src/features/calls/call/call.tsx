@@ -120,19 +120,6 @@ export const Call = () => {
 
     regionsPluginRef.current.clearRegions()
 
-    const getTopByChannel = (channel?: number): string => {
-      switch (channel) {
-        case 0:
-          return '50%'
-        case 1:
-          return '50%'
-        case -1:
-          return '75%'
-        default:
-          return '50%'
-      }
-    }
-
     audioIndicators.forEach(indicator => {
       if (!indicator.regions) return
 
@@ -183,7 +170,7 @@ export const Call = () => {
             circle.style.border = '1px solid rgba(0, 0, 0, 0.3)'
             circle.style.borderRadius = '50%'
             circle.style.backgroundColor = actualColor
-            circle.style.top = getTopByChannel(region.channel)
+            circle.style.top = '50%'
             circle.style.left = '0'
             circle.style.transform = 'translate(-50%, -50%)'
             circle.setAttribute(
