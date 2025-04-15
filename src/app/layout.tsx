@@ -3,6 +3,7 @@ import Providers from '@/app/providers'
 import { AuthGate } from '@/shared/AuthGate'
 import { Arimo } from 'next/font/google'
 import NavigationLoader from '@/shared/loader/navigation-loader-state/navigation-loader-state'
+import { Suspense } from 'react'
 
 const arimo = Arimo({
   subsets: ['latin'],
@@ -22,7 +23,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={arimo.variable}>
         <Providers>
-          <NavigationLoader />
+          <Suspense
+            fallback={
+              <div className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800"></div>
+            }
+          >
+            <NavigationLoader />
+          </Suspense>
           <AuthGate>{children}</AuthGate>
         </Providers>
       </body>

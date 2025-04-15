@@ -2,7 +2,6 @@
 
 import DropzoneComponent from '@/shared/dropzone-component/dropzone-component'
 import { UploadForm } from '@/features/uploading-record/upload-form'
-import PageBreadcrumb from '@/shared/page-breadcrumb/page-breadcrumb'
 import { useState } from 'react'
 import { LoaderContent } from '@/shared/loader'
 

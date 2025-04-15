@@ -58,6 +58,10 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
     }
   }, [uploadedFile, setValue])
 
+  useEffect(() => {
+    setIsLoading(isLoading)
+  }, [isLoading, setIsLoading])
+
   const reset = () => {
     hookFormReset()
     onFileUploaded([])
@@ -87,6 +91,8 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
       reset()
     } catch (error) {
       toast.error('Ошибка загрузки')
+    } finally {
+      setIsLoading(false)
     }
   })
 
