@@ -1,18 +1,14 @@
 'use client'
 
-import Pagination from '@/shared/pagination/pagination'
 import { ReactNode, useEffect, useState } from 'react'
-import { useCalls } from '@/entities/mediafile/hooks/use-calls'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
-import { UploadAlert } from '@/shared/upload-alert/upload-alert'
+import { UploadAlert } from '@/shared/ui/upload-alert/upload-alert'
 
 interface CallsFeatureWrapperProps {
   children: ReactNode
 }
 
 export const CallsFeatureWrapper = ({ children }: CallsFeatureWrapperProps) => {
-  const { handlePageChange, totalPages, currentPage, totalEntries, startIndex, endIndex } =
-    useCalls()
 
   const [showUploadAlert, setShowUploadAlert] = useState(false)
 

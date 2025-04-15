@@ -7,11 +7,11 @@ import ImpressionChart from '@/features/analytics/analytics-impression-chart/ana
 import TopChannel from '@/features/analytics/top-channel/top-channel'
 import TopPages from '@/features/analytics/top-pages/top-pages'
 import { useGetAnalyticsDashboardQuery } from '@/entities/analytics/analytics.api'
-import Button from '@/shared/button/button'
+import Button from '@/shared/ui/button/button'
 import { FilterIcon } from '@/../public/assets/icons'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
 import { getLast30DaysRange } from '@/shared/utils/date-utils'
-import { LoaderContent } from '@/shared/loader'
+import { LoaderContent } from '@/shared/ui/loader'
 
 export const Analytics = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)

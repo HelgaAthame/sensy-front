@@ -1,6 +1,6 @@
 'use client'
 
-import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
+import { useSidebar } from '@/shared/ui/sidebar/context/sidebar-context'
 import { useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -12,7 +12,7 @@ import {
   TelephoneIcon,
   UserCircleIcon,
   LogoIcon,
-} from '@/../public/assets/svg-components'
+} from '../../../../../public/assets/svg-components'
 
 type NavItem = {
   name: string
@@ -64,7 +64,7 @@ export const Sidebar: React.FC = () => {
       <div
         className={`py-4 flex ${!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'}`}
       >
-        <Link href="/">
+        <Link href="/public">
           {isExpanded || isHovered || isMobileOpen ? (
             <LogoIcon width={123} height={31} fill={'#5A2D76'} />
           ) : (

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Tab } from '@/shared/tab/tab'
-import PageBreadcrumb from '@/shared/page-breadcrumb/page-breadcrumb'
+import { Tab } from '@/shared/ui/tab/tab'
+import PageBreadcrumb from '@/shared/ui/page-breadcrumb/page-breadcrumb'
 import { Transcript } from './transcript/transcript'
 import { Checklist, ChecklistGroup } from '@/features/calls/call/checklists/checklists'
 import { Summary } from '@/features/calls/call/summary/summary'
@@ -15,9 +15,9 @@ import WaveSurfer from 'wavesurfer.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
 import { formatDates } from '@/shared/utils/date-utils'
-import './calls.css'
+import './call.css'
 import { appRoutes } from '@/shared/constants/routes'
-import { LoaderContent } from '@/shared/loader'
+import { LoaderContent } from '@/shared/ui/loader'
 
 enum CallTab {
   Transcript = 'transcript',

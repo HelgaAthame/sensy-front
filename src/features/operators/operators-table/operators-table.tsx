@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/table/table'
-import Pagination from '@/shared/pagination/pagination'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
+import Pagination from '@/shared/ui/pagination/pagination'
 
 interface ColumnDef<T> {
   key: keyof T | string

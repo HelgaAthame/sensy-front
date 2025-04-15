@@ -1,8 +1,8 @@
 'use client'
 
 import { JSX } from 'react'
-import Button from '@/shared/button/button'
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/table/table'
+import Button from '@/shared/ui/button/button'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
 import { FilterIcon } from '@/../public/assets/icons'
 import { appRoutes } from '@/shared/constants/routes'
 import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
@@ -15,8 +15,8 @@ import {
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
 import { DownloadIcon, ResetFiltersActive, ResetFilters } from '@/../public/assets/svg-components'
 import { formatDates, formatDuration } from '@/shared/utils/date-utils'
-import Pagination from '@/shared/pagination/pagination'
-import { LoaderContent } from '@/shared/loader'
+import Pagination from '@/shared/ui/pagination/pagination'
+import { LoaderContent } from '@/shared/ui/loader'
 
 export const CallsTable = (): JSX.Element => {
   const {

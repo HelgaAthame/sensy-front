@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { MoreDotIcon } from '@/../public/assets/icons'
-import { Dropdown } from '@/shared/dropdown/dropdown'
-import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
+import { Dropdown } from '@/shared/ui/dropdown/dropdown'
+import { DropdownItem } from '@/shared/ui/dropdown/dropdown-Item'
 import { OperatorRatingDataItem } from '@/entities/analytics/analytics.types'
 
 interface TopChannelProps {

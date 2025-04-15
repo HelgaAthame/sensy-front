@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
+import { useSidebar } from '@/shared/ui/sidebar/context/sidebar-context'
 import Link from 'next/link'
-import { ThemeToggleButton } from '@/shared/theme-toggle-button/theme-toggle-button'
-import { NotificationDropdown } from '@/shared/notification-dropdown/notification-dropdown'
-import UserDropdown from '@/shared/header/user-dropdown'
+import { ThemeToggleButton } from '@/shared/ui/theme-toggle-button/theme-toggle-button'
+import { NotificationDropdown } from '@/shared/ui/notification-dropdown/notification-dropdown'
+import UserDropdown from '@/shared/ui/header/user-dropdown'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { appRoutes } from '@/shared/constants/routes'
-import { LogoIcon } from '@/../public/assets/svg-components'
+import { LogoIcon } from '../../../../public/assets/svg-components'
 
 export const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false)
@@ -136,7 +136,7 @@ export const Header = () => {
             {/* Cross Icon */}
           </button>
 
-          <Link href="/" className="lg:hidden">
+          <Link href="/public" className="lg:hidden">
             <LogoIcon />
           </Link>
 

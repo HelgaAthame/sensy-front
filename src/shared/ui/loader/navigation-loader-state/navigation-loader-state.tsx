@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { LinearLoader } from '@/shared/loader/linear-loader'
+import { LinearLoader } from '@/shared/ui/loader/linear-loader'
 
 export default function NavigationLoader() {
   const [isLoading, setIsLoading] = useState(true)

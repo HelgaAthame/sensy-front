@@ -1,5 +1,5 @@
 import { FieldValues, UseControllerProps, useController } from 'react-hook-form'
-import Input, { InputProps } from '@/shared/input/input'
+import Input, { InputProps } from '@/shared/ui/input/input'
 
 type ControlledTextFieldProps<T extends FieldValues> = Omit<
   InputProps,

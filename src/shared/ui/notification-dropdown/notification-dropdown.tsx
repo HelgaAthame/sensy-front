@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Dropdown } from '@/shared/dropdown/dropdown'
-import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
+import { Dropdown } from '@/shared/ui/dropdown/dropdown'
+import { DropdownItem } from '@/shared/ui/dropdown/dropdown-Item'
 import { useGetChatMessagesQuery } from '@/entities/chat/chat.api'
 import { ChatMessage } from '@/entities/chat/chat.types'
 import { formatDates, formatTimeAgo } from '@/shared/utils/date-utils'

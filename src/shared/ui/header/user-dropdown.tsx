@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Dropdown } from '@/shared/dropdown/dropdown'
-import { DropdownItem } from '@/shared/dropdown/dropdown-Item'
-import { appRoutes } from '../constants/routes'
+import { Dropdown } from '@/shared/ui/dropdown/dropdown'
+import { DropdownItem } from '@/shared/ui/dropdown/dropdown-Item'
+import { appRoutes } from '../../constants/routes'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
-import Button from '@/shared/button/button'
+import Button from '@/shared/ui/button/button'
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false)

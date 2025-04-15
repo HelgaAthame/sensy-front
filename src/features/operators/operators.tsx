@@ -1,9 +1,9 @@
 'use client'
 
-import ComponentCard from '@/shared/component-card/component-card'
+import ComponentCard from '@/shared/ui/component-card/component-card'
 import { OperatorsTable } from '@/features/operators/operators-table/operators-table'
 import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
-import { LoaderContent } from '@/shared/loader'
+import { LoaderContent } from '@/shared/ui/loader'
 
 export const Operators = () => {
   const { data: operatorsData, isLoading } = useGetOperatorsQuery()

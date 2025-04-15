@@ -1,9 +1,9 @@
 'use client'
 
-import { useSidebar } from '@/shared/sidebar/context/sidebar-context'
-import { Sidebar } from '@/shared/sidebar/ui/sidebar'
-import Backdrop from '@/shared/backdrop/backdrop'
-import { Header } from '@/shared/header/header'
+import { useSidebar } from '@/shared/ui/sidebar/context/sidebar-context'
+import { Sidebar } from '@/shared/ui/sidebar/ui/sidebar'
+import Backdrop from '@/shared/ui/backdrop/backdrop'
+import { Header } from '@/shared/ui/header/header'
 import { ReactNode, Suspense } from 'react'
 import { RootLayout } from '@/widgets/root-layout/root-layout'
 

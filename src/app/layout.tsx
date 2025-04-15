@@ -1,8 +1,8 @@
 import '@/app/globals.css'
 import Providers from '@/app/providers'
-import { AuthGate } from '@/shared/AuthGate'
+import { AuthGate } from '../widgets/AuthGate'
 import { Arimo } from 'next/font/google'
-import NavigationLoader from '@/shared/loader/navigation-loader-state/navigation-loader-state'
+import NavigationLoader from '@/shared/ui/loader/navigation-loader-state/navigation-loader-state'
 import { Suspense } from 'react'
 
 const arimo = Arimo({

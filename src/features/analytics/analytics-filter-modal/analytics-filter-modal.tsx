@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Button from '@/shared/button/button'
-import { Modal } from '@/shared/modal/modal'
+import Button from '@/shared/ui/button/button'
+import { Modal } from '@/shared/ui/modal/modal'
 import { useGetVocabularyQuery } from '@/entities/dictionaries/dictionaries.api'
-import Checkbox from '@/shared/checkbox/checkbox'
+import Checkbox from '@/shared/ui/checkbox/checkbox'
 import { formatEndDate, formatStartDate } from '@/shared/utils/date-utils'
-import { DateTimePicker } from '@/shared/date-picker/date-picker'
+import { DateTimePicker } from '@/shared/ui/date-picker/date-picker'
 
 interface DateRange {
   start: string

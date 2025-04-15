@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@/shared/context/theme-context/theme-context'
-import { SidebarProvider } from '@/shared/sidebar/context/sidebar-context'
+import { SidebarProvider } from '@/shared/ui/sidebar/context/sidebar-context'
 import { ReactNode } from 'react'
 import { ReduxProvider } from '@/app/redux-provider'
 import { Toaster } from '@/widgets/toaster/toaster'

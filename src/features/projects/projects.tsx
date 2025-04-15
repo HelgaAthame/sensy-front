@@ -1,9 +1,9 @@
 'use client'
 
-import ComponentCard from '@/shared/component-card/component-card'
+import ComponentCard from '@/shared/ui/component-card/component-card'
 import { ProjectsTable } from '@/features/projects/projects-table/projects-table'
 import { useGetProjectsQuery } from '@/entities/projects/projects.api'
-import { LoaderContent } from '@/shared/loader'
+import { LoaderContent } from '@/shared/ui/loader'
 
 export const Projects = () => {
   const { data: operatorsData, isLoading } = useGetProjectsQuery()

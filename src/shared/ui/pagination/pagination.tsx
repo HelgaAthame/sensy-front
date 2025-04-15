@@ -1,6 +1,6 @@
 'use client'
 
-import Button from '@/shared/button/button'
+import Button from '@/shared/ui/button/button'
 
 interface PaginationProps {
   currentPage: number

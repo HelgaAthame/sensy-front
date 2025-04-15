@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import Button from '@/shared/button/button'
+import Button from '@/shared/ui/button/button'
 import { EditIcon } from '@/../public/assets/icons'
 
 interface SummaryProps {

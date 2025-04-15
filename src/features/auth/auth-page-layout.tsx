@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import GridShape from '@/shared/grid-shape/grid-shape'
-import ThemeTogglerTwo from '@/shared/theme-toggler-two/theme-toggler-two'
+import GridShape from '@/shared/ui/grid-shape/grid-shape'
+import ThemeTogglerTwo from '@/shared/ui/theme-toggler-two/theme-toggler-two'
 import { LogoIcon } from '@/../public/assets/svg-components'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {

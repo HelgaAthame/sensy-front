@@ -1,9 +1,9 @@
 'use client'
 
-import DropzoneComponent from '@/shared/dropzone-component/dropzone-component'
+import DropzoneComponent from '@/shared/ui/dropzone-component/dropzone-component'
 import { UploadForm } from '@/features/uploading-record/upload-form'
 import { useState } from 'react'
-import { LoaderContent } from '@/shared/loader'
+import { LoaderContent } from '@/shared/ui/loader'
 
 export const UploadingRecord = () => {
   const [uploadedFile, setUploadedFile] = useState<File[] | null>(null)

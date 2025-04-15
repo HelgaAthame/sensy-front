@@ -1,6 +1,6 @@
 import React from 'react'
-import Label from '@/shared/label/label'
-import { ErrorComponent } from '@/shared/error/error'
+import Label from '@/shared/ui/label/label'
+import { ErrorComponent } from '@/shared/ui/error/error'
 
 interface Option {
   value: string

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import ComponentCard from '@/shared/component-card/component-card'
+import ComponentCard from '@/shared/ui/component-card/component-card'
 import { useDropzone } from 'react-dropzone'
 
 interface DropzoneComponentProps {

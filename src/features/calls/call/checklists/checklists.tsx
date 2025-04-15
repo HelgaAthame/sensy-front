@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/table/table'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
 import { ChecklistSummary } from './checklist-summary'
 
 type ChecklistItem = {

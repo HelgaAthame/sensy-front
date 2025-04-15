@@ -1,6 +1,6 @@
 'use client'
 
-import { LoaderMain } from '@/shared/loader'
+import { LoaderMain } from '../../shared/ui/loader'
 import { usePathname } from 'next/navigation'
 import { Fragment, type ReactNode } from 'react'
 import { useMinWidth } from '@/shared/hooks/useMinWidth'
