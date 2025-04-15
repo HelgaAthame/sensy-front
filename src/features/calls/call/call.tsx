@@ -17,6 +17,7 @@ import { getFromLocalStorage } from '@/shared/utils/common-utils'
 import { formatDates } from '@/shared/utils/date-utils'
 import './calls.css'
 import { appRoutes } from '@/shared/constants/routes'
+import { LoaderContent } from '@/shared/loader'
 
 enum CallTab {
   Transcript = 'transcript',
@@ -58,7 +59,7 @@ export const Call = () => {
 
   const { data: mediaFileResult } = useGetMediaFileResultQuery({
     id,
-    negativeProbThreshold: 0.45,
+    negativeProbThreshold: 0,
     simultaneousSilenceDurationThreshold: 5,
   })
 
@@ -119,6 +120,19 @@ export const Call = () => {
 
     regionsPluginRef.current.clearRegions()
 
+    const getTopByChannel = (channel?: number): string => {
+      switch (channel) {
+        case 0:
+          return '50%'
+        case 1:
+          return '50%'
+        case -1:
+          return '75%'
+        default:
+          return '50%'
+      }
+    }
+
     audioIndicators.forEach(indicator => {
       if (!indicator.regions) return
 
@@ -169,8 +183,8 @@ export const Call = () => {
             circle.style.border = '1px solid rgba(0, 0, 0, 0.3)'
             circle.style.borderRadius = '50%'
             circle.style.backgroundColor = actualColor
-            circle.style.top = '50%'
-            circle.style.left = '0' // Позиционируем в начале региона
+            circle.style.top = getTopByChannel(region.channel)
+            circle.style.left = '0'
             circle.style.transform = 'translate(-50%, -50%)'
             circle.setAttribute(
               'style',
@@ -300,7 +314,7 @@ export const Call = () => {
   const tabs: TabItem[] = [
     { name: 'Расшифровка', key: CallTab.Transcript },
     { name: 'Резюме', key: CallTab.Summary },
-    { name: 'Чеклисты', key: CallTab.Checklists },
+    { name: 'Чек-листы', key: CallTab.Checklists },
   ]
 
   const handleTabChange = (tab: TabItem) => {
@@ -366,6 +380,14 @@ export const Call = () => {
     mediaFileResult?.gptSummary ||
     `В рамках спецификации современных стандартов, непосредственные участники технического прогресса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть описаны максимально подробно.`
 
+  if (isLoading) {
+    return (
+      <div className="p-4 min-h-screen flex items-center justify-center">
+        <LoaderContent width={200} height={200} isLoading={isLoading} />
+      </div>
+    )
+  }
+
   return (
     <div className="p-4 min-h-screen">
       <PageBreadcrumb
@@ -377,8 +399,8 @@ export const Call = () => {
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center text-white font-bold">
-              {hasMultipleChannels ? callInfo.name.charAt(0).toUpperCase() : '1'}
+            <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center text-white font-medium">
+              {callInfo.name.charAt(0).toUpperCase()}
             </div>
             <div className="ml-4">
               <>

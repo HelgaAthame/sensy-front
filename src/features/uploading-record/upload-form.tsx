@@ -11,7 +11,6 @@ import { ControlledTextField } from '@/shared/input/controlled-text-field'
 import { useEffect, useState } from 'react'
 import { ErrorComponent } from '@/shared/error/error'
 import { toast } from 'react-toastify'
-import { Loader } from '@/shared/loader/loader'
 import { useGetProjectsQuery } from '@/entities/projects/projects.api'
 import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
 import { setToLocalStorage } from '@/shared/utils/common-utils'
@@ -20,13 +19,15 @@ import 'react-multi-date-picker/styles/backgrounds/bg-gray.css'
 import 'react-multi-date-picker/styles/colors/purple.css'
 import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css'
 import { DateTimePicker } from '@/shared/date-picker/date-picker'
+import { LoaderContent } from '@/shared/loader'
 
 interface UploadFormProps {
   uploadedFile: File[] | null
   onFileUploaded: (files: File[]) => void
+  setIsLoading: (isLoading: boolean) => void
 }
 
-export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) => {
+export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: UploadFormProps) => {
   const [createMediaFile, { isLoading }] = useCreateMediaFileMutation()
   const { data: projectsData } = useGetProjectsQuery()
   const { data: operatorsData } = useGetOperatorsQuery()
@@ -103,7 +104,6 @@ export const UploadForm = ({ uploadedFile, onFileUploaded }: UploadFormProps) =>
 
   return (
     <>
-      {isLoading && <Loader message={'Идёт загрузка файла...'} />}
       <ComponentCard title="Данные">
         <Form onSubmit={onSubmit}>
           <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">

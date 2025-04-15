@@ -94,7 +94,7 @@ export const formatEndDate = (
     return undefined
   }
 
-  return formatInTimeZone(date, timeZone, "yyyy-MM-dd'T'00:00:00.000'Z'")
+  return formatInTimeZone(date, timeZone, "yyyy-MM-dd'T'23:59:59.999")
 }
 
 export const formatDateWithLocalTimeZone = (selectedDate: string | null): string => {

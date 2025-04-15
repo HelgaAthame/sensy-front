@@ -4,7 +4,7 @@ type LoaderProps = {
   textColor?: string
 }
 
-export const Loader = ({
+export const LoaderMain = ({
   message = 'Загрузка...',
   bgColor = 'bg-black/30',
   textColor = 'text-white',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import AnalyticsMetrics from '@/features/analytics/analytics-metrics/analytics-metrics'
 import AnalyticsBarChart from '@/features/analytics/analytics-bar-chart/analytics-bar-chart'
 import ImpressionChart from '@/features/analytics/analytics-impression-chart/analytics-impression-chart'
@@ -11,6 +11,7 @@ import Button from '@/shared/button/button'
 import { FilterIcon } from '@/../public/assets/icons'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
 import { getLast30DaysRange } from '@/shared/utils/date-utils'
+import { LoaderContent } from '@/shared/loader'
 
 export const Analytics = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
@@ -24,7 +25,7 @@ export const Analytics = () => {
     topNKeywords: 5,
   })
 
-  const { data } = useGetAnalyticsDashboardQuery(filterParams)
+  const { data, isLoading } = useGetAnalyticsDashboardQuery(filterParams)
 
   const openFilterModal = () => setIsFilterModalOpen(true)
   const closeFilterModal = () => setIsFilterModalOpen(false)
@@ -41,54 +42,59 @@ export const Analytics = () => {
 
   return (
     <div className="bg-white rounded-lg">
-      {/* Add page title and filter button */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Аналитика</h1>
-        <Button
-          className="w-[112px] h-[44px] border border-gray-200 rounded-full mb-2 flex items-center gap-2 cursor-pointer"
-          onClick={openFilterModal}
-        >
-          <span>Фильтр</span>
-          <FilterIcon width={20} height={20} />
-        </Button>
-      </div>
+      {isLoading ? (
+        <LoaderContent width={200} height={200} isLoading={isLoading} />
+      ) : (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-xl font-bold">Аналитика</h1>
+            <Button
+              className="w-[112px] h-[44px] border border-gray-200 rounded-full mb-2 flex items-center gap-2 cursor-pointer"
+              onClick={openFilterModal}
+            >
+              <span>Фильтр</span>
+              <FilterIcon width={20} height={20} />
+            </Button>
+          </div>
 
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12">
-          <AnalyticsMetrics data={data?.summaryData} />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <ImpressionChart data={data?.plotData} dateRange={currentDateRange} />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <AnalyticsBarChart data={data?.negativeHistogramData} />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <TopChannel data={data?.operatorRatingData} />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <TopPages
-            data={
-              data?.keywordsFrequencyData
-                ? Object.entries(data.keywordsFrequencyData)
-                    .map(([keyword, count]) => ({
-                      keyword,
-                      count,
-                    }))
-                    .sort((a, b) => b.count - a.count)
-                : []
-            }
+          <div className="grid grid-cols-12 gap-4 md:gap-6">
+            <div className="col-span-12">
+              <AnalyticsMetrics data={data?.summaryData} />
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <ImpressionChart data={data?.plotData} dateRange={currentDateRange} />
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <AnalyticsBarChart data={data?.negativeHistogramData} />
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <TopChannel data={data?.operatorRatingData} />
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <TopPages
+                data={
+                  data?.keywordsFrequencyData
+                    ? Object.entries(data.keywordsFrequencyData)
+                        .map(([keyword, count]) => ({
+                          keyword,
+                          count,
+                        }))
+                        .sort((a, b) => b.count - a.count)
+                    : []
+                }
+              />
+            </div>
+          </div>
+
+          {/* Filter Modal */}
+          <AnalyticsFilterModal
+            isOpen={isFilterModalOpen}
+            onClose={closeFilterModal}
+            onApply={applyFilters}
+            storagePrefix="_analytics"
           />
-        </div>
-      </div>
-
-      {/* Filter Modal */}
-      <AnalyticsFilterModal
-        isOpen={isFilterModalOpen}
-        onClose={closeFilterModal}
-        onApply={applyFilters}
-        storagePrefix="_analytics"
-      />
+        </>
+      )}
     </div>
   )
 }

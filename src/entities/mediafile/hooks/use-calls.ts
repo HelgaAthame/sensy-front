@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getLast30DaysRange } from '@/shared/utils/date-utils'
+import { formatEndDate, formatStartDate, getLast30DaysRange } from '@/shared/utils/date-utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useGetMediaFilesQueryQuery,
@@ -105,7 +105,7 @@ export const useCalls = () => {
     ...getSortParams(),
   }
 
-  const { data: mediaFilesData, refetch } = useGetMediaFilesQueryQuery(queryParams)
+  const { data: mediaFilesData, refetch, isLoading } = useGetMediaFilesQueryQuery(queryParams)
   const [downloadUrl] = useLazyGetDownloadFileExcelQuery()
 
   const mediaFilesDataTable = mediaFilesData?.mediaFile || []
@@ -218,19 +218,14 @@ export const useCalls = () => {
   }
 
   const handleDateRangeChange = (dates: Date[]) => {
-    if (!dates[0] && !dates[1]) return
+    if (Array.isArray(dates)) {
+      const [startDate, endDate] = dates
 
-    const newParams: Record<string, string> = {}
-
-    if (dates[0]) {
-      newParams.start = dates[0].toISOString().split('T')[0]
+      updateSearchParams({
+        endDate: endDate ? formatEndDate(endDate, 'Europe/Moscow') : undefined,
+        startDate: startDate ? formatStartDate(startDate, 'Europe/Moscow') : undefined,
+      })
     }
-
-    if (dates[1]) {
-      newParams.end = dates[1].toISOString().split('T')[0]
-    }
-
-    updateSearchParams({ ...newParams, page: '1' })
   }
 
   const handleApplyFilter = () => {
@@ -325,6 +320,7 @@ export const useCalls = () => {
   }
 
   return {
+    isLoading,
     filtersReset,
     mediaFilesDataTable,
     filtersActive,

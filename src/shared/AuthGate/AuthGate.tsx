@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader } from '@/shared/loader'
+import { LoaderMain } from '@/shared/loader'
 import { usePathname } from 'next/navigation'
 import { Fragment, type ReactNode } from 'react'
 import { useMinWidth } from '@/shared/hooks/useMinWidth'
@@ -29,7 +29,7 @@ export const AuthGate = ({ children }: { children: ReactNode }) => {
 
   return (
     <Fragment>
-      {showLoader && <Loader bgColor={loaderBgColor} textColor={loaderTextColor} />}
+      {showLoader && <LoaderMain bgColor={loaderBgColor} textColor={loaderTextColor} />}
       {!showLoader && !isWideEnough ? (
         <div className="p-6 text-lg h-screen flex items-center justify-center">
           Это приложение доступно только на экранах шириной от 1024px

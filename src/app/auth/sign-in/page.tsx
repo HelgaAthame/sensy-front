@@ -1,7 +1,7 @@
 import { SignInForm } from '@/features/auth/sign-in-form'
 
 export const metadata = {
-  title: 'Sign In',
+  title: 'Авторизация',
   description: 'Sign in to your account',
 }
 

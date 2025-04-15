@@ -1,5 +1,4 @@
 @import '../shared/styles/_colors.css';
-@import '../shared/styles/fonts.css';
 @import '../shared/styles/react-toastify.css';
 @import 'tailwindcss';
 @tailwind utilities;
@@ -12,6 +11,10 @@
     box-sizing: border-box;
   }
 
+  :root {
+    --font-arimo: system-ui, sans-serif;
+  }
+
   html {
     font-size: 100%;
     text-size-adjust: 100%;
@@ -20,7 +23,7 @@
   }
 
   body {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-arimo), sans-serif;
     font-size: 14px;
     background: var(--foreground);
     color: var(--color-neutral-900);

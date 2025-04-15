@@ -3,13 +3,10 @@
 import ComponentCard from '@/shared/component-card/component-card'
 import { OperatorsTable } from '@/features/operators/operators-table/operators-table'
 import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
+import { LoaderContent } from '@/shared/loader'
 
 export const Operators = () => {
-  const { data: operatorsData, error, isLoading } = useGetOperatorsQuery()
-
-  if (isLoading) {
-    return <div>Загрузка...</div>
-  }
+  const { data: operatorsData, isLoading } = useGetOperatorsQuery()
 
   const columns = [
     {
@@ -26,16 +23,25 @@ export const Operators = () => {
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-6" x-text="pageName">
-        Операторы
-      </h2>
-      <div className="space-y-6">
-        <ComponentCard>
-          {operatorsData && (
-            <OperatorsTable data={operatorsData} columns={columns} itemsPerPage={10} />
-          )}
-        </ComponentCard>
-      </div>
+      {isLoading ? (
+        <LoaderContent width={200} height={200} isLoading={isLoading} />
+      ) : (
+        <>
+          <h2
+            className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-6"
+            x-text="pageName"
+          >
+            Операторы
+          </h2>
+          <div className="space-y-6">
+            <ComponentCard>
+              {operatorsData && (
+                <OperatorsTable data={operatorsData} columns={columns} itemsPerPage={10} />
+              )}
+            </ComponentCard>
+          </div>
+        </>
+      )}
     </>
   )
 }
