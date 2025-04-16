@@ -141,7 +141,7 @@ export const Transcript: React.FC<TranscriptProps> = ({ sttData, currentPlayerTi
   }, [currentPlayerTime, messages])
 
   return (
-    <div ref={containerRef} className="max-h-[calc(100vh-420px)] overflow-y-auto">
+    <div ref={containerRef} className="max-h-[calc(100vh-500px)] overflow-y-auto">
       <div className="flex flex-col gap-6 p-4">
         {messages.map(message => {
           const isRightAligned = !message.isMono && message.sender === 'agent'

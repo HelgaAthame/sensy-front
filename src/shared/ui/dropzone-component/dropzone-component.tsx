@@ -90,6 +90,14 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
             </div>
           </div>
 
+          {uploadedFile && uploadedFile.length > 0 && (
+            <div className="mb-3 text-center">
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                {uploadedFile[0].name}
+              </span>
+            </div>
+          )}
+
           <h4 className="mb-3 font-semibold text-gray-800 text-lg dark:text-white/90">
             {isDragActive ? 'Поместите файл сюда' : title}
           </h4>
@@ -105,7 +113,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
               open()
             }}
           >
-            Выбрать файл
+            {uploadedFile && uploadedFile.length > 0 ? 'Выбрать другой файл' : 'Выбрать файл'}
           </span>
         </div>
       </div>

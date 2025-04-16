@@ -17,8 +17,8 @@ const FileSchema =
 
 export const MediaFileSchema = z.object({
   clientNumber: z.string().min(1, { message: 'clientNumber обязателен' }),
-  operatorName: z.string().min(1, { message: 'operatorName обязателен' }),
-  projectName: z.string().min(1, { message: 'projectName обязателен' }),
+  operatorId: z.string().min(1, { message: 'operatorId обязателен' }),
+  projectId: z.string().min(1, { message: 'projectId обязателен' }),
   file: FileSchema,
 })
 

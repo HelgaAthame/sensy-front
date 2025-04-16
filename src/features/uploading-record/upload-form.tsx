@@ -45,8 +45,8 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
     resolver: zodResolver(MediaFileSchema),
     defaultValues: {
       clientNumber: '',
-      operatorName: '',
-      projectName: '',
+      operatorId: '',
+      projectId: '',
       file: null,
     },
   })
@@ -67,6 +67,8 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
     setSelectedDate(today)
   }
 
+  console.log('error', errors)
+
   const onSubmit = handleSubmit(async data => {
     if (!data.file) return
 
@@ -78,8 +80,8 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
         queryParams: {
           createDate,
           clientNumber: data.clientNumber,
-          operatorName: data.operatorName,
-          projectName: data.projectName,
+          operatorId: parseInt(data.operatorId),
+          projectId: parseInt(data.projectId),
         },
       }).unwrap()
 
@@ -115,7 +117,7 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
             <div>
               <ControlledSelect
                 control={control}
-                name="operatorName"
+                name="operatorId"
                 label={'Оператор'}
                 placeholder="Выберите оператора"
                 options={operatorsOptions}
@@ -137,7 +139,7 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
               <div className="w-full">
                 <ControlledSelect
                   control={control}
-                  name="projectName"
+                  name="projectId"
                   label={'Проект'}
                   placeholder="Выберите проект"
                   options={projectOptions}

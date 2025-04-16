@@ -1,8 +1,8 @@
 export interface MediaFileQueryParams {
   createDate: string
   clientNumber: string
-  operatorName: string
-  projectName: string
+  operatorId: number
+  projectId: number
 }
 
 export interface CreateMediaFileRequest {

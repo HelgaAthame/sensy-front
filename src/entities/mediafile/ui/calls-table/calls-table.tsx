@@ -3,7 +3,7 @@
 import { JSX } from 'react'
 import Button from '@/shared/ui/button/button'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
-import { FilterIcon } from '@/../public/assets/icons'
+import { DownloadUpIcon, FilterIcon } from '@/../public/assets/icons'
 import { appRoutes } from '@/shared/constants/routes'
 import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
 import { useCalls } from '@/entities/mediafile/hooks/use-calls'
@@ -13,7 +13,7 @@ import {
   getValueColorClass,
 } from '@/shared/lib/color/get-color-class'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
-import { DownloadIcon, ResetFiltersActive, ResetFilters } from '@/../public/assets/svg-components'
+import { ResetFiltersActive, ResetFilters } from '@/../public/assets/svg-components'
 import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils'
 import Pagination from '@/shared/ui/pagination/pagination'
 import { LoaderContent } from '@/shared/ui/loader'
@@ -122,7 +122,7 @@ export const CallsTable = (): JSX.Element => {
                 onClick={handleDownload}
               >
                 <span>Скачать XLS</span>
-                <DownloadIcon width={15} height={15} />
+                <DownloadUpIcon width={15} height={15} />
               </Button>
             </div>
           </div>
@@ -176,35 +176,41 @@ export const CallsTable = (): JSX.Element => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mediaFilesDataTable.length > 0 ? (
+                  {mediaFilesDataTable && mediaFilesDataTable.length > 0 ? (
                     mediaFilesDataTable.map(item => {
-                      const summaryAnalyserResult = item.summaryAnalyserResult || {}
+                      const summaryAnalyserResult = item?.summaryAnalyserResult || {}
                       const negativeValue = Math.round(
-                        (summaryAnalyserResult.negativeLevelOverall || 0) * 100
+                        (summaryAnalyserResult?.negativeLevelOverall || 0) * 100
                       )
                       const silenceSeconds =
-                        summaryAnalyserResult.maxSimultaneousSilenceDuration || 0
+                        summaryAnalyserResult?.maxSimultaneousSilenceDuration || 0
                       const lexis = Object.keys(
-                        summaryAnalyserResult.keywordsSearchCounter || {}
+                        summaryAnalyserResult?.keywordsSearchCounter || {}
                       ).length
-                      const interruptions = summaryAnalyserResult.simultaneousSpeechCount || 0
+                      const interruptions = summaryAnalyserResult?.simultaneousSpeechCount || 0
+                      const clientNumber = item?.additionalMetadata?.clientNumber || 'Н/Д'
+
                       return (
                         <TableRow
                           className="cursor-pointer hover:bg-gray-100"
                           key={item.id}
-                          onClick={() => router.push(appRoutes.private.call(String(item.id)))}
+                          onClick={() =>
+                            item?.id && router.push(appRoutes.private.call(String(item.id)))
+                          }
                         >
                           <TableCell className="px-4 py-4 border-b border-l border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
-                            {formatDatesTime(item.createDate ? new Date(item.createDate) : null)}
+                            {item?.createDate ? formatDatesTime(new Date(item.createDate)) : 'Н/Д'}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
-                            {item.operatorName}
+                            {item?.operatorName || 'Н/Д'}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                            {item.additionalMetadata.clientNumber}
+                            {clientNumber}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                            {formatDuration(item.duration)}
+                            {typeof item?.duration === 'number'
+                              ? formatDuration(item.duration)
+                              : 'Н/Д'}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
                             <span
@@ -253,15 +259,16 @@ export const CallsTable = (): JSX.Element => {
           <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
             <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
               <div className="pb-3 xl:pb-0">
-                {totalEntries > 0 && (
+                {totalEntries && totalEntries > 0 && (
                   <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
-                    Отображаются от {startIndex + 1} до {endIndex} из {totalEntries} записей
+                    Отображаются от {(startIndex || 0) + 1} до {endIndex || 0} из {totalEntries}{' '}
+                    записей
                   </p>
                 )}
               </div>
-              {totalPages > 1 && (
+              {totalPages && totalPages > 1 && (
                 <Pagination
-                  currentPage={currentPage}
+                  currentPage={currentPage || 1}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
                 />
