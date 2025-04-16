@@ -14,7 +14,7 @@ import {
 } from '@/shared/lib/color/get-color-class'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
 import { DownloadIcon, ResetFiltersActive, ResetFilters } from '@/../public/assets/svg-components'
-import { formatDates, formatDuration } from '@/shared/utils/date-utils'
+import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils'
 import Pagination from '@/shared/ui/pagination/pagination'
 import { LoaderContent } from '@/shared/ui/loader'
 
@@ -122,7 +122,7 @@ export const CallsTable = (): JSX.Element => {
                 onClick={handleDownload}
               >
                 <span>Скачать XLS</span>
-                <DownloadIcon width={16} height={16} />
+                <DownloadIcon width={15} height={15} />
               </Button>
             </div>
           </div>
@@ -195,7 +195,7 @@ export const CallsTable = (): JSX.Element => {
                           onClick={() => router.push(appRoutes.private.call(String(item.id)))}
                         >
                           <TableCell className="px-4 py-4 border-b border-l border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
-                            {formatDates(item.createDate ? new Date(item.createDate) : null)}
+                            {formatDatesTime(item.createDate ? new Date(item.createDate) : null)}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
                             {item.operatorName}

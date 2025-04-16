@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { formatEndDate, formatStartDate, getLast30DaysRange } from '@/shared/utils/date-utils'
+import { getLast30DaysRange } from '@/shared/utils/date-utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useGetMediaFilesQueryQuery,
@@ -30,7 +30,6 @@ export const useCalls = () => {
   const [filtersReset, setFiltersReset] = useState(false)
   const defaultDateRange = getLast30DaysRange()
   const router = useRouter()
-  const [selectedDictionary, setSelectedDictionary] = useState(['Словарь 1'])
   const [totalEntries, setTotalEntries] = useState<number>(0)
   const handleSortChange = (key: keyof TableRowData | null, isActive: boolean) => {
     updateSortParams(key as string, isActive)
@@ -63,6 +62,9 @@ export const useCalls = () => {
         break
       case 'lexis':
         params.orderByDescPhrasesCount = true
+        break
+      case 'interruptions':
+        params.orderByDescSimultaneousSpeechCount = true
         break
       case 'silence':
         params.orderByDescMaxSimultaneousSilence = true
@@ -166,6 +168,7 @@ export const useCalls = () => {
       'orderByDescDuration',
       'orderByDescNegativeLevel',
       'orderByDescPhrasesCount',
+      'orderByDescSimultaneousSpeechCount',
       'orderByDescMaxSimultaneousSilence',
     ].forEach(param => {
       params.delete(param)
@@ -191,6 +194,9 @@ export const useCalls = () => {
         case 'lexis':
           params.set('orderByDescPhrasesCount', 'true')
           break
+        case 'interruptions':
+          params.set('orderByDescSimultaneousSpeechCount', 'true')
+          break
         case 'silence':
           params.set('orderByDescMaxSimultaneousSilence', 'true')
           break
@@ -207,31 +213,6 @@ export const useCalls = () => {
 
   const closeFilterModal = () => {
     setIsFilterModalOpen(false)
-  }
-
-  const handleDictionaryChange = (dictionary: string) => {
-    if (selectedDictionary.includes(dictionary)) {
-      setSelectedDictionary(selectedDictionary.filter(item => item !== dictionary))
-    } else {
-      setSelectedDictionary([...selectedDictionary, dictionary])
-    }
-  }
-
-  const handleDateRangeChange = (dates: Date[]) => {
-    if (Array.isArray(dates)) {
-      const [startDate, endDate] = dates
-
-      updateSearchParams({
-        endDate: endDate ? formatEndDate(endDate, 'Europe/Moscow') : undefined,
-        startDate: startDate ? formatStartDate(startDate, 'Europe/Moscow') : undefined,
-      })
-    }
-  }
-
-  const handleApplyFilter = () => {
-    params.set('page', '1')
-    refetch()
-    closeFilterModal()
   }
 
   const totalPages: number = Math.ceil(totalCount / rowsPerPage)
@@ -331,7 +312,6 @@ export const useCalls = () => {
     startIndex,
     endIndex,
     sortConfig,
-    selectedDictionary,
     isFilterModalOpen,
     startDate,
     endDate,
@@ -349,10 +329,6 @@ export const useCalls = () => {
     getSortDirection,
     openFilterModal,
     closeFilterModal,
-    handleDictionaryChange,
-    handleDateRangeChange,
-    handleApplyFilter,
     handleDownload,
-    setSelectedDictionary,
   }
 }

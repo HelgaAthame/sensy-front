@@ -73,6 +73,7 @@ export interface MediaFileRequest {
   orderByDescNegativeLevel?: boolean
   orderByDescPhrasesCount?: boolean
   orderByDescMaxSimultaneousSilence?: boolean
+  orderByDescSimultaneousSpeechCount?: boolean
   filterByPhrasesCategoriesCommaSeparated?: string
 }
 

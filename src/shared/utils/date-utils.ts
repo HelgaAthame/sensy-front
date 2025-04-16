@@ -10,6 +10,15 @@ export const formatDates = (date: Date | null): string | undefined => {
   return formatInTimeZone(date, 'UTC', 'dd.MM.yyyy HH:mm', { locale: ru })
 }
 
+export const formatDatesTime = (date: Date | null): string | undefined => {
+  if (!date) {
+    return undefined
+  }
+
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  return formatInTimeZone(date, timeZone, 'dd.MM.yyyy HH:mm', { locale: ru })
+}
+
 export const getDateRange = (days = 7) => {
   const end = new Date()
   const start = subDays(end, days)

@@ -9,7 +9,6 @@ interface CallsFeatureWrapperProps {
 }
 
 export const CallsFeatureWrapper = ({ children }: CallsFeatureWrapperProps) => {
-
   const [showUploadAlert, setShowUploadAlert] = useState(false)
 
   useEffect(() => {
