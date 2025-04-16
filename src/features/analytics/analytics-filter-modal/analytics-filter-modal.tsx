@@ -34,7 +34,7 @@ export const AnalyticsFilterModal = ({
 }: AnalyticsFilterModalProps) => {
   const { data: vocabularyData } = useGetVocabularyQuery()
   const [selectedDictionaries, setSelectedDictionaries] = useState<number[]>([])
-  const [dateRange, setDateRange] = useState<DateRange>()
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
   useEffect(() => {
     if (vocabularyData) {
@@ -76,7 +76,19 @@ export const AnalyticsFilterModal = ({
     )
   }
 
+  const isDateRangeValid = () => {
+    return dateRange && dateRange.start && dateRange.end
+  }
+
+  const hasAnyFiltersSelected = () => {
+    return isDateRangeValid() || selectedDictionaries.length > 0
+  }
+
   const handleApply = () => {
+    if (!hasAnyFiltersSelected()) {
+      return
+    }
+
     const params: {
       start: string
       end: string
@@ -140,8 +152,13 @@ export const AnalyticsFilterModal = ({
             Отменить
           </Button>
           <Button
-            className="px-2 py-2 bg-purple-900 text-white cursor-pointer hover:bg-purple-800 rounded-full"
+            className={`px-2 py-2 ${
+              hasAnyFiltersSelected()
+                ? 'bg-purple-900 cursor-pointer hover:bg-purple-800'
+                : 'bg-purple-300 cursor-not-allowed'
+            } text-white rounded-full`}
             onClick={handleApply}
+            disabled={!hasAnyFiltersSelected()}
           >
             Применить
           </Button>
