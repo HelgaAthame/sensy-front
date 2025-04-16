@@ -1,8 +1,9 @@
 # Этап 1: Сборка приложения
 FROM node:22.4-alpine as build
 
-# Устанавливаем переменные окружения для Vite (на этапе сборки)
-ENV NEXT_PUBLIC_BASE_API_URL=http://86.57.195.162:5187/
+# Устанавливаем переменные окружения для Next.js (на этапе сборки)
+ENV NEXT_PUBLIC_BASE_API_URL=https://api.sensy.by/
+
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
