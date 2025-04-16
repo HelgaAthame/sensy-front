@@ -64,7 +64,7 @@ export const Sidebar: React.FC = () => {
       <div
         className={`py-4 flex ${!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'}`}
       >
-        <Link href={appRoutes.private.underConstruction}>
+        <Link href={appRoutes.private.dashboard}>
           {isExpanded || isHovered || isMobileOpen ? (
             <LogoIcon width={123} height={31} fill={'#5A2D76'} />
           ) : (
