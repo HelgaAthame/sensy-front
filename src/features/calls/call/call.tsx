@@ -230,7 +230,22 @@ export const Call = () => {
 
     const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`
 
-    wavesurfer.load(audioUrl)
+    // wavesurfer.load(audioUrl)
+    fetch(audioUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(response => {
+        if (!response.ok) throw new Error('Ошибка загрузки аудио')
+        return response.blob()
+      })
+      .then(blob => {
+        wavesurfer.loadBlob(blob)
+      })
+      .catch(error => {
+        console.error('Ошибка при загрузке аудио:', error)
+      })
 
     wavesurfer.on('loading', percent => {
       setIsAudioLoading(true)
