@@ -33,6 +33,15 @@ export const useCalls = () => {
   const [totalEntries, setTotalEntries] = useState<number>(0)
 
   const updateSortParams = (key: string | null, isActive: boolean) => {
+    if (
+      key === 'date' &&
+      isActive &&
+      params.has('orderByDescCreateDate') &&
+      params.get('orderByDescCreateDate') === 'true'
+    ) {
+      return
+    }
+
     ;[
       'orderByDescOperatorName',
       'orderByDescCreateDate',
@@ -74,8 +83,8 @@ export const useCalls = () => {
           break
       }
     }
-    updateSearchParams({ page: '1' })
 
+    updateSearchParams({ page: '1' })
     router.push(`?${params.toString()}`)
   }
 
