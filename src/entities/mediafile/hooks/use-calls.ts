@@ -76,9 +76,9 @@ export const useCalls = () => {
     return params
   }
 
-  const getPrefix = () => {
+  const getPrefix = useCallback(() => {
     return window.location.pathname.replace(/\//g, '_')
-  }
+  }, [])
 
   const getFilterKey = useCallback((key: string) => `${getPrefix()}_filter-${key}`, [getPrefix])
 
