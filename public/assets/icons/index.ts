@@ -28,7 +28,6 @@ import CloseLineIcon from './close-line.svg'
 import ChevronDownIcon from './chevron-down.svg'
 import ChevronUpIcon from './chevron-up.svg'
 import PaperPlaneIcon from './paper-plane.svg'
-import DownloadUpIcon from './download-up-icon.svg'
 import LockIcon from './lock.svg'
 import EnvelopeIcon from './envelope.svg'
 import UserIcon from './user-line.svg'
@@ -94,7 +93,6 @@ export {
   UserIcon,
   CalenderIcon,
   EyeIcon,
-  DownloadUpIcon,
   EyeCloseIcon,
   TimeIcon,
   CopyIcon,

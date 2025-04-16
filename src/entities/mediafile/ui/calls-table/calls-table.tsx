@@ -3,7 +3,7 @@
 import { JSX } from 'react'
 import Button from '@/shared/ui/button/button'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
-import { DownloadUpIcon, FilterIcon } from '@/../public/assets/icons'
+import { FilterIcon } from '@/../public/assets/icons'
 import { appRoutes } from '@/shared/constants/routes'
 import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
 import { useCalls } from '@/entities/mediafile/hooks/use-calls'
@@ -13,7 +13,7 @@ import {
   getValueColorClass,
 } from '@/shared/lib/color/get-color-class'
 import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
-import { ResetFiltersActive, ResetFilters } from '@/../public/assets/svg-components'
+import { ResetFiltersActive, ResetFilters, DownloadIcon } from '@/../public/assets/svg-components'
 import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils'
 import Pagination from '@/shared/ui/pagination/pagination'
 import { LoaderContent } from '@/shared/ui/loader'
@@ -118,11 +118,11 @@ export const CallsTable = (): JSX.Element => {
                 <span>Обновить</span>
               </Button>
               <Button
-                className="w-[150px] h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
+                className="w-[155px] h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
                 onClick={handleDownload}
               >
                 <span>Скачать XLS</span>
-                <DownloadUpIcon width={15} height={15} />
+                <DownloadIcon width={18} height={18} />
               </Button>
             </div>
           </div>

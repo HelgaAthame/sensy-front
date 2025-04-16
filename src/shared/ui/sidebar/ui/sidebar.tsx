@@ -7,12 +7,12 @@ import { usePathname } from 'next/navigation'
 import { appRoutes } from '@/shared/constants/routes'
 import {
   BarIcon,
-  DownloadIcon,
   StarFatIcon,
   TelephoneIcon,
   UserCircleIcon,
   LogoIcon,
 } from '../../../../../public/assets/svg-components'
+import { DownloadUpIcon } from '@/../public/assets/svg-components/download-up-icon-svg'
 
 type NavItem = {
   name: string
@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
     path: appRoutes.private.calls,
   },
   {
-    icon: isSelected => <DownloadIcon isSelected={isSelected} />,
+    icon: isSelected => <DownloadUpIcon isSelected={isSelected} />,
     name: 'Загрузка записи',
     path: appRoutes.private.uploadingRecord,
   },

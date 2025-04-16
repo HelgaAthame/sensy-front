@@ -67,8 +67,6 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
     setSelectedDate(today)
   }
 
-  console.log('error', errors)
-
   const onSubmit = handleSubmit(async data => {
     if (!data.file) return
 
