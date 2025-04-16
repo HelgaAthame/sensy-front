@@ -8,7 +8,7 @@ import { NotificationDropdown } from '@/shared/ui/notification-dropdown/notifica
 import UserDropdown from '@/shared/ui/header/user-dropdown'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { appRoutes } from '@/shared/constants/routes'
-import { LogoIcon } from '../../../../public/assets/svg-components'
+import { LogoIcon } from '@/../public/assets/svg-components'
 
 export const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false)
@@ -37,6 +37,18 @@ export const Header = () => {
       setSearchTerm(searchFromUrl)
     }
   }, [searchParams])
+
+  useEffect(() => {
+    const handleFiltersReset = () => {
+      setSearchTerm('')
+    }
+
+    window.addEventListener('filters-reset', handleFiltersReset)
+
+    return () => {
+      window.removeEventListener('filters-reset', handleFiltersReset)
+    }
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

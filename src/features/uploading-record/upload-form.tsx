@@ -57,10 +57,6 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
     }
   }, [uploadedFile, setValue])
 
-  useEffect(() => {
-    setIsLoading(isLoading)
-  }, [isLoading, setIsLoading])
-
   const reset = () => {
     hookFormReset()
     onFileUploaded([])
@@ -71,6 +67,7 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
     if (!data.file) return
 
     const createDate = formatDateWithLocalTimeZone(selectedDate.toISOString())
+    setIsLoading(true)
 
     try {
       await createMediaFile({

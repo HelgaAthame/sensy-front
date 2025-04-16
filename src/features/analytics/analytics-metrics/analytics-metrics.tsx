@@ -1,7 +1,7 @@
 import { SummaryData } from '@/entities/analytics/analytics.types'
 
 interface AnalyticsMetricsProps {
-  data?: SummaryData // Изменили тип с SummaryData[] на SummaryData
+  data?: SummaryData
 }
 
 const formatDuration = (seconds: number): string => {
@@ -11,7 +11,7 @@ const formatDuration = (seconds: number): string => {
 }
 
 const formatPercentage = (value: number): string => {
-  return `${Math.round(value)}%`
+  return `${(value * 100).toFixed(2)}%`
 }
 
 const metricsMapping = [
@@ -34,7 +34,7 @@ const metricsMapping = [
   {
     key: 'averageKeywordsCount',
     title: 'Среднее количество стоп-слов',
-    format: (value: number) => Math.round(value).toString(),
+    format: (value: number) => value.toFixed(2),
   },
   {
     key: 'averageMaxSimultaneousSilenceDuration',
@@ -44,7 +44,7 @@ const metricsMapping = [
   {
     key: 'averageSimultaneousSpeechCount',
     title: 'Среднее число перебиваний',
-    format: (value: number) => Math.round(value).toString(),
+    format: (value: number) => value.toFixed(2) + '%',
   },
 ] as const
 

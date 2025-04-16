@@ -59,7 +59,7 @@ export const Call = () => {
 
   const { data: mediaFileResult } = useGetMediaFileResultQuery({
     id,
-    negativeProbThreshold: 0,
+    negativeProbThreshold: 0.15,
     simultaneousSilenceDurationThreshold: 5,
   })
 

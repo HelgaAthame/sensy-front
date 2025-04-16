@@ -41,6 +41,7 @@ export interface AnalyticsDashboardQueryParams {
   limit?: number
   operatorId?: string
   topNKeywords?: number
+  negativeLevelThreshold?: number
   filterByPhrasesCategoriesCommaSeparated?: string
 }
 

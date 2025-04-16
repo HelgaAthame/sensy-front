@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 export interface SortConfig<T> {
   key: keyof T | null
@@ -13,12 +13,19 @@ export interface ColumnConfig<T> {
 
 export function useSortable<T extends Record<string, any>>(
   initialKey: keyof T | null = null,
-  onSortChange?: (key: keyof T | null, isActive: boolean) => void
+  onSortChange?: (key: keyof T | null, isActive: boolean) => void,
+  initialActive: boolean = false
 ) {
   const [sortConfig, setSortConfig] = useState<SortConfig<T>>({
     key: initialKey,
-    isActive: false,
+    isActive: initialActive,
   })
+
+  useEffect(() => {
+    if (initialActive && initialKey && onSortChange) {
+      onSortChange(initialKey, true)
+    }
+  }, [initialActive, initialKey, onSortChange])
 
   const requestSort = (key: keyof T, columnConfig: ColumnConfig<T>[]): void => {
     const column = columnConfig.find(col => col.key === key)

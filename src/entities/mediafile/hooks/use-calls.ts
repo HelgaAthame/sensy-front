@@ -31,12 +31,62 @@ export const useCalls = () => {
   const defaultDateRange = getLast30DaysRange()
   const router = useRouter()
   const [totalEntries, setTotalEntries] = useState<number>(0)
+
+  const updateSortParams = (key: string | null, isActive: boolean) => {
+    ;[
+      'orderByDescOperatorName',
+      'orderByDescCreateDate',
+      'orderByDescClientNumber',
+      'orderByDescDuration',
+      'orderByDescNegativeLevel',
+      'orderByDescPhrasesCount',
+      'orderByDescSimultaneousSpeechCount',
+      'orderByDescMaxSimultaneousSilence',
+    ].forEach(param => {
+      params.delete(param)
+    })
+
+    if (key && isActive) {
+      switch (key) {
+        case 'operator':
+          params.set('orderByDescOperatorName', 'true')
+          break
+        case 'date':
+          params.set('orderByDescCreateDate', 'true')
+          break
+        case 'phone':
+          params.set('orderByDescClientNumber', 'true')
+          break
+        case 'duration':
+          params.set('orderByDescDuration', 'true')
+          break
+        case 'negative':
+          params.set('orderByDescNegativeLevel', 'true')
+          break
+        case 'lexis':
+          params.set('orderByDescPhrasesCount', 'true')
+          break
+        case 'interruptions':
+          params.set('orderByDescSimultaneousSpeechCount', 'true')
+          break
+        case 'silence':
+          params.set('orderByDescMaxSimultaneousSilence', 'true')
+          break
+      }
+    }
+    updateSearchParams({ page: '1' })
+
+    router.push(`?${params.toString()}`)
+  }
+
   const handleSortChange = (key: keyof TableRowData | null, isActive: boolean) => {
     updateSortParams(key as string, isActive)
   }
+
   const { sortConfig, requestSort, getSortState } = useSortable<TableRowData>(
-    null,
-    handleSortChange
+    'date',
+    handleSortChange,
+    true
   )
 
   const getSortParams = () => {
@@ -160,53 +210,6 @@ export const useCalls = () => {
     localStorage.setItem(getFilterKey('_calls_filter-filtersActive'), JSON.stringify(active))
   }, [searchTerm, startDate, endDate, filterByCategories, defaultDateRange])
 
-  const updateSortParams = (key: string | null, isActive: boolean) => {
-    ;[
-      'orderByDescOperatorName',
-      'orderByDescCreateDate',
-      'orderByDescClientNumber',
-      'orderByDescDuration',
-      'orderByDescNegativeLevel',
-      'orderByDescPhrasesCount',
-      'orderByDescSimultaneousSpeechCount',
-      'orderByDescMaxSimultaneousSilence',
-    ].forEach(param => {
-      params.delete(param)
-    })
-
-    if (key && isActive) {
-      switch (key) {
-        case 'operator':
-          params.set('orderByDescOperatorName', 'true')
-          break
-        case 'date':
-          params.set('orderByDescCreateDate', 'true')
-          break
-        case 'phone':
-          params.set('orderByDescClientNumber', 'true')
-          break
-        case 'duration':
-          params.set('orderByDescDuration', 'true')
-          break
-        case 'negative':
-          params.set('orderByDescNegativeLevel', 'true')
-          break
-        case 'lexis':
-          params.set('orderByDescPhrasesCount', 'true')
-          break
-        case 'interruptions':
-          params.set('orderByDescSimultaneousSpeechCount', 'true')
-          break
-        case 'silence':
-          params.set('orderByDescMaxSimultaneousSilence', 'true')
-          break
-      }
-    }
-    updateSearchParams({ page: '1' })
-
-    router.push(`?${params.toString()}`)
-  }
-
   const openFilterModal = () => {
     setIsFilterModalOpen(true)
   }
@@ -287,6 +290,8 @@ export const useCalls = () => {
         localStorage.removeItem(key)
       }
     })
+
+    window.dispatchEvent(new CustomEvent('filters-reset'))
 
     setFiltersReset(true)
 

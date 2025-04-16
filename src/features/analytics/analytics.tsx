@@ -23,6 +23,7 @@ export const Analytics = () => {
     offset: 0,
     limit: 10,
     topNKeywords: 5,
+    negativeLevelThreshold: 0.3,
   })
 
   const { data, isLoading } = useGetAnalyticsDashboardQuery(filterParams)

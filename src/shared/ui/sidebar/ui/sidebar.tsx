@@ -11,7 +11,7 @@ import {
   TelephoneIcon,
   UserCircleIcon,
   LogoIcon,
-} from '../../../../../public/assets/svg-components'
+} from '@/../public/assets/svg-components'
 import { DownloadUpIcon } from '@/../public/assets/svg-components/download-up-icon-svg'
 
 type NavItem = {
@@ -64,7 +64,7 @@ export const Sidebar: React.FC = () => {
       <div
         className={`py-4 flex ${!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'}`}
       >
-        <Link href="/public">
+        <Link href={appRoutes.private.underConstruction}>
           {isExpanded || isHovered || isMobileOpen ? (
             <LogoIcon width={123} height={31} fill={'#5A2D76'} />
           ) : (
