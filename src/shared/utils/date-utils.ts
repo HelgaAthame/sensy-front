@@ -1,6 +1,6 @@
 import { ru } from 'date-fns/locale'
 import { formatInTimeZone } from 'date-fns-tz'
-import { subDays, endOfDay, startOfDay } from 'date-fns'
+import { subDays, endOfDay, startOfDay, addHours } from 'date-fns'
 
 export const formatDates = (date: Date | null): string | undefined => {
   if (!date) {
@@ -14,9 +14,8 @@ export const formatDatesTime = (date: Date | null): string | undefined => {
   if (!date) {
     return undefined
   }
-
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  return formatInTimeZone(date, timeZone, 'dd.MM.yyyy HH:mm', { locale: ru })
+  return formatInTimeZone(addHours(date,3), timeZone, 'dd.MM.yyyy HH:mm', { locale: ru })
 }
 
 export const getDateRange = (days = 7) => {
@@ -63,7 +62,7 @@ export const formatDuration = (seconds: number): string => {
   const remainingSeconds = Math.floor(seconds % 60)
 
   return [
-    hours.toString().padStart(2, '0'),
+    // hours.toString().padStart(2, '0'),
     minutes.toString().padStart(2, '0'),
     remainingSeconds.toString().padStart(2, '0'),
   ].join(':')

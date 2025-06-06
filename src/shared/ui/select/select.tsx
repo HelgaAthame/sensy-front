@@ -13,7 +13,7 @@ export interface SelectProps {
   onChange: (value: string) => void
   className?: string
   label?: string
-  value: string
+  value?: string
   errorMessage?: string
 }
 

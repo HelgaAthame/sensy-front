@@ -14,7 +14,8 @@ import { useParams } from 'next/navigation'
 import WaveSurfer from 'wavesurfer.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
 import { getFromLocalStorage } from '@/shared/utils/common-utils'
-import { formatDates } from '@/shared/utils/date-utils'
+import { formatDatesTime, formatDates } from '@/shared/utils/date-utils'
+
 import './call.css'
 import { appRoutes } from '@/shared/constants/routes'
 import { LoaderContent } from '@/shared/ui/loader'
@@ -34,6 +35,7 @@ type AudioIndicator = {
   type: string
   color: string
   regions?: {
+    phrase?: string
     start: number
     end: number
     channel?: number
@@ -60,11 +62,63 @@ export const Call = () => {
   const { data: mediaFileResult } = useGetMediaFileResultQuery({
     id,
     negativeProbThreshold: 0.15,
-    simultaneousSilenceDurationThreshold: 5,
+    simultaneousSilenceDurationThreshold: 10,
   })
 
   const [activeTab, setActiveTab] = useState(CallTab.Transcript)
   const [playbackRate, setPlaybackRate] = useState('1x')
+
+  
+
+  const mouseEvent = (event: any) => {
+    if(event.type === 'mouseover'){
+      event.target.querySelector('#tooltip').style.opacity = '1'
+    }else{
+      event.target.querySelector('#tooltip').style.opacity = '0'
+    }
+  }
+
+  const tooltipContent = (actualColor: string, region: any, indicator: { type: string } ) =>{
+    const inner = document.createElement('div')
+    inner.id = 'tooltip'
+    inner.style.borderRadius = '5px'
+    inner.style.boxShadow =' 2px 2px 6px -4px #999'
+    inner.style.fontFamily = 'inherit'
+    inner.style.padding = '4px'
+    inner.style.border = '1px solid #e3e3e3'
+    inner.style.background = 'rgba(255, 255, 255, .96)'
+    inner.style.fontSize = '12px'
+    inner.style.top = '-20px'
+    inner.style.left = '20px'
+    inner.style.opacity = '0'
+    inner.style.pointerEvents = 'none'
+    inner.style.position = 'absolute'
+    inner.style.display = 'flex'
+    inner.style.flexDirection = 'column'
+    inner.style.overflow = 'hidden'
+    inner.style.whiteSpace = 'nowrap'
+    inner.style.zIndex = '12'
+    inner.style.transition = '.15s ease all'
+    const header = document.createElement('div')
+    header.style.display = 'flex'
+    const indicatorPoint = document.createElement('div')
+    indicatorPoint.style.backgroundColor = actualColor
+    indicatorPoint.style.borderRadius = '50%'
+    indicatorPoint.style.margin = '4px'
+    indicatorPoint.style.width = '8px'
+    indicatorPoint.style.height = '8px'
+    
+    const indicatorType = document.createElement('span')
+    if(region.phrase){
+      indicatorType.innerHTML = indicator.type+': <span style="display: inline-block; margin-left: 4px; font-weight: 600;">'+region.phrase+'</span>'
+    }else{
+      indicatorType.innerHTML = indicator.type
+    }
+    header.appendChild(indicatorPoint)
+    header.appendChild(indicatorType)
+    inner.appendChild(header)
+    return inner
+  }
 
   const audioIndicators: AudioIndicator[] = useMemo(() => {
     return [
@@ -88,6 +142,7 @@ export const Call = () => {
             start: region.startTime,
             end: region.endTime,
             channel: region.channel !== undefined ? region.channel : 0,
+            phrase: region.phrase
           })) || [],
       },
       {
@@ -117,14 +172,13 @@ export const Call = () => {
 
   const createRegions = useCallback(() => {
     if (!wavesurferRef.current || !regionsPluginRef.current || regionsAddedRef.current) return
-
     regionsPluginRef.current.clearRegions()
 
     audioIndicators.forEach(indicator => {
       if (!indicator.regions) return
-
       indicator.regions.forEach(region => {
         const isCircleMarker = indicator.type === 'Перебивания' || indicator.type === 'Лексика'
+        const isSilence = indicator.type === 'Паузы'
         let actualColor
 
         switch (indicator.color) {
@@ -146,22 +200,21 @@ export const Call = () => {
 
         if (isCircleMarker) {
           const regionId = `marker-${indicator.type}-${region.start}-${region.channel || 0}`
-
+      
           const markerRegion = regionsPluginRef.current.addRegion({
             id: regionId,
             start: region.start,
-            end: region.start + 0.01,
+            end: region.start + 1,
             color: 'rgba(0,0,0,0)',
             drag: false,
             resize: false,
             channelIdx: region.channel,
             channel: region.channel,
             markerType: indicator.type,
-          })
+          });
 
           if (markerRegion && markerRegion.element) {
             markerRegion.element.style.zIndex = '100'
-
             const circle = document.createElement('div')
             circle.className = 'marker-circle'
             circle.style.position = 'absolute'
@@ -172,15 +225,41 @@ export const Call = () => {
             circle.style.backgroundColor = actualColor
             circle.style.top = '50%'
             circle.style.left = '0'
+            circle.style.cursor = 'pointer'
             circle.style.transform = 'translate(-50%, -50%)'
             circle.setAttribute(
               'style',
-              circle.getAttribute('style') + '; z-index: 100 !important;'
-            )
-
+              ''+circle.getAttribute('style') + '; z-index: 100 !important;')
+            circle.onmouseover = mouseEvent
+            circle.onmouseleave = mouseEvent
+            const tooltip = tooltipContent(actualColor, region, indicator)
+            circle.appendChild (tooltip)
             markerRegion.setContent(circle)
           }
-        } else {
+        } else if(isSilence) {
+          const markerRegion =  regionsPluginRef.current.addRegion({
+            start: region.start,
+            end: region.end,
+            color: actualColor,
+            drag: false,
+            resize: false,
+            channelIdx: region.channel,
+            channel: region.channel,
+          })
+          const duration = Math.round(region.end - region.start)
+          const marker = document.createElement('div')
+          marker.style.display = 'inline-block'
+          marker.style.padding = '0.2em 0.4em'
+          marker.style.position = 'relative'
+          marker.style.width = '100%'
+          marker.style.top = '40%'
+          marker.style.textAlign = 'center'
+          marker.style.fontSize = '12px'
+          marker.style.fontWeight = '600'
+          marker.style.color = '#947500'
+          marker.innerHTML = duration>10 ? 'Пауза: '+duration+'c' : ''
+          markerRegion.setContent(marker)
+        }else{
           regionsPluginRef.current.addRegion({
             start: region.start,
             end: region.end,
@@ -209,12 +288,12 @@ export const Call = () => {
       container: containerRef.current,
       waveColor: '#5A2D76',
       progressColor: 'bg-gray-500',
-      height: hasMultipleChannels ? 80 : 64,
+      height: hasMultipleChannels ? 48 : 48,
       cursorColor: '#6B21A8',
       splitChannels: hasMultipleChannels ? new Array(numChannels).fill({}) : undefined,
-      barWidth: 2,
-      barGap: 1,
-      barRadius: 2,
+      // barWidth: 2,
+      // barGap: 1,
+      // barRadius: 2,
       normalize: true,
       fetchParams: {
         headers: {
@@ -228,7 +307,7 @@ export const Call = () => {
 
     regionsPluginRef.current.regionsContainer.style.position = 'static'
 
-    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`
+    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream` 
 
     // wavesurfer.load(audioUrl)
     fetch(audioUrl, {
@@ -315,7 +394,7 @@ export const Call = () => {
 
   const tabs: TabItem[] = [
     { name: 'Расшифровка', key: CallTab.Transcript },
-    { name: 'Резюме', key: CallTab.Summary },
+    // { name: 'Резюме', key: CallTab.Summary },
     { name: 'Чек-листы', key: CallTab.Checklists },
   ]
 
@@ -326,7 +405,7 @@ export const Call = () => {
   const callInfo = {
     name: mediaFileById?.operatorName || 'Lindsay Curtis',
     phone: mediaFileById?.additionalMetadata?.clientNumber || '+123 (45) 678-91-01',
-    date: formatDates(mediaFileById?.createDate ? new Date(mediaFileById.createDate) : null),
+    date: formatDatesTime(mediaFileById?.createDate ? new Date(mediaFileById.createDate) : null),
     duration: `${formatTime(currentTime)} / ${formatTime(duration)}`,
   }
 
@@ -391,7 +470,7 @@ export const Call = () => {
   }
 
   return (
-    <div className="p-4 min-h-screen">
+    <div>
       <PageBreadcrumb
         pageTitle={callInfo.name}
         backTitle="Звонки"
@@ -399,7 +478,7 @@ export const Call = () => {
       />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
+        {/* <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center text-white font-medium">
               {callInfo.name.charAt(0).toUpperCase()}
@@ -412,10 +491,10 @@ export const Call = () => {
             </div>
           </div>
           <div className="text-gray-500 text-sm">{callInfo.date}</div>
-        </div>
+        </div> */}
 
         <div
-          className={`bg-purple-50 rounded-xl p-4 mb-4 relative ${hasMultipleChannels ? 'h-48' : 'h-24'}`}
+          className={`bg-purple-50 rounded-xl p-4 mb-4 relative ${hasMultipleChannels ? 'h-32' : 'h-24'}`}
         >
           {!isAudioLoading && (
             <button
@@ -448,7 +527,7 @@ export const Call = () => {
           )}
 
           <div
-            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-40' : 'h-24'}`}
+            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-48' : 'h-24'}`}
             ref={containerRef}
             id="waveform"
           >
@@ -498,7 +577,7 @@ export const Call = () => {
         <div>
           {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
           {activeTab === CallTab.Transcript && (
-            <Transcript sttData={mediaFileResult?.stt} currentPlayerTime={currentTime} />
+            <Transcript summary={summaryContent} callInfo={callInfo} sttData={mediaFileResult?.stt} currentPlayerTime={currentTime} />
           )}
           {activeTab === CallTab.Checklists && (
             <Checklist checklistData={checklistData} gptChecklist={mediaFileResult?.gptChecklist} />
