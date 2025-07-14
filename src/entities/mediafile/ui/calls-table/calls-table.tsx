@@ -18,6 +18,12 @@ import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils'
 import Pagination from '@/shared/ui/pagination/pagination'
 import { LoaderContent } from '@/shared/ui/loader'
 
+
+const getChanelColor = (chanel: number) => {
+  if (chanel >1) return 'bg-green-100 text-green-800'
+  return 'bg-yellow-100 text-yellow-800'
+}
+
 export const CallsTable = (): JSX.Element => {
   const {
     isLoading,
@@ -184,11 +190,13 @@ export const CallsTable = (): JSX.Element => {
                       )
                       const silenceSeconds =
                         summaryAnalyserResult?.maxSimultaneousSilenceDuration || 0
-                      const lexis = Object.keys(
-                        summaryAnalyserResult?.keywordsSearchCounter || {}
-                      ).length
+                      const lexis = item?.filteredKeywordsCount || 0
                       const interruptions = summaryAnalyserResult?.simultaneousSpeechCount || 0
                       const clientNumber = item?.additionalMetadata?.clientNumber || 'Н/Д'
+
+                      const scorePercentage = (item.gptChecklist&&item.gptChecklist.collection.length > 0) ? ( item.gptChecklist.collection[0].score /  item.gptChecklist.collection[0].maxScore) * 100 : 0
+
+
 
                       return (
                         <TableRow
@@ -206,6 +214,13 @@ export const CallsTable = (): JSX.Element => {
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
                             {clientNumber}
+                          </TableCell>
+                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-full font-medium ${getChanelColor(item.numChannels)}`}
+                            >
+                               {item.projectName}
+                            </span>
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
                             {typeof item?.duration === 'number'
@@ -227,10 +242,27 @@ export const CallsTable = (): JSX.Element => {
                               {interruptions}
                             </span>
                           </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-r border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <TableCell className="px-4 py-4 border-b border-gray-100  border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
                             <span className={`${getSilenceColorClass(silenceSeconds)}`}>
                               {formatDuration(silenceSeconds)}
                             </span>
+                          </TableCell>
+                          <TableCell className="px-4 py-4 border-b border-gray-100  font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                            <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                              <div
+                                className={`h-2.5 rounded-full ${
+                                  scorePercentage >= 80
+                                    ? 'bg-green-500'
+                                    : scorePercentage >= 60
+                                      ? 'bg-yellow-500'
+                                      : 'bg-red-500'
+                                }`}
+                                style={{ width: `${scorePercentage}%` }}
+                              ></div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs px-4 py-4 border-b border-r font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90">
+                            {item.gptSummary}
                           </TableCell>
                         </TableRow>
                       )

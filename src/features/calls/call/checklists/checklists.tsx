@@ -20,7 +20,7 @@ export type ChecklistGroup = {
 
 interface ChecklistProps {
   checklistData: ChecklistGroup[]
-  gptChecklist?: string | null
+  gptChecklist?: any | null
 }
 
 export const Checklist: React.FC<ChecklistProps> = ({ checklistData, gptChecklist }) => {

@@ -14,6 +14,7 @@ export interface TableRowData {
   date: string
   operator: string
   phone: string
+  numChannels: string
   duration: string
   negative: string
   negativeValue: number
@@ -21,6 +22,9 @@ export interface TableRowData {
   interruptions: number
   silence: string
   silenceSeconds: number
+  checklist: any
+  gptSummary: string
+  projectName: string
 }
 
 export const useCalls = () => {

@@ -11,6 +11,9 @@ export interface CreateMediaFileRequest {
 }
 
 export interface MediaFile {
+  projectName: string
+  gptChecklist: any
+  gptSummary: string
   id: number
   fileName: string | null
   totalCount: number
@@ -124,6 +127,7 @@ export interface MediaFileResultResponse {
   }
   keywordsSearchResult: {
     regions: {
+      phrase: any
       category: number
       startChar: number
       endChar: number
