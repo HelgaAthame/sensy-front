@@ -1,10 +1,5 @@
 import { forwardRef, memo } from 'react'
-
-type SvgComponentProps = {
-  width?: number
-  height?: number
-  fill?: string
-}
+import { type SvgComponentProps } from '../svgComponentProps'
 
 const SvgComponent = forwardRef<SVGSVGElement, SvgComponentProps>(
   ({ width = 260, height = 65, fill = 'white', ...props }, ref) => (

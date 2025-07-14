@@ -1,58 +1,70 @@
-'use client'
+'use client';
 
-import { useSidebar } from '@/shared/ui/sidebar/context/sidebar-context'
-import { useCallback } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { appRoutes } from '@/shared/constants/routes'
+import { useSidebar } from '@/shared/ui/sidebar/context/sidebar-context';
+import { useCallback } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { appRoutes } from '@/shared/constants/routes';
 import {
   BarIcon,
   StarFatIcon,
   TelephoneIcon,
   UserCircleIcon,
   LogoIcon,
-} from '@/../public/assets/svg-components'
-import { DownloadUpIcon } from '@/../public/assets/svg-components/download-up-icon-svg'
+  CheckListIcon,
+  DictionaryIcon,
+} from '@/../public/assets/svg-components';
+import { DownloadUpIcon } from '@/../public/assets/svg-components/download-up-icon-svg';
 
 type NavItem = {
-  name: string
-  icon: (isSelected: boolean) => React.ReactNode
-  path?: string
-}
+  name: string;
+  icon: (isSelected: boolean) => React.ReactNode;
+  path?: string;
+};
 
 const navItems: NavItem[] = [
   {
-    icon: isSelected => <BarIcon isSelected={isSelected} />,
+    icon: (isSelected) => <BarIcon isSelected={isSelected} />,
     name: 'Аналитика',
     path: appRoutes.private.dashboard,
   },
   {
-    icon: isSelected => <TelephoneIcon isSelected={isSelected} />,
+    icon: (isSelected) => <TelephoneIcon isSelected={isSelected} />,
     name: 'Звонки',
     path: appRoutes.private.calls,
   },
   {
-    icon: isSelected => <DownloadUpIcon isSelected={isSelected} />,
+    icon: (isSelected) => <DownloadUpIcon isSelected={isSelected} />,
     name: 'Загрузка записи',
     path: appRoutes.private.uploadingRecord,
   },
   {
-    icon: isSelected => <UserCircleIcon isSelected={isSelected} />,
+    icon: (isSelected) => <UserCircleIcon isSelected={isSelected} />,
     name: 'Операторы',
     path: appRoutes.private.operators,
   },
   {
-    icon: isSelected => <StarFatIcon isSelected={isSelected} />,
+    icon: (isSelected) => <StarFatIcon isSelected={isSelected} />,
     name: 'Проекты',
     path: appRoutes.private.projects,
   },
-]
+  {
+    icon: (isSelected) => <CheckListIcon isSelected={isSelected} />,
+    name: 'Чек-листы',
+    path: appRoutes.private.checklists,
+  },
+  {
+    icon: (isSelected) => <DictionaryIcon isSelected={isSelected} />,
+    name: 'Словари',
+    path: appRoutes.private.dictionaries,
+  },
+];
 
 export const Sidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
-  const pathname = usePathname()
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const pathname = usePathname();
 
-  const isActive = useCallback((path: string) => pathname === path, [pathname])
+  const isActive = useCallback((path: string) => pathname === path, [pathname]);
 
   return (
     <aside
@@ -79,9 +91,9 @@ export const Sidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? 'МЕНЮ' : ''}
         </h2>
         <nav className="mb-6">
-          <ul className="flex flex-col gap-4">
-            {navItems.map(nav => {
-              const active = nav.path ? isActive(nav.path) : false
+          <ul className="flex flex-col gap-2">
+            {navItems.map((nav) => {
+              const active = nav.path ? isActive(nav.path) : false;
 
               return (
                 <li key={nav.name} className="flex flex-col">
@@ -98,18 +110,22 @@ export const Sidebar: React.FC = () => {
                           : 'hover:bg-gray-100 text-gray-700'
                       }`}
                     >
-                      <span className="flex items-center justify-center">{nav.icon(active)}</span>
+                      <span className="flex items-center justify-center w-6">
+                        {nav.icon(active)}
+                      </span>
                       {(isExpanded || isMobileOpen) && (
-                        <span className="menu-item-text text-sm">{nav.name}</span>
+                        <span className="menu-item-text text-sm">
+                          {nav.name}
+                        </span>
                       )}
                     </Link>
                   )}
                 </li>
-              )
+              );
             })}
           </ul>
         </nav>
       </div>
     </aside>
-  )
-}
+  );
+};

@@ -11,5 +11,7 @@ export const appRoutes = {
     underConstruction: '/under-construction',
     operators: '/operators',
     projects: '/projects',
+    checklists: '/checklists',
+    dictionaries: '/dictionaries'
   },
 }
