@@ -1,22 +1,30 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
-import Pagination from '@/shared/ui/pagination/pagination'
+import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from '@/shared/ui/table/table';
+import Pagination from '@/shared/ui/pagination/pagination';
+import Button from '@/shared/ui/button/button';
+import { PencilIcon } from '@/../public/assets/icons';
 
 interface ColumnDef<T> {
-  key: keyof T | string
-  title: string
-  render?: (item: T) => React.ReactNode
+  key: keyof T | string;
+  title: string;
+  render?: (item: T) => React.ReactNode;
 }
 
 interface DynamicTableProps<T> {
-  title?: string
-  data: T[]
-  columns: ColumnDef<T>[]
-  itemsPerPage?: number
-  initialPage?: number
-  className?: string
+  title?: string;
+  data: T[];
+  columns: ColumnDef<T>[];
+  itemsPerPage?: number;
+  initialPage?: number;
+  className?: string;
 }
 
 export const ProjectsTable = <T extends Record<string, any>>({
@@ -27,46 +35,70 @@ export const ProjectsTable = <T extends Record<string, any>>({
   initialPage = 1,
   className = '',
 }: DynamicTableProps<T>) => {
-  const [currentPage, setCurrentPage] = useState<number>(initialPage)
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
 
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage)
+  const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white pt-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+    <div className="rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="overflow-hidden">
         <div className="max-w-full overflow-x-auto">
           <Table className="w-full">
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                {columns.map(column => (
+                {columns.map((column) => (
                   <TableCell
-                    key={`header-${column}`}
+                    key={`header-${column.title}`}
                     isHeader
-                    className="py-3 px-4 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400"
+                    className="p-6 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400"
                   >
                     {column.title}
                   </TableCell>
                 ))}
+
+                <TableCell
+                  key={`create-project`}
+                  isHeader
+                  className="w-44 py-2 px-3 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400"
+                >
+                  <Button variant="purple">Создать проект</Button>
+                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {currentItems.map(item => (
+              {currentItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="px-4 py-4 h-16">
+                  <TableCell className="p-6">
                     <div className="flex items-center gap-3">
                       <div>
                         <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
                           {item.name}
                         </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-6">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+                          {item.is_active}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-6 w-44">
+                    <div className="flex items-center gap-3 w-full justify-end">
+                      <div className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300">
+                        <PencilIcon width={14} height={14} />
                       </div>
                     </div>
                   </TableCell>
@@ -90,5 +122,5 @@ export const ProjectsTable = <T extends Record<string, any>>({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

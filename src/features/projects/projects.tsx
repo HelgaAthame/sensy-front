@@ -1,18 +1,20 @@
-'use client'
+'use client';
 
-import ComponentCard from '@/shared/ui/component-card/component-card'
-import { ProjectsTable } from '@/features/projects/projects-table/projects-table'
-import { useGetProjectsQuery } from '@/entities/projects/projects.api'
-import { LoaderContent } from '@/shared/ui/loader'
+import { ProjectsTable } from '@/features/projects/projects-table/projects-table';
+import { useGetProjectsQuery } from '@/entities/projects/projects.api';
+import { LoaderContent } from '@/shared/ui/loader';
 
 export const Projects = () => {
-  const { data: operatorsData, isLoading } = useGetProjectsQuery()
+  const { data: operatorsData, isLoading } = useGetProjectsQuery();
 
   if (isLoading) {
-    return <div>Загрузка...</div>
+    return <div>Загрузка...</div>;
   }
 
-  const columns = [{ key: 'name', title: 'Название проекта' }]
+  const columns = [
+    { key: 'name', title: 'Название проекта' },
+    { key: 'active', title: 'Активный' },
+  ];
 
   return (
     <>
@@ -26,15 +28,15 @@ export const Projects = () => {
           >
             Проекты
           </h2>
-          <div className="space-y-6">
-            <ComponentCard>
-              {operatorsData && (
-                <ProjectsTable data={operatorsData} columns={columns} itemsPerPage={10} />
-              )}
-            </ComponentCard>
-          </div>
+          {operatorsData && (
+            <ProjectsTable
+              data={operatorsData}
+              columns={columns}
+              itemsPerPage={10}
+            />
+          )}
         </>
       )}
     </>
-  )
-}
+  );
+};

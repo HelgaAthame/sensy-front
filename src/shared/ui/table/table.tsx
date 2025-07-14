@@ -1,60 +1,64 @@
-import { ReactNode } from 'react'
+import { ReactNode } from 'react';
 
 // Props for Table
 interface TableProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 // Props for TableHeader
 interface TableHeaderProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 // Props for TableBody
 interface TableBodyProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 // Props for TableRow
 interface TableRowProps {
-  children: ReactNode
-  className?: string
-  onClick?: () => void
-  onKeyDown?: (e: React.KeyboardEvent) => void
-  role?: string
-  tabIndex?: number
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  role?: string;
+  tabIndex?: number;
 }
 
 // Props for TableCell
 interface TableCellProps {
-  children: ReactNode
-  isHeader?: boolean
-  className?: string
-  colSpan?: number
-  rowSpan?: number
+  children: ReactNode;
+  isHeader?: boolean;
+  className?: string;
+  colSpan?: number;
+  rowSpan?: number;
   borders?: {
-    right?: boolean
-    bottom?: boolean
-  }
+    right?: boolean;
+    bottom?: boolean;
+  };
 }
 
 // Table Component
 const Table: React.FC<TableProps> = ({ children, className }) => {
-  return <table className={`min-w-full  ${className}`}>{children}</table>
-}
+  return (
+    <div className="overflow-x-auto">
+      <table className={`min-w-full ${className}`}>{children}</table>
+    </div>
+  );
+};
 
 // TableHeader Component
 const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => {
-  return <thead className={className}>{children}</thead>
-}
+  return <thead className={className}>{children}</thead>;
+};
 
 // TableBody Component
 const TableBody: React.FC<TableBodyProps> = ({ children, className }) => {
-  return <tbody className={className}>{children}</tbody>
-}
+  return <tbody className={className}>{children}</tbody>;
+};
 
 // TableRow Component
 const TableRow: React.FC<TableRowProps> = ({
@@ -75,8 +79,8 @@ const TableRow: React.FC<TableRowProps> = ({
     >
       {children}
     </tr>
-  )
-}
+  );
+};
 
 // TableCell Component
 const TableCell: React.FC<TableCellProps> = ({
@@ -87,9 +91,9 @@ const TableCell: React.FC<TableCellProps> = ({
   rowSpan,
   borders = { right: false, bottom: false },
 }) => {
-  const CellTag = isHeader ? 'th' : 'td'
+  const CellTag = isHeader ? 'th' : 'td';
 
-  const borderClasses = `${borders.right ? 'border-r' : ''} ${borders.bottom ? 'border-b' : ''}`
+  const borderClasses = `${borders.right ? 'border-r' : ''} ${borders.bottom ? 'border-b' : ''}`;
 
   return (
     <CellTag
@@ -99,7 +103,7 @@ const TableCell: React.FC<TableCellProps> = ({
     >
       {children}
     </CellTag>
-  )
-}
+  );
+};
 
-export { Table, TableHeader, TableBody, TableRow, TableCell }
+export { Table, TableHeader, TableBody, TableRow, TableCell };
