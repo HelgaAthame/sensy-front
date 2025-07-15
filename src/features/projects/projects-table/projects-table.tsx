@@ -12,6 +12,7 @@ import Pagination from '@/shared/ui/pagination/pagination';
 import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
+import { type ProjectResponse } from '@/entities/projects/projects.types';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -28,7 +29,7 @@ interface DynamicTableProps<T> {
   className?: string;
 }
 
-export const ProjectsTable = <T extends Record<string, any>>({
+export const ProjectsTable = <T extends ProjectResponse>({
   title = '',
   data = [],
   columns = [],
@@ -116,17 +117,17 @@ export const ProjectsTable = <T extends Record<string, any>>({
       </div>
 
       {/* Pagination */}
-      <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
-          {totalPages > 1 && (
+      {totalPages > 1 && (
+        <div className="rounded-b-xl py-4 pl-[18px] pr-4">
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

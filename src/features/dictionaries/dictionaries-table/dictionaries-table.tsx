@@ -14,7 +14,7 @@ import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
 import { useUpdateDictionaryMutation } from '@/entities/dictionaries/dictionaries.api';
 import { toast } from 'react-toastify';
-import { Dictionary } from '@/entities/dictionaries/dictionaries.types';
+import { type Dictionary } from '@/entities/dictionaries/dictionaries.types';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -134,17 +134,17 @@ export const DictionariesTable = <T extends Dictionary>({
       </div>
 
       {/* Pagination */}
-      <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
+      {totalPages > 1 && (<div className="rounded-b-xl py-4 pl-[18px] pr-4">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
-          {totalPages > 1 && (
+          
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />
-          )}
+          
         </div>
-      </div>
+      </div>)}
     </div>
   );
 };
