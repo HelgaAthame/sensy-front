@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -38,6 +38,9 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
   className = '',
 }: DynamicTableProps<T>) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [currentItem, setCurrentItem] = useState<ChecklistResponse | undefined>(
+    undefined
+  );
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -49,6 +52,20 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
+  const handleToggle = useCallback(
+    (item: ChecklistResponse | undefined) => () => {
+      if (!item) return;
+      // updateChecklist({
+      //   id: item.id,
+      //   body: {
+      //     ...item,
+      //     isActive: !item.isActive,
+      //   },
+      // });
+    },
+    []
+  );
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -80,7 +97,12 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {currentItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow
+                  key={item.id}
+                  onClick={() => {
+                    setCurrentItem((prev) => item);
+                  }}
+                >
                   <TableCell className="h-16 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <div>
@@ -95,9 +117,7 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
                       <div>
                         <Switcher
                           enabled={item.isActive}
-                          setEnabled={(newValue) => {
-                            console.log(newValue);
-                          }}
+                          setEnabled={handleToggle(currentItem)}
                         />
                       </div>
                     </div>

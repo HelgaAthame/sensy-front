@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -40,6 +40,9 @@ export const DictionariesTable = <T extends Dictionary>({
   className = '',
 }: DynamicTableProps<T>) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [currentItem, setCurrentItem] = useState<Dictionary | undefined>(
+    undefined
+  );
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -60,6 +63,20 @@ export const DictionariesTable = <T extends Dictionary>({
       toast.success('Словарь успешно обновлён');
     }
   }, [updateDictionaryResult]);
+
+  const handleToggle = useCallback(
+    (item: Dictionary | undefined) => () => {
+      if (!item) return;
+      updateDictionaty({
+        id: item.id,
+        body: {
+          ...item,
+          isActive: !item.isActive,
+        },
+      });
+    },
+    []
+  );
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -91,7 +108,12 @@ export const DictionariesTable = <T extends Dictionary>({
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {currentItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow
+                  key={item.id}
+                  onClick={() => {
+                    setCurrentItem(() => item);
+                  }}
+                >
                   <TableCell className="h-16 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <div>
@@ -106,15 +128,7 @@ export const DictionariesTable = <T extends Dictionary>({
                       <div>
                         <Switcher
                           enabled={item.isActive}
-                          setEnabled={(newValue) => {
-                            updateDictionaty({
-                              id: item.id,
-                              body: {
-                                ...item,
-                                isActive: newValue,
-                              },
-                            });
-                          }}
+                          setEnabled={handleToggle(currentItem)}
                         />
                       </div>
                     </div>
@@ -134,17 +148,17 @@ export const DictionariesTable = <T extends Dictionary>({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (<div className="rounded-b-xl py-4 pl-[18px] pr-4">
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
-          
+      {totalPages > 1 && (
+        <div className="rounded-b-xl py-4 pl-[18px] pr-4">
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-end">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />
-          
+          </div>
         </div>
-      </div>)}
+      )}
     </div>
   );
 };

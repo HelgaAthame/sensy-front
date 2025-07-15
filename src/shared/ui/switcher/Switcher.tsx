@@ -1,8 +1,6 @@
-import { useState } from 'react';
-
 interface Props {
   enabled: boolean;
-  setEnabled: (newValue: boolean) => void;
+  setEnabled: () => void;
 }
 
 export const Switcher = ({ enabled, setEnabled }: Props) => {
@@ -18,7 +16,7 @@ export const Switcher = ({ enabled, setEnabled }: Props) => {
             id="toggle4"
             className="sr-only"
             onChange={() => {
-              setEnabled(!enabled);
+              setEnabled();
             }}
           />
           <div
