@@ -69,5 +69,6 @@ export const commonApi = createApi({
     'CHAT',
     'AUTH',
     'CHECKLISTS',
+    'DICTIONARIES',
   ],
 });
