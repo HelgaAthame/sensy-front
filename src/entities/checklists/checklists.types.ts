@@ -23,7 +23,7 @@ interface Data {
   blocks: Block[];
 }
 
-export interface ChecklistResponse {
+export interface Checklist {
   id: number;
   name: string | null;
   isActive: boolean;

@@ -1,23 +1,23 @@
 import { commonApi } from '@/entities/common/base-query';
-import { ProjectResponse } from '@/entities/projects/projects.types';
+import { Project } from '@/entities/projects/projects.types';
 
 const ProjectApi = commonApi.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<ProjectResponse[], void>({
+    getProjects: builder.query<Project[], void>({
       query: () => ({
         url: 'api/project',
         method: 'GET',
       }),
       providesTags: ['PROJECTS'],
     }),
-    getProject: builder.query<ProjectResponse, number>({
+    getProject: builder.query<Project, number>({
       query: (id) => ({
         url: `api/project/${id}`,
         method: 'GET',
       }),
       providesTags: ['PROJECTS'],
     }),
-    createProject: builder.mutation<null, ProjectResponse>({
+    createProject: builder.mutation<null, Partial<Project>>({
       query: (body) => ({
         url: 'api/project',
         method: 'POST',
@@ -25,10 +25,7 @@ const ProjectApi = commonApi.injectEndpoints({
       }),
       invalidatesTags: ['PROJECTS'],
     }),
-    updateProject: builder.mutation<
-      null,
-      { body: ProjectResponse; id: number }
-    >({
+    updateProject: builder.mutation<null, { body: Project; id: number }>({
       query: ({ body, id }) => ({
         url: `api/project/${id}`,
         method: 'PUT',

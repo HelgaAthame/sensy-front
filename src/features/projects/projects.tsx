@@ -1,6 +1,6 @@
 'use client';
 
-import { ProjectsTable } from '@/features/projects/projects-table/projects-table';
+import { ProjectsTable } from '@/features/projects/components/projects-table';
 import { useGetProjectsQuery } from '@/entities/projects/projects.api';
 import { LoaderContent } from '@/shared/ui/loader';
 

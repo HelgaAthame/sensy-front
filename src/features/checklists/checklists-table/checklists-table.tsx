@@ -12,7 +12,7 @@ import Pagination from '@/shared/ui/pagination/pagination';
 import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
-import { type ChecklistResponse } from '@/entities/checklists/checklists.types';
+import { type Checklist } from '@/entities/checklists/checklists.types';
 import { toast } from 'react-toastify';
 import { useUpdateChecklistMutation } from '@/entities/checklists/checklists.api';
 
@@ -31,7 +31,7 @@ interface DynamicTableProps<T> {
   className?: string;
 }
 
-export const ChecklistsTable = <T extends ChecklistResponse>({
+export const ChecklistsTable = <T extends Checklist>({
   title = '',
   data = [],
   columns = [],
@@ -40,7 +40,7 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
   className = '',
 }: DynamicTableProps<T>) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
-  const [currentItem, setCurrentItem] = useState<ChecklistResponse | undefined>(
+  const [currentItem, setCurrentItem] = useState<Checklist | undefined>(
     undefined
   );
 
@@ -64,7 +64,7 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
   }, [updateChecklistResult]);
 
   const handleToggle = useCallback(
-    (item: ChecklistResponse | undefined) => () => {
+    (item: Checklist | undefined) => () => {
       if (!item) return;
       updateChecklist({
         id: item.id,

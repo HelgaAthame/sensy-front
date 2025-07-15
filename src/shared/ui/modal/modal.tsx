@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react';
 
 interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  className?: string
-  title?: string
-  children: React.ReactNode
-  showCloseButton?: boolean
-  isFullscreen?: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  className?: string;
+  title?: string;
+  children: React.ReactNode;
+  showCloseButton?: boolean;
+  isFullscreen?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -19,41 +19,41 @@ export const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   isFullscreen = false,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        onClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape)
+      document.addEventListener('keydown', handleEscape);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape)
-    }
-  }, [isOpen, onClose])
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const contentClasses = isFullscreen
     ? 'w-full h-full'
-    : 'relative w-full rounded-3xl bg-white  dark:bg-gray-900'
+    : 'relative w-full rounded-3xl bg-white  dark:bg-gray-900';
 
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
@@ -66,11 +66,13 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={`${contentClasses}  ${className}`}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {title && (
           <div className="flex items-center justify-between px-4 pt-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6">
+              {title}
+            </h2>
             {showCloseButton && (
               <button
                 onClick={onClose}
@@ -97,5 +99,5 @@ export const Modal: React.FC<ModalProps> = ({
         <div>{children}</div>
       </div>
     </div>
-  )
-}
+  );
+};

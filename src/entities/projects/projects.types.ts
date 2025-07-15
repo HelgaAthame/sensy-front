@@ -1,5 +1,6 @@
-export interface ProjectResponse {
-  id: number
-  name: string | null
+export interface Project {
+  id: number;
+  name: string | null;
   isActive: boolean;
+  outerId?: string;
 }

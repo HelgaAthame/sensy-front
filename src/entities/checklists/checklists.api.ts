@@ -1,23 +1,23 @@
 import { commonApi } from '@/entities/common/base-query';
-import { ChecklistResponse } from './checklists.types';
+import { Checklist } from './checklists.types';
 
 const ChecklistApi = commonApi.injectEndpoints({
   endpoints: (builder) => ({
-    getChecklists: builder.query<ChecklistResponse[], void>({
+    getChecklists: builder.query<Checklist[], void>({
       query: () => ({
         url: 'api/checklist',
         method: 'GET',
       }),
       providesTags: ['CHECKLISTS'],
     }),
-    getChecklist: builder.query<ChecklistResponse, number>({
+    getChecklist: builder.query<Checklist, number>({
       query: (id) => ({
         url: `api/checklist/${id}`,
         method: 'GET',
       }),
       providesTags: ['CHECKLISTS'],
     }),
-    createChecklist: builder.mutation<null, ChecklistResponse>({
+    createChecklist: builder.mutation<null, Checklist>({
       query: (body) => ({
         url: 'api/checklist',
         method: 'POST',
@@ -25,10 +25,7 @@ const ChecklistApi = commonApi.injectEndpoints({
       }),
       invalidatesTags: ['CHECKLISTS'],
     }),
-    updateChecklist: builder.mutation<
-      null,
-      { body: ChecklistResponse; id: number }
-    >({
+    updateChecklist: builder.mutation<null, { body: Checklist; id: number }>({
       query: ({ body, id }) => ({
         url: `api/checklist/${id}`,
         method: 'PUT',
