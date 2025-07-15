@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,8 @@ import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
 import { type ChecklistResponse } from '@/entities/checklists/checklists.types';
+import { toast } from 'react-toastify';
+import { useUpdateChecklistMutation } from '@/entities/checklists/checklists.api';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -53,18 +55,26 @@ export const ChecklistsTable = <T extends ChecklistResponse>({
     setCurrentPage(page);
   };
 
+  const [updateChecklist, updateChecklistResult] = useUpdateChecklistMutation();
+
+  useEffect(() => {
+    if (updateChecklistResult.isSuccess) {
+      toast.success('Чек-лист успешно обновлён');
+    }
+  }, [updateChecklistResult]);
+
   const handleToggle = useCallback(
     (item: ChecklistResponse | undefined) => () => {
       if (!item) return;
-      // updateChecklist({
-      //   id: item.id,
-      //   body: {
-      //     ...item,
-      //     isActive: !item.isActive,
-      //   },
-      // });
+      updateChecklist({
+        id: item.id,
+        body: {
+          ...item,
+          isActive: !item.isActive,
+        },
+      });
     },
-    []
+    [updateChecklist]
   );
 
   return (

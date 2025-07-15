@@ -75,7 +75,7 @@ export const DictionariesTable = <T extends Dictionary>({
         },
       });
     },
-    []
+    [updateDictionaty]
   );
 
   return (

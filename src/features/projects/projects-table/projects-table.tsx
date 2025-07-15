@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,8 @@ import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
 import { type ProjectResponse } from '@/entities/projects/projects.types';
+import { useUpdateProjectMutation } from '@/entities/projects/projects.api';
+import { toast } from 'react-toastify';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -53,16 +55,24 @@ export const ProjectsTable = <T extends ProjectResponse>({
     setCurrentPage(page);
   };
 
+  const [updateProject, updateProjectResult] = useUpdateProjectMutation();
+
+  useEffect(() => {
+    if (updateProjectResult.isSuccess) {
+      toast.success('Проект успешно обновлён');
+    }
+  }, [updateProjectResult]);
+
   const handleToggle = useCallback(
     (item: ProjectResponse | undefined) => () => {
       if (!item) return;
-      // updateProject({
-      //   id: item.id,
-      //   body: {
-      //     ...item,
-      //     isActive: !item.isActive,
-      //   },
-      // });
+      updateProject({
+        id: item.id,
+        body: {
+          ...item,
+          isActive: !item.isActive,
+        },
+      });
     },
     []
   );
