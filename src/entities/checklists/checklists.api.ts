@@ -12,14 +12,14 @@ const ChecklistApi = commonApi.injectEndpoints({
     }),
     getChecklist: builder.query<ChecklistResponse, number>({
       query: (id) => ({
-        url: `api/vocabulary/${id}`,
+        url: `api/checklist/${id}`,
         method: 'GET',
       }),
       providesTags: ['CHECKLISTS'],
     }),
     createChecklist: builder.mutation<null, ChecklistResponse>({
       query: (body) => ({
-        url: 'api/vocabulary',
+        url: 'api/checklist',
         method: 'POST',
         body: body,
       }),
@@ -30,7 +30,7 @@ const ChecklistApi = commonApi.injectEndpoints({
       { body: ChecklistResponse; id: number }
     >({
       query: ({ body, id }) => ({
-        url: `api/vocabulary/${id}`,
+        url: `api/checklist/${id}`,
         method: 'PUT',
         body: body,
       }),
