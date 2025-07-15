@@ -11,6 +11,7 @@ import {
 import Pagination from '@/shared/ui/pagination/pagination';
 import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
+import { Switcher } from '@/shared/ui/switcher';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -55,11 +56,11 @@ export const ProjectsTable = <T extends Record<string, any>>({
           <Table className="w-full">
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                {columns.map((column) => (
+                {columns.map((column, index) => (
                   <TableCell
                     key={`header-${column.title}`}
                     isHeader
-                    className="p-6 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400"
+                    className={`p-6 font-normal text-gray-500 text-theme-sm dark:text-gray-400 ${index !== 0 ? 'text-center' : 'text-start '}`}
                   >
                     {column.title}
                   </TableCell>
@@ -89,11 +90,14 @@ export const ProjectsTable = <T extends Record<string, any>>({
                     </div>
                   </TableCell>
                   <TableCell className="h-16 px-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 justify-center">
                       <div>
-                        <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-                          {item.is_active}
-                        </span>
+                        <Switcher
+                          enabled={item.isActive}
+                          setEnabled={(newValue) => {
+                            console.log(newValue);
+                          }}
+                        />
                       </div>
                     </div>
                   </TableCell>
