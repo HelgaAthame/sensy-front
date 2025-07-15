@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,6 +12,9 @@ import Pagination from '@/shared/ui/pagination/pagination';
 import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
+import { useUpdateDictionaryMutation } from '@/entities/dictionaries/dictionaries.api';
+import { toast } from 'react-toastify';
+import { Dictionary } from '@/entities/dictionaries/dictionaries.types';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -28,7 +31,7 @@ interface DynamicTableProps<T> {
   className?: string;
 }
 
-export const DictionariesTable = <T extends Record<string, any>>({
+export const DictionariesTable = <T extends Dictionary>({
   title = '',
   data = [],
   columns = [],
@@ -48,6 +51,15 @@ export const DictionariesTable = <T extends Record<string, any>>({
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
+  const [updateDictionaty, updateDictionaryResult] =
+    useUpdateDictionaryMutation();
+
+  useEffect(() => {
+    if (updateDictionaryResult.isSuccess) {
+      toast.success('Словарь успешно обновлён');
+    }
+  }, [updateDictionaryResult]);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -95,7 +107,13 @@ export const DictionariesTable = <T extends Record<string, any>>({
                         <Switcher
                           enabled={item.isActive}
                           setEnabled={(newValue) => {
-                            console.log(newValue);
+                            updateDictionaty({
+                              id: item.id,
+                              body: {
+                                ...item,
+                                isActive: newValue,
+                              },
+                            });
                           }}
                         />
                       </div>

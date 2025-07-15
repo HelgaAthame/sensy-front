@@ -23,6 +23,7 @@ const DictionaryApi = commonApi.injectEndpoints({
         method: 'POST',
         body: body,
       }),
+      invalidatesTags: ['DICTIONARIES'],
     }),
     updateDictionary: builder.mutation<null, { body: Dictionary; id: number }>({
       query: ({ body, id }) => ({
@@ -30,6 +31,7 @@ const DictionaryApi = commonApi.injectEndpoints({
         method: 'PUT',
         body: body,
       }),
+      invalidatesTags: ['DICTIONARIES'],
     }),
   }),
 });
