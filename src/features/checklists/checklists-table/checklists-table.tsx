@@ -79,7 +79,7 @@ export const ChecklistsTable = <T extends Record<string, any>>({
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {currentItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="p-6">
+                  <TableCell className="h-16 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <div>
                         <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
@@ -88,7 +88,7 @@ export const ChecklistsTable = <T extends Record<string, any>>({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="p-6">
+                  <TableCell className="h-16 px-3">
                     <div className="flex items-center gap-3">
                       <div>
                         <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
@@ -97,7 +97,7 @@ export const ChecklistsTable = <T extends Record<string, any>>({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="p-6 w-44">
+                  <TableCell className="h-16 w-44 pr-6 pl-3">
                     <div className="flex items-center gap-3 w-full justify-end">
                       <div className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300">
                         <PencilIcon width={14} height={14} />

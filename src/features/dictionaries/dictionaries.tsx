@@ -1,40 +1,43 @@
 'use client';
 
-import ComponentCard from '@/shared/ui/component-card/component-card';
-// import { DictionariesTable } from '@/features/dictionaries/dictionaries-table/dictionaries-table'
-// import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api'
+import { DictionariesTable } from '@/features/dictionaries/dictionaries-table/dictionaries-table';
+import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api';
 import { LoaderContent } from '@/shared/ui/loader';
 
 export const Dictionaries = () => {
-  // const { data: operatorsData, isLoading } = useGetDictionariesQuery()
+  const { data: dictionariesData, isLoading } = useGetDictionariesQuery();
 
-  // if (isLoading) {
-  //   return <div>Загрузка...</div>
-  // }
+  if (isLoading) {
+    return <div>Загрузка...</div>;
+  }
 
-  const columns = [{ key: 'name', title: 'Название проекта' }];
+  const columns = [
+    { key: 'name', title: 'Название словаря' },
+    { key: 'isActive', title: 'Опубликован' },
+  ];
 
   return (
     <>
-      {/* {isLoading ? (
+      {isLoading ? (
         <LoaderContent width={200} height={200} isLoading={isLoading} />
       ) : (
-        <>*/}
-      <h2
-        className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-6"
-        x-text="pageName"
-      >
-        Словари
-      </h2>
-      <div className="space-y-6">
-        {/* <ComponentCard>
-              {operatorsData && (
-                <DictionariesTable data={operatorsData} columns={columns} itemsPerPage={10} />
-              )}
-            </ComponentCard> */}
-      </div>
-      {/* </>
-      )} */}
+        <>
+          <h2
+            className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-6"
+            x-text="pageName"
+          >
+            Словари
+          </h2>
+
+          {dictionariesData && (
+            <DictionariesTable
+              data={dictionariesData}
+              columns={columns}
+              itemsPerPage={10}
+            />
+          )}
+        </>
+      )}
     </>
   );
 };

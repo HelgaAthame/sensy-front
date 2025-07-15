@@ -27,7 +27,7 @@ interface DynamicTableProps<T> {
   className?: string;
 }
 
-export const ProjectsTable = <T extends Record<string, any>>({
+export const DictionariesTable = <T extends Record<string, any>>({
   title = '',
   data = [],
   columns = [],
@@ -71,7 +71,7 @@ export const ProjectsTable = <T extends Record<string, any>>({
                   className="w-44 py-2 px-6 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400"
                 >
                   <Button variant="purple" className="whitespace-nowrap">
-                    Создать проект
+                    Создать словарь
                   </Button>
                 </TableCell>
               </TableRow>

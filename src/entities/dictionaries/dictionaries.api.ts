@@ -1,8 +1,9 @@
-import { commonApi } from '@/entities/common/base-query'
+import { commonApi } from '@/entities/common/base-query';
+import { Dictionary } from './dictionaries.types';
 
 const DictionaryApi = commonApi.injectEndpoints({
-  endpoints: builder => ({
-    getDictionaries: builder.query<string, void>({
+  endpoints: (builder) => ({
+    getDictionaries: builder.query<Dictionary[], void>({
       query: () => ({
         url: 'api/vocabulary',
         method: 'GET',
@@ -10,6 +11,6 @@ const DictionaryApi = commonApi.injectEndpoints({
       providesTags: ['DICTIONARIES'],
     }),
   }),
-})
+});
 
-export const { useGetDictionariesQuery } = DictionaryApi
+export const { useGetDictionariesQuery } = DictionaryApi;
