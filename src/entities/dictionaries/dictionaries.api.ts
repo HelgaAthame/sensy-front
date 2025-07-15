@@ -10,7 +10,33 @@ const DictionaryApi = commonApi.injectEndpoints({
       }),
       providesTags: ['DICTIONARIES'],
     }),
+    getDictionary: builder.query<Dictionary, number>({
+      query: (id) => ({
+        url: `api/vocabulary/${id}`,
+        method: 'GET',
+      }),
+      providesTags: ['DICTIONARIES'],
+    }),
+    createDictionary: builder.mutation<null, Dictionary>({
+      query: (body) => ({
+        url: 'api/vocabulary',
+        method: 'POST',
+        body: body,
+      }),
+    }),
+    updateDictionary: builder.mutation<null, { body: Dictionary; id: number }>({
+      query: ({ body, id }) => ({
+        url: `api/vocabulary/${id}`,
+        method: 'PUT',
+        body: body,
+      }),
+    }),
   }),
 });
 
-export const { useGetDictionariesQuery } = DictionaryApi;
+export const {
+  useGetDictionariesQuery,
+  useGetDictionaryQuery,
+  useCreateDictionaryMutation,
+  useUpdateDictionaryMutation,
+} = DictionaryApi;
