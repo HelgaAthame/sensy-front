@@ -11,6 +11,14 @@ export interface Dictionary {
   } | null;
 }
 
+export interface DictionaryReqBody {
+  name: string;
+  isActive: boolean;
+  type: DictionaryType;
+  colorHex: (typeof dictionaryColors)[number];
+  phrases: string[];
+}
+
 export const DictionaryTypeValues = [
   'All',
   'OnlyOperator',

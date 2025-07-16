@@ -88,7 +88,9 @@ export const DictionariesTable = <T extends Dictionary>({
         id: item.id,
         body: {
           ...item,
+          name: item.name ?? '',
           isActive: !item.isActive,
+          phrases: item.data?.phrases ?? [],
         },
       });
     },

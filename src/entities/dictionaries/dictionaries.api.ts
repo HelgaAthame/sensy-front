@@ -1,5 +1,5 @@
 import { commonApi } from '@/entities/common/base-query';
-import { Dictionary } from './dictionaries.types';
+import { Dictionary, DictionaryReqBody } from './dictionaries.types';
 
 const DictionaryApi = commonApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,7 +17,7 @@ const DictionaryApi = commonApi.injectEndpoints({
       }),
       providesTags: ['DICTIONARIES'],
     }),
-    createDictionary: builder.mutation<null, Dictionary>({
+    createDictionary: builder.mutation<null, DictionaryReqBody>({
       query: (body) => ({
         url: 'api/vocabulary',
         method: 'POST',
@@ -25,7 +25,10 @@ const DictionaryApi = commonApi.injectEndpoints({
       }),
       invalidatesTags: ['DICTIONARIES'],
     }),
-    updateDictionary: builder.mutation<null, { body: Dictionary; id: number }>({
+    updateDictionary: builder.mutation<
+      null,
+      { body: DictionaryReqBody; id: number }
+    >({
       query: ({ body, id }) => ({
         url: `api/vocabulary/${id}`,
         method: 'PUT',

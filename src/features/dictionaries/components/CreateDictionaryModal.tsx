@@ -1,6 +1,7 @@
 import { Modal } from '@/shared/ui/modal/modal';
 import Button from '@/shared/ui/button/button';
 import {
+  DictionaryReqBody,
   DictionaryType,
   DictionaryTypeValues,
   type Dictionary,
@@ -18,7 +19,7 @@ import { Switcher } from '@/shared/ui/switcher';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (data: Partial<Dictionary>) => void;
+  onApply: (data: DictionaryReqBody) => void;
 }
 
 const createDictionarySchema = z.object({
