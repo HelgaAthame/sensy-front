@@ -28,4 +28,5 @@ export interface Checklist {
   name: string | null;
   isActive: boolean;
   data: Data | null;
+  projectIds?: number[];
 }

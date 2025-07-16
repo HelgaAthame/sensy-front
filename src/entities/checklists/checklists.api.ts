@@ -17,7 +17,7 @@ const ChecklistApi = commonApi.injectEndpoints({
       }),
       providesTags: ['CHECKLISTS'],
     }),
-    createChecklist: builder.mutation<null, Checklist>({
+    createChecklist: builder.mutation<null, Pick<Checklist, "name" | "projectIds">>({
       query: (body) => ({
         url: 'api/checklist',
         method: 'POST',

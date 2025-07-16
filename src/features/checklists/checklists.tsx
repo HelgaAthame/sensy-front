@@ -1,6 +1,6 @@
 'use client';
 
-import { ChecklistsTable } from '@/features/checklists/checklists-table/checklists-table';
+import { ChecklistsTable } from '@/features/checklists/components/checklists-table';
 import { useGetChecklistsQuery } from '@/entities/checklists/checklists.api';
 import { LoaderContent } from '@/shared/ui/loader';
 
