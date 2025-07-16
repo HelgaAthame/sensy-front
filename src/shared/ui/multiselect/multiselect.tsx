@@ -61,7 +61,7 @@ export const MultiSelect = ({
           onClick={() => setDropdownOpen(!dropdownOpen)}
           className="min-h-11 w-full inline-flex items-center gap-2.5 bg-primary 
             px-3 py-1.5 font-medium hover:bg-opacity-95 border text-gray-800 border-gray-300
-    focus:border-gray-400 focus:ring-gray-300 rounded-full
+    focus:border-gray-400 focus:ring-gray-300 rounded-[22px]
     dark:border-gray-700 dark:text-white/90 dark:focus:border-gray-500"
         >
           <div className="grow flex gap-2 flex-wrap">
@@ -103,7 +103,7 @@ export const MultiSelect = ({
           </div>
 
           <svg
-            className={`fill-current duration-200 ease-linear ${
+            className={`fill-current duration-200 ease-linear basis-5  ${
               dropdownOpen && 'rotate-180'
             }`}
             width="12"
@@ -128,7 +128,7 @@ export const MultiSelect = ({
           ref={dropdown}
           onFocus={() => setDropdownOpen(true)}
           onBlur={() => setDropdownOpen(false)}
-          className={`absolute left-0 top-full z-40 mt-2 w-full rounded-full border border-stroke bg-white py-3 shadow-card dark:border-strokedark dark:bg-boxdark ${
+          className={`absolute left-0 top-full z-40 mt-2 w-full rounded-[22px] border border-stroke bg-white py-3 shadow-card dark:border-strokedark dark:bg-boxdark ${
             dropdownOpen === true ? 'block' : 'hidden'
           }`}
         >

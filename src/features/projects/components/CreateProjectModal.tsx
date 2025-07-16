@@ -64,7 +64,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onApply }: Props) => {
             className={`px-2 py-2 bg-purple-900 cursor-pointer hover:bg-purple-800 text-white rounded-full`}
             disabled={!isValid}
           >
-            Применить
+            Создать проект
           </Button>
         </div>
       </form>

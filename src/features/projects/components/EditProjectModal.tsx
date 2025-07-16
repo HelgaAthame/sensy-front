@@ -9,6 +9,9 @@ import { MultiSelect } from '@/shared/ui/multiselect/multiselect';
 import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api';
 import { useGetChecklistsQuery } from '@/entities/checklists/checklists.api';
 import { useGetProjectQuery } from '@/entities/projects/projects.api';
+import Label from '@/shared/ui/label/label';
+import { Switcher } from '@/shared/ui/switcher';
+import { useEffect } from 'react';
 
 interface Props {
   isOpen: boolean;
@@ -23,7 +26,7 @@ const editProjectSchema = z.object({
   }),
   vocabularyIds: z.array(z.number()).optional(),
   checklistIds: z.array(z.number()).optional(),
-  isActive: z.boolean().optional(),
+  isActive: z.boolean(),
 });
 
 export const EditProjectModal = ({
@@ -32,20 +35,19 @@ export const EditProjectModal = ({
   onApply,
   projectId,
 }: Props) => {
-  const { data: project } = useGetProjectQuery(projectId);
   const {
     register,
     handleSubmit,
     watch,
     control,
+    reset,
     formState: { isValid, errors },
   } = useForm<z.infer<typeof editProjectSchema>>({
     resolver: zodResolver(editProjectSchema),
     defaultValues: {
-      name: project?.name ?? undefined,
-      isActive: project?.isActive,
-      vocabularyIds: project?.vocabularyIds ?? [],
-      checklistIds: project?.checklistIds ?? [],
+      isActive: true,
+      vocabularyIds: [],
+      checklistIds: [],
     },
   });
 
@@ -60,6 +62,19 @@ export const EditProjectModal = ({
 
   const vocabularies = watch('vocabularyIds');
   const checklists = watch('checklistIds');
+
+  const { data: project, isSuccess } = useGetProjectQuery(projectId);
+
+  useEffect(() => {
+    if (isSuccess && project) {
+      reset({
+        name: project.name ?? '',
+        isActive: project.isActive,
+        vocabularyIds: project.vocabularyIds ?? [],
+        checklistIds: project.vocabularyIds ?? [],
+      });
+    }
+  }, [project, isSuccess, reset]);
 
   return (
     <Modal
@@ -113,7 +128,7 @@ export const EditProjectModal = ({
               <MultiSelect
                 label="Чек-листы"
                 selectedOptions={checklistsData
-                  .filter((dict) => value && value.includes(dict.id))
+                  .filter((check) => value && value.includes(check.id))
                   .map((opt) => ({
                     label: opt.name,
                     value: opt.id.toString(),
@@ -133,6 +148,21 @@ export const EditProjectModal = ({
             name={'checklistIds'}
           />
         )}
+        <Controller
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <div className="flex items-center gap-3">
+              <Switcher
+                enabled={value}
+                setEnabled={() => {
+                  onChange(!value);
+                }}
+              />
+              <Label>Активный</Label>
+            </div>
+          )}
+          name={'isActive'}
+        />
 
         <div className="flex justify-between">
           <Button
@@ -146,7 +176,7 @@ export const EditProjectModal = ({
             className={`px-2 py-2 bg-purple-900 cursor-pointer hover:bg-purple-800 text-white rounded-full`}
             disabled={!isValid}
           >
-            Применить
+            Сохранить
           </Button>
         </div>
       </form>
