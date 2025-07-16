@@ -25,7 +25,10 @@ const ProjectApi = commonApi.injectEndpoints({
       }),
       invalidatesTags: ['PROJECTS'],
     }),
-    updateProject: builder.mutation<null, { body: Project; id: number }>({
+    updateProject: builder.mutation<
+      null,
+      { body: Partial<Project>; id: number }
+    >({
       query: ({ body, id }) => ({
         url: `api/project/${id}`,
         method: 'PUT',

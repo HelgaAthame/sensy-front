@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Button from '@/shared/ui/button/button'
 import { Modal } from '@/shared/ui/modal/modal'
-import { useGetVocabularyQuery } from '@/entities/dictionaries/dictionaries.api'
+import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api'
 import Checkbox from '@/shared/ui/checkbox/checkbox'
 import { formatEndDate, formatStartDate } from '@/shared/utils/date-utils'
 import { DateTimePicker } from '@/shared/ui/date-picker/date-picker'
@@ -32,7 +32,7 @@ export const AnalyticsFilterModal = ({
   storagePrefix,
   filtersReset,
 }: AnalyticsFilterModalProps) => {
-  const { data: vocabularyData } = useGetVocabularyQuery()
+  const { data: vocabularyData } = useGetDictionariesQuery()
   const [selectedDictionaries, setSelectedDictionaries] = useState<number[]>([])
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
@@ -138,7 +138,7 @@ export const AnalyticsFilterModal = ({
                   className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
                 <label htmlFor={`dictionary-${id}`} className="ml-2 text-sm text-gray-700">
-                  {name}
+                  {name.name}
                 </label>
               </div>
             ))}

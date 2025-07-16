@@ -19,6 +19,7 @@ import {
 } from '@/entities/projects/projects.api';
 import { toast } from 'react-toastify';
 import { CreateProjectModal } from './CreateProjectModal';
+import { EditProjectModal } from './EditProjectModal';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -49,6 +50,7 @@ export const ProjectsTable = <T extends Project>({
   );
 
   const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [isEditingProject, setIsEditingProject] = useState(false);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -88,7 +90,7 @@ export const ProjectsTable = <T extends Project>({
         },
       });
     },
-    []
+    [updateProject]
   );
 
   return (
@@ -99,9 +101,24 @@ export const ProjectsTable = <T extends Project>({
           setIsCreatingProject(false);
         }}
         onApply={(data) => {
-          createProject({ ...data, outerId: '0' });
+          createProject(data);
         }}
       />
+      {currentItem && (
+        <EditProjectModal
+          project={currentItem}
+          isOpen={isEditingProject}
+          onClose={() => {
+            setIsEditingProject(false);
+          }}
+          onApply={(data) => {
+            updateProject({
+              body: data,
+              id: currentItem.id,
+            });
+          }}
+        />
+      )}
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="overflow-hidden">
           <div className="max-w-full overflow-x-auto">
@@ -164,7 +181,12 @@ export const ProjectsTable = <T extends Project>({
                     </TableCell>
                     <TableCell className="h-16 w-44 pr-6 pl-3">
                       <div className="flex items-center gap-3 w-full justify-end">
-                        <div className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300">
+                        <div
+                          className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300"
+                          onClick={() => {
+                            setIsEditingProject(true);
+                          }}
+                        >
                           <PencilIcon width={14} height={14} />
                         </div>
                       </div>
