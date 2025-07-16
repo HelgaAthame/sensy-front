@@ -1,6 +1,6 @@
 'use client';
 
-import { DictionariesTable } from '@/features/dictionaries/dictionaries-table/dictionaries-table';
+import { DictionariesTable } from '@/features/dictionaries/components/dictionaries-table';
 import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api';
 import { LoaderContent } from '@/shared/ui/loader';
 

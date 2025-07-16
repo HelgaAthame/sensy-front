@@ -1,6 +1,6 @@
 import { Modal } from '@/shared/ui/modal/modal';
 import Button from '@/shared/ui/button/button';
-import { type Project } from '@/entities/projects/projects.types';
+import { type Dictionary } from '@/entities/dictionaries/dictionaries.types';
 import { z } from 'zod';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,16 +8,16 @@ import Input from '@/shared/ui/input/input';
 import { MultiSelect } from '@/shared/ui/multiselect/multiselect';
 import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api';
 import { useGetChecklistsQuery } from '@/entities/checklists/checklists.api';
-import { useGetProjectQuery } from '@/entities/projects/projects.api';
+import { useGetDictionaryQuery } from '@/entities/dictionaries/dictionaries.api';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (data: Partial<Project>) => void;
-  projectId: number;
+  onApply: (data: Partial<Dictionary>) => void;
+  dictionaryId: number;
 }
 
-const editProjectSchema = z.object({
+const editDictionarySchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
@@ -26,30 +26,32 @@ const editProjectSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const EditProjectModal = ({
+export const EditDictionaryModal = ({
   isOpen,
   onClose,
   onApply,
-  projectId,
+  dictionaryId,
 }: Props) => {
-  const { data: project } = useGetProjectQuery(projectId);
+  const { data: dictionary } = useGetDictionaryQuery(dictionaryId);
   const {
     register,
     handleSubmit,
     watch,
     control,
     formState: { isValid, errors },
-  } = useForm<z.infer<typeof editProjectSchema>>({
-    resolver: zodResolver(editProjectSchema),
+  } = useForm<z.infer<typeof editDictionarySchema>>({
+    resolver: zodResolver(editDictionarySchema),
     defaultValues: {
-      name: project?.name ?? undefined,
-      isActive: project?.isActive,
-      vocabularyIds: project?.vocabularyIds ?? [],
-      checklistIds: project?.checklistIds ?? [],
+      name: dictionary?.name ?? undefined,
+      isActive: dictionary?.isActive,
+      vocabularyIds: dictionary?.vocabularyIds ?? [],
+      checklistIds: dictionary?.checklistIds ?? [],
     },
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof editProjectSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof editDictionarySchema>> = (
+    data
+  ) => {
     onApply(data);
     onClose();
   };
@@ -74,7 +76,7 @@ export const EditProjectModal = ({
       >
         <Input
           {...register('name')}
-          id="project-name"
+          id="dictionary-name"
           label="Название проекта"
           placeholder="Введите название проекта"
           error={errors.name?.message}

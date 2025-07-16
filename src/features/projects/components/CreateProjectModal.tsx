@@ -39,7 +39,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onApply }: Props) => {
       isOpen={isOpen}
       title={'Создание проекта'}
       onClose={onClose}
-      className="max-w-[410px] mx-auto"
+      className="max-w-[700px] mx-auto"
     >
       <form
         className="px-10 flex flex-col gap-6 pb-10 pt-4"
