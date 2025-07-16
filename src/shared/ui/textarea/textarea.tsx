@@ -38,15 +38,13 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       success = false,
       error = false,
       hint,
-      rounded = 'lg',
+      rounded = '[22px]',
       cols = 4,
       ...props
     },
     ref
   ) => {
-    let inputClasses = `h-11 w-full ${
-      rounded.startsWith('[') ? `rounded-${rounded}` : `rounded-${rounded}`
-    } border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-1 ${className}`;
+    let inputClasses = `min-h-30 w-full rounded-[22px] border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-1 ${className}`;
 
     if (disabled) {
       inputClasses += ` text-gray-500 border-gray-300 bg-gray-100 cursor-not-allowed opacity-40

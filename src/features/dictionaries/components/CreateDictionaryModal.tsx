@@ -67,8 +67,8 @@ export const CreateDictionaryModal = ({ isOpen, onClose, onApply }: Props) => {
         <Input
           {...register('name')}
           id="dictionary-name"
-          label="Название проекта"
-          placeholder="Введите название проекта"
+          label="Название словаря"
+          placeholder="Введите название словаря"
           error={errors.name?.message}
         />
         <Controller
@@ -141,12 +141,15 @@ export const CreateDictionaryModal = ({ isOpen, onClose, onApply }: Props) => {
         <Controller
           control={control}
           render={({ field: { onChange, value } }) => (
-            <Switcher
-              enabled={value}
-              setEnabled={() => {
-                onChange(!value);
-              }}
-            />
+            <div className="flex items-center gap-3">
+              <Switcher
+                enabled={value}
+                setEnabled={() => {
+                  onChange(!value);
+                }}
+              />
+              <Label>Опубликован</Label>
+            </div>
           )}
           name={'isActive'}
         />
@@ -163,7 +166,7 @@ export const CreateDictionaryModal = ({ isOpen, onClose, onApply }: Props) => {
             className={`px-2 py-2 bg-purple-900 cursor-pointer hover:bg-purple-800 text-white rounded-full`}
             disabled={!isValid}
           >
-            Применить
+            Создать словарь
           </Button>
         </div>
       </form>

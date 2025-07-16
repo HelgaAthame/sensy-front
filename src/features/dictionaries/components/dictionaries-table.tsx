@@ -183,7 +183,12 @@ export const DictionariesTable = <T extends Dictionary>({
                     </TableCell>
                     <TableCell className="h-16 w-44 pr-6 pl-3">
                       <div className="flex items-center gap-3 w-full justify-end">
-                        <div className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300">
+                        <div
+                          onClick={() => {
+                            setIsEditingDictionary(true);
+                          }}
+                          className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300"
+                        >
                           <PencilIcon width={14} height={14} />
                         </div>
                       </div>

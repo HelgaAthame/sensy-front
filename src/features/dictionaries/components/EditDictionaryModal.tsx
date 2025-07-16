@@ -1,14 +1,21 @@
 import { Modal } from '@/shared/ui/modal/modal';
 import Button from '@/shared/ui/button/button';
-import { type Dictionary } from '@/entities/dictionaries/dictionaries.types';
+import {
+  DictionaryType,
+  DictionaryTypeValues,
+  type Dictionary,
+} from '@/entities/dictionaries/dictionaries.types';
 import { z } from 'zod';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from '@/shared/ui/input/input';
-import { MultiSelect } from '@/shared/ui/multiselect/multiselect';
-import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api';
-import { useGetChecklistsQuery } from '@/entities/checklists/checklists.api';
+import Select from '@/shared/ui/select/select';
+import Label from '@/shared/ui/label/label';
+import { dictionaryColors } from '@/shared/constants/dictionaryColors';
+import Textarea from '@/shared/ui/textarea/textarea';
+import { Switcher } from '@/shared/ui/switcher';
 import { useGetDictionaryQuery } from '@/entities/dictionaries/dictionaries.api';
+import { useEffect } from 'react';
 
 interface Props {
   isOpen: boolean;
@@ -21,9 +28,10 @@ const editDictionarySchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
-  vocabularyIds: z.array(z.number()).optional(),
-  checklistIds: z.array(z.number()).optional(),
-  isActive: z.boolean().optional(),
+  isActive: z.boolean(),
+  type: z.enum(DictionaryTypeValues),
+  phrases: z.array(z.string()),
+  colorHex: z.string().min(7).max(9),
 });
 
 export const EditDictionaryModal = ({
@@ -32,20 +40,18 @@ export const EditDictionaryModal = ({
   onApply,
   dictionaryId,
 }: Props) => {
-  const { data: dictionary } = useGetDictionaryQuery(dictionaryId);
   const {
     register,
     handleSubmit,
-    watch,
     control,
+    watch,
+    reset,
     formState: { isValid, errors },
   } = useForm<z.infer<typeof editDictionarySchema>>({
     resolver: zodResolver(editDictionarySchema),
     defaultValues: {
-      name: dictionary?.name ?? undefined,
-      isActive: dictionary?.isActive,
-      vocabularyIds: dictionary?.vocabularyIds ?? [],
-      checklistIds: dictionary?.checklistIds ?? [],
+      isActive: true,
+      colorHex: '#FF3B30',
     },
   });
 
@@ -56,17 +62,25 @@ export const EditDictionaryModal = ({
     onClose();
   };
 
-  const { data: dictionariesData } = useGetDictionariesQuery();
+  const { data: dictioinaryData, isSuccess } =
+    useGetDictionaryQuery(dictionaryId);
 
-  const { data: checklistsData } = useGetChecklistsQuery();
-
-  const vocabularies = watch('vocabularyIds');
-  const checklists = watch('checklistIds');
+  useEffect(() => {
+    if (isSuccess && dictioinaryData) {
+      reset({
+        name: dictioinaryData.name ?? '',
+        isActive: dictioinaryData.isActive,
+        type: dictioinaryData.type,
+        colorHex: dictioinaryData.colorHex ?? '#FF3B30',
+        phrases: dictioinaryData.data?.phrases ?? [],
+      });
+    }
+  }, [dictioinaryData, isSuccess, reset]);
 
   return (
     <Modal
       isOpen={isOpen}
-      title={'Редактирование проекта'}
+      title={'Редактирование словаря'}
       onClose={onClose}
       className="max-w-[700px] mx-auto"
     >
@@ -77,64 +91,92 @@ export const EditDictionaryModal = ({
         <Input
           {...register('name')}
           id="dictionary-name"
-          label="Название проекта"
-          placeholder="Введите название проекта"
+          label="Название словаря"
+          placeholder="Введите название словаря"
           error={errors.name?.message}
         />
-        {dictionariesData && vocabularies && (
-          <Controller
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <MultiSelect
-                label="Словари"
-                selectedOptions={dictionariesData
-                  .filter((dict) => value && value.includes(dict.id))
-                  .map((opt) => ({
-                    label: opt.name,
-                    value: opt.id.toString(),
-                  }))}
-                options={dictionariesData.map((opt) => ({
-                  label: opt.name,
-                  value: opt.id.toString(),
-                }))}
-                setOptions={(newOptions) => {
-                  const optionsIds = newOptions.map((opt) =>
-                    parseInt(opt.value)
-                  );
-                  onChange(optionsIds);
+        <Controller
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Select
+              value={value}
+              label="Тип словаря"
+              onChange={(newValue) => {
+                onChange(newValue as DictionaryType);
+              }}
+              options={DictionaryTypeValues.map((dictionaryValue, index) => ({
+                label: dictionaryValue,
+                value: dictionaryValue,
+              }))}
+            />
+          )}
+          name={'type'}
+        />
+        <div className="flex flex-col gap-1.5">
+          <Label>Цвет словаря</Label>
+          <div className="flex gap-3">
+            {dictionaryColors.map((color) => (
+              <label
+                className="inline-flex items-center cursor-pointer"
+                key={color}
+              >
+                <input
+                  type="radio"
+                  // defaultChecked={color === watch('colorHex')}
+                  value={color}
+                  {...register('colorHex')}
+                  className="absolute opacity-0 peer"
+                />
+                <span
+                  style={{
+                    backgroundColor: color,
+                  }}
+                  className={`
+      inline-block w-8 h-8 rounded-full transition after:duration-300       
+      relative after:content-[''] after:absolute after:top-2 after:left-2 
+      after:w-4 after:h-4 after:rounded-full after:bg-white 
+      after:opacity-0 peer-checked:after:opacity-100
+    `}
+                ></span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <Controller
+          control={control}
+          render={({ field: { onChange, value } }) => {
+            const textareaValue = value ? value.join('\n') : '';
+            return (
+              <Textarea
+                id="dictionary-phrases"
+                label="Ключевые слова"
+                placeholder="Введите ключевые слова"
+                value={textareaValue}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  onChange(newValue.split('\n'));
+                }}
+                error={errors.phrases?.message}
+              />
+            );
+          }}
+          name={'phrases'}
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <div className="flex items-center gap-3">
+              <Switcher
+                enabled={value}
+                setEnabled={() => {
+                  onChange(!value);
                 }}
               />
-            )}
-            name={'vocabularyIds'}
-          />
-        )}
-        {checklistsData && checklists && (
-          <Controller
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <MultiSelect
-                label="Чек-листы"
-                selectedOptions={checklistsData
-                  .filter((dict) => value && value.includes(dict.id))
-                  .map((opt) => ({
-                    label: opt.name,
-                    value: opt.id.toString(),
-                  }))}
-                options={checklistsData.map((opt) => ({
-                  label: opt.name,
-                  value: opt.id.toString(),
-                }))}
-                setOptions={(newOptions) => {
-                  const optionsIds = newOptions.map((opt) =>
-                    parseInt(opt.value)
-                  );
-                  onChange(optionsIds);
-                }}
-              />
-            )}
-            name={'checklistIds'}
-          />
-        )}
+              <Label>Опубликован</Label>
+            </div>
+          )}
+          name={'isActive'}
+        />
 
         <div className="flex justify-between">
           <Button
@@ -148,7 +190,7 @@ export const EditDictionaryModal = ({
             className={`px-2 py-2 bg-purple-900 cursor-pointer hover:bg-purple-800 text-white rounded-full`}
             disabled={!isValid}
           >
-            Применить
+            Сохранить
           </Button>
         </div>
       </form>

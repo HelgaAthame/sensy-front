@@ -41,7 +41,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       success = false,
       error = false,
       hint,
-      rounded = 'lg',
+      rounded = 'full',
       ...props
     },
     ref
