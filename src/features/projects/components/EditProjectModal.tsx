@@ -7,20 +7,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Input from '@/shared/ui/input/input';
 import { MultiSelect } from '@/shared/ui/multiselect/multiselect';
 import { useGetDictionariesQuery } from '@/entities/dictionaries/dictionaries.api';
+import { useGetChecklistsQuery } from '@/entities/checklists/checklists.api';
+import { useGetProjectQuery } from '@/entities/projects/projects.api';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onApply: (data: Partial<Project>) => void;
-  project: Project;
+  projectId: number;
 }
 
 const editProjectSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
-  vocabularies: z.array(z.number()).optional(),
-  checklists: z.array(z.number()).optional(),
+  vocabularyIds: z.array(z.number()).optional(),
+  checklistIds: z.array(z.number()).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -28,8 +30,9 @@ export const EditProjectModal = ({
   isOpen,
   onClose,
   onApply,
-  project,
+  projectId,
 }: Props) => {
+  const { data: project } = useGetProjectQuery(projectId);
   const {
     register,
     handleSubmit,
@@ -39,10 +42,10 @@ export const EditProjectModal = ({
   } = useForm<z.infer<typeof editProjectSchema>>({
     resolver: zodResolver(editProjectSchema),
     defaultValues: {
-      name: project.name ?? undefined,
-      isActive: project.isActive,
-      vocabularies: [],
-      checklists: [],
+      name: project?.name ?? undefined,
+      isActive: project?.isActive,
+      vocabularyIds: project?.vocabularyIds ?? [],
+      checklistIds: project?.checklistIds ?? [],
     },
   });
 
@@ -51,9 +54,12 @@ export const EditProjectModal = ({
     onClose();
   };
 
-  const { data: dictionariesData, isLoading } = useGetDictionariesQuery();
+  const { data: dictionariesData } = useGetDictionariesQuery();
 
-  const vocabularies = watch('vocabularies');
+  const { data: checklistsData } = useGetChecklistsQuery();
+
+  const vocabularies = watch('vocabularyIds');
+  const checklists = watch('checklistIds');
 
   return (
     <Modal
@@ -78,20 +84,53 @@ export const EditProjectModal = ({
             control={control}
             render={({ field: { onChange, value } }) => (
               <MultiSelect
+                label="Словари"
                 selectedOptions={dictionariesData
                   .filter((dict) => value && value.includes(dict.id))
                   .map((opt) => ({
                     label: opt.name,
                     value: opt.id.toString(),
                   }))}
-                options={[]}
+                options={dictionariesData.map((opt) => ({
+                  label: opt.name,
+                  value: opt.id.toString(),
+                }))}
                 setOptions={(newOptions) => {
-                  const optionsIds = newOptions.map((opt) => opt.value);
+                  const optionsIds = newOptions.map((opt) =>
+                    parseInt(opt.value)
+                  );
                   onChange(optionsIds);
                 }}
               />
             )}
-            name={'vocabularies'}
+            name={'vocabularyIds'}
+          />
+        )}
+        {checklistsData && checklists && (
+          <Controller
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <MultiSelect
+                label="Чек-листы"
+                selectedOptions={checklistsData
+                  .filter((dict) => value && value.includes(dict.id))
+                  .map((opt) => ({
+                    label: opt.name,
+                    value: opt.id.toString(),
+                  }))}
+                options={checklistsData.map((opt) => ({
+                  label: opt.name,
+                  value: opt.id.toString(),
+                }))}
+                setOptions={(newOptions) => {
+                  const optionsIds = newOptions.map((opt) =>
+                    parseInt(opt.value)
+                  );
+                  onChange(optionsIds);
+                }}
+              />
+            )}
+            name={'checklistIds'}
           />
         )}
 

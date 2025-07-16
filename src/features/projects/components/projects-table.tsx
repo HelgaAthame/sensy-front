@@ -106,7 +106,7 @@ export const ProjectsTable = <T extends Project>({
       />
       {currentItem && (
         <EditProjectModal
-          project={currentItem}
+          projectId={currentItem.id}
           isOpen={isEditingProject}
           onClose={() => {
             setIsEditingProject(false);

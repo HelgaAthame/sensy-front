@@ -51,7 +51,7 @@ export const MultiSelect = ({
   });
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className="w-full flex flex-col">
       {label && <Label htmlFor="multiselect">{label}</Label>}
 
       <div className="relative inline-block">
@@ -59,12 +59,12 @@ export const MultiSelect = ({
           type="button"
           ref={trigger}
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="h-11 w-full inline-flex items-center gap-2.5 bg-primary 
-            py-3 px-5.5 font-medium hover:bg-opacity-95 border text-gray-800 border-gray-300
+          className="min-h-11 w-full inline-flex items-center gap-2.5 bg-primary 
+            px-3 py-1.5 font-medium hover:bg-opacity-95 border text-gray-800 border-gray-300
     focus:border-gray-400 focus:ring-gray-300 rounded-lg
     dark:border-gray-700 dark:text-white/90 dark:focus:border-gray-500"
         >
-          <div className="grow flex gap-2">
+          <div className="grow flex gap-2 flex-wrap">
             {selectedOptions.map((option, index) => (
               <div
                 key={option.value}

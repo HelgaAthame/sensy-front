@@ -64,13 +64,12 @@ export const CreateChecklistModal = ({ isOpen, onClose, onApply }: Props) => {
           placeholder="Введите название чек-листа"
           error={errors.name?.message}
         />
-        {JSON.stringify(projectsData)}
-        {JSON.stringify(`projectIds = ${projectIds}`)}
         {projectsData && projectIds && (
           <Controller
             control={control}
             render={({ field: { onChange, value } }) => (
               <MultiSelect
+                label="Проекты"
                 selectedOptions={projectsData
                   .filter((proj) => value && value.includes(proj.id))
                   .map((opt) => ({
