@@ -30,3 +30,40 @@ export interface Checklist {
   data: Data | null;
   projectIds?: number[];
 }
+
+export interface ChecklistFull {
+  id: number;
+  name: string | null;
+  isActive: boolean;
+  data: Data | null;
+  checklistProjects:
+    | {
+        projectName: string | null;
+        projectId: number | null;
+      }[]
+    | null;
+}
+export const ChecklistScaleTypeValues = [
+  'Full',
+  'Binary',
+] as const;
+export type ChecklistScale = (typeof ChecklistScaleTypeValues)[number];
+
+export interface ChecklistReqBody {
+  isActive?: boolean;
+  name?: string;
+  projectIds?: number[];
+  data?: {
+    name: string;
+    blocks?: {
+      name: string;
+      criterias?: {
+        name: string;
+        minScore?: number;
+        maxScore?: number;
+        help?: string | null;
+        scale?: ChecklistScale;
+      }[];
+    }[];
+  }[];
+}

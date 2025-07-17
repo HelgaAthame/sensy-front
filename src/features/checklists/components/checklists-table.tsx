@@ -12,13 +12,14 @@ import Pagination from '@/shared/ui/pagination/pagination';
 import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
-import { type Checklist } from '@/entities/checklists/checklists.types';
+import { ChecklistReqBody, type Checklist } from '@/entities/checklists/checklists.types';
 import { toast } from 'react-toastify';
 import {
   useCreateChecklistMutation,
   useUpdateChecklistMutation,
 } from '@/entities/checklists/checklists.api';
 import { CreateChecklistModal } from './CreateChecklistModal';
+import Link from 'next/link';
 
 interface ColumnDef<T> {
   key: keyof T | string;
@@ -84,7 +85,9 @@ export const ChecklistsTable = <T extends Checklist>({
         id: item.id,
         body: {
           ...item,
+          name: item.name ?? '',
           isActive: !item.isActive,
+          data: Array.isArray(item.data) ? item.data : [], 
         },
       });
     },
@@ -164,9 +167,12 @@ export const ChecklistsTable = <T extends Checklist>({
                     </TableCell>
                     <TableCell className="h-16 w-44 pr-6 pl-3">
                       <div className="flex items-center gap-3 w-full justify-end">
-                        <div className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300">
+                        <Link
+                          href={`/checklists/${item.id}`}
+                          className="cursor-pointer block font-medium text-gray-700 text-theme-sm dark:text-gray-400 rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition duration-300"
+                        >
                           <PencilIcon width={14} height={14} />
-                        </div>
+                        </Link>
                       </div>
                     </TableCell>
                   </TableRow>
