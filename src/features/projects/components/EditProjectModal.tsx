@@ -70,8 +70,14 @@ export const EditProjectModal = ({
       reset({
         name: project.name ?? '',
         isActive: project.isActive,
-        vocabularyIds: project.vocabularyIds ?? [],
-        checklistIds: project.vocabularyIds ?? [],
+        vocabularyIds:
+          project.vocabularyProjects
+            ?.map((pr) => pr.projectId)
+            .filter((id) => id !== null) ?? [],
+        checklistIds:
+          project.checklistProjects
+            ?.map((pr) => pr.projectId)
+            .filter((id) => id !== null) ?? [],
       });
     }
   }, [project, isSuccess, reset]);

@@ -2,6 +2,16 @@ export interface Project {
   id: number;
   name: string | null;
   isActive: boolean;
-  vocabularyIds?: number[];
-  checklistIds?: number[];
+  vocabularyProjects?: {
+    vocabularyName: string | null;
+    vocabularyId: number;
+    projectName: string | null;
+    projectId: number;
+  }[];
+  checklistProjects?: {
+    checklistName: string | null;
+    checklistId: number;
+    projectName: string | null;
+    projectId: number;
+  }[];
 }
