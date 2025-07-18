@@ -72,8 +72,9 @@ export const MultiSelect = ({
                 items-center grow-0"
               >
                 {option.label}
-                <button
-                  onClick={() => {
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const newOptions = selectedOptions.filter(
                       (_, i) => i !== index
                     );
@@ -97,7 +98,7 @@ export const MultiSelect = ({
                       fill="currentColor"
                     />
                   </svg>
-                </button>
+                </div>
               </div>
             ))}
           </div>
@@ -126,7 +127,9 @@ export const MultiSelect = ({
         </button>
         <div
           ref={dropdown}
-          onFocus={() => setDropdownOpen(true)}
+          onFocus={() => {
+            setDropdownOpen(true);
+          }}
           onBlur={() => setDropdownOpen(false)}
           className={`absolute left-0 top-full z-40 mt-2 w-full rounded-[22px] border border-stroke bg-white py-3 shadow-card dark:border-strokedark dark:bg-boxdark ${
             dropdownOpen === true ? 'block' : 'hidden'

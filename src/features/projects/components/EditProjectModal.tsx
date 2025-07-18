@@ -72,11 +72,11 @@ export const EditProjectModal = ({
         isActive: project.isActive,
         vocabularyIds:
           project.vocabularyProjects
-            ?.map((pr) => pr.projectId)
+            ?.map((pr) => pr.vocabularyId)
             .filter((id) => id !== null) ?? [],
         checklistIds:
           project.checklistProjects
-            ?.map((pr) => pr.projectId)
+            ?.map((pr) => pr.checklistId)
             .filter((id) => id !== null) ?? [],
       });
     }
