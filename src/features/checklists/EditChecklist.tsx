@@ -69,6 +69,7 @@ export const EditChecklist = () => {
     control,
     watch,
     setValue,
+    reset,
     formState: { isValid, errors },
   } = useForm<z.infer<typeof editChecklistSchema>>({
     resolver: zodResolver(editChecklistSchema),
@@ -123,12 +124,19 @@ export const EditChecklist = () => {
     }
   }, [cloneChecklistResult]);
 
+  useEffect(() => {
+    if (checklistData) {
+      reset({
+        data: checklistData.data,
+      });
+    }
+  }, [checklistData, reset]);
+
   if (isLoading) {
     return <div>Загрузка...</div>;
   }
 
   const blocks = watch('data.blocks') ?? [];
-
   return (
     <Fragment>
       <EditChecklistModal
