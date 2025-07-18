@@ -1,41 +1,52 @@
 import { Modal } from '@/shared/ui/modal/modal';
 import Button from '@/shared/ui/button/button';
-import { type Checklist } from '@/entities/checklists/checklists.types';
+import {
+  ChecklistFull,
+  type Checklist,
+} from '@/entities/checklists/checklists.types';
 import { z } from 'zod';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from '@/shared/ui/input/input';
 import { MultiSelect } from '@/shared/ui/multiselect/multiselect';
 import { useGetProjectsQuery } from '@/entities/projects/projects.api';
+import { useEffect } from 'react';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onApply: (data: Pick<Checklist, 'name' | 'projectIds'>) => void;
+  checklistData?: ChecklistFull | null;
 }
 
-const createChecklistSchema = z.object({
+const editChecklistSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
   projectIds: z.array(z.number()),
 });
 
-export const CreateChecklistModal = ({ isOpen, onClose, onApply }: Props) => {
+export const EditChecklistModal = ({
+  isOpen,
+  onClose,
+  onApply,
+  checklistData,
+}: Props) => {
   const {
     register,
     handleSubmit,
     watch,
     control,
+    reset,
     formState: { isValid, errors },
-  } = useForm<z.infer<typeof createChecklistSchema>>({
-    resolver: zodResolver(createChecklistSchema),
+  } = useForm<z.infer<typeof editChecklistSchema>>({
+    resolver: zodResolver(editChecklistSchema),
     defaultValues: {
       projectIds: [],
     },
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof createChecklistSchema>> = (
+  const onSubmit: SubmitHandler<z.infer<typeof editChecklistSchema>> = (
     data
   ) => {
     onApply(data);
@@ -46,10 +57,22 @@ export const CreateChecklistModal = ({ isOpen, onClose, onApply }: Props) => {
 
   const projectIds = watch('projectIds');
 
+  useEffect(() => {
+    if (checklistData) {
+      reset({
+        name: checklistData.name ?? '',
+        projectIds:
+          checklistData.checklistProjects
+            ?.map((pr) => pr.projectId)
+            .filter((id) => id !== null) ?? [],
+      });
+    }
+  }, [checklistData, reset]);
+
   return (
     <Modal
       isOpen={isOpen}
-      title={'Создание чек-листа'}
+      title={'Редактирование чек-листа'}
       onClose={onClose}
       className="max-w-[700px] mx-auto"
     >
@@ -103,7 +126,7 @@ export const CreateChecklistModal = ({ isOpen, onClose, onApply }: Props) => {
             className={`px-2 py-2 bg-purple-900 cursor-pointer hover:bg-purple-800 text-white rounded-full`}
             disabled={!isValid}
           >
-            Создать чек-лист
+            Сохранить
           </Button>
         </div>
       </form>

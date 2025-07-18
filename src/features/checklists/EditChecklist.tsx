@@ -2,7 +2,7 @@
 
 import { ChecklistsTable } from '@/features/checklists/components/checklists-table';
 import {
-  useCreateChecklistMutation,
+  useCloneChecklistMutation,
   useGetChecklistQuery,
   useUpdateChecklistMutation,
 } from '@/entities/checklists/checklists.api';
@@ -24,10 +24,11 @@ import {
   PlusIcon,
   TrashRedIcon,
 } from '@/../public/assets/icons';
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { ChecklistScaleTypeValues } from '@/entities/checklists/checklists.types';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
+import { EditChecklistModal } from './components/EditChecklistModal';
 
 const CriteriaSchema = z.object({
   name: z.string(),
@@ -57,8 +58,10 @@ export const EditChecklist = () => {
   const params = useParams();
   const checklistid = Number(params.checklistid);
   const { data: checklistData, isLoading } = useGetChecklistQuery(checklistid);
+
+  const [isEditingChecklist, setIsEditingChecklist] = useState(false);
   const [updateChecklist, updateChecklistResult] = useUpdateChecklistMutation();
-  const [createChecklist, createChecklistResult] = useCreateChecklistMutation();
+  const [cloneChecklist, cloneChecklistResult] = useCloneChecklistMutation();
 
   const {
     register,
@@ -98,7 +101,7 @@ export const EditChecklist = () => {
       id: checklistid,
       body: {
         ...data,
-        data: [safeData],
+        data: safeData,
         // isActive: checklistData?.isActive,
         // projectIds:
         //   checklistData?.checklistProjects?.map((pr) => Number(pr.projectId)) ??
@@ -115,10 +118,10 @@ export const EditChecklist = () => {
   }, [updateChecklistResult]);
 
   useEffect(() => {
-    if (createChecklistResult.isSuccess) {
+    if (cloneChecklistResult.isSuccess) {
       toast.success('Копия создана');
     }
-  }, [createChecklistResult]);
+  }, [cloneChecklistResult]);
 
   if (isLoading) {
     return <div>Загрузка...</div>;
@@ -127,7 +130,17 @@ export const EditChecklist = () => {
   const blocks = watch('data.blocks') ?? [];
 
   return (
-    <>
+    <Fragment>
+      <EditChecklistModal
+        isOpen={isEditingChecklist}
+        onClose={() => {
+          setIsEditingChecklist(false);
+        }}
+        onApply={(data) => {
+          updateChecklist({ id: checklistid, body: data });
+        }}
+        checklistData={checklistData}
+      />
       {isLoading ? (
         <LoaderContent width={200} height={200} isLoading={isLoading} />
       ) : (
@@ -157,7 +170,12 @@ export const EditChecklist = () => {
                     <Switcher
                       enabled={Boolean(checklistData?.isActive)}
                       setEnabled={() => {
-                        // TODO update checklist
+                        updateChecklist({
+                          id: checklistid,
+                          body: {
+                            isActive: !checklistData?.isActive,
+                          },
+                        });
                       }}
                     />
                     <Label>Опубликовать</Label>
@@ -168,12 +186,7 @@ export const EditChecklist = () => {
                 <Button
                   className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
                   onClick={() => {
-                    createChecklist({
-                      name: checklistData?.name ?? '',
-                      projectIds: checklistData?.checklistProjects?.map((pr) =>
-                        Number(pr.projectId)
-                      ),
-                    });
+                    cloneChecklist(checklistid);
                   }}
                 >
                   <div className="w-4.5">
@@ -184,7 +197,7 @@ export const EditChecklist = () => {
                 <Button
                   className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
                   onClick={() => {
-                    // открыть окно редактированитя названитя и проектов чек листа
+                    setIsEditingChecklist(true);
                   }}
                 >
                   <div className="w-4.5">
@@ -405,6 +418,6 @@ export const EditChecklist = () => {
           </div>
         </form>
       )}
-    </>
+    </Fragment>
   );
 };

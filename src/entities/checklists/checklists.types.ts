@@ -43,15 +43,12 @@ export interface ChecklistFull {
       }[]
     | null;
 }
-export const ChecklistScaleTypeValues = [
-  'Full',
-  'Binary',
-] as const;
+export const ChecklistScaleTypeValues = ['Full', 'Binary'] as const;
 export type ChecklistScale = (typeof ChecklistScaleTypeValues)[number];
 
 export interface ChecklistReqBody {
   isActive?: boolean;
-  name?: string;
+  name?: string | null;
   projectIds?: number[];
   data?: {
     name: string;
@@ -65,5 +62,5 @@ export interface ChecklistReqBody {
         scale?: ChecklistScale;
       }[];
     }[];
-  }[];
+  };
 }

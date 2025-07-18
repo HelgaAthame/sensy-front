@@ -34,12 +34,19 @@ const ChecklistApi = commonApi.injectEndpoints({
     }),
     updateChecklist: builder.mutation<
       null,
-      { body: ChecklistReqBody; id: number }
+      { body: Partial<ChecklistReqBody>; id: number }
     >({
       query: ({ body, id }) => ({
         url: `api/checklist/${id}`,
         method: 'PUT',
         body: body,
+      }),
+      invalidatesTags: ['CHECKLISTS'],
+    }),
+    cloneChecklist: builder.mutation<null, number>({
+      query: (id) => ({
+        url: `api/checklist/${id}`,
+        method: 'POST',
       }),
       invalidatesTags: ['CHECKLISTS'],
     }),
@@ -51,4 +58,5 @@ export const {
   useGetChecklistQuery,
   useCreateChecklistMutation,
   useUpdateChecklistMutation,
+  useCloneChecklistMutation,
 } = ChecklistApi;

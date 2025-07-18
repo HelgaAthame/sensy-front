@@ -12,7 +12,10 @@ import Pagination from '@/shared/ui/pagination/pagination';
 import Button from '@/shared/ui/button/button';
 import { PencilIcon } from '@/../public/assets/icons';
 import { Switcher } from '@/shared/ui/switcher';
-import { ChecklistReqBody, type Checklist } from '@/entities/checklists/checklists.types';
+import {
+  ChecklistReqBody,
+  type Checklist,
+} from '@/entities/checklists/checklists.types';
 import { toast } from 'react-toastify';
 import {
   useCreateChecklistMutation,
@@ -87,7 +90,12 @@ export const ChecklistsTable = <T extends Checklist>({
           ...item,
           name: item.name ?? '',
           isActive: !item.isActive,
-          data: Array.isArray(item.data) ? item.data : [], 
+          data: item.data
+            ? {
+                ...item.data,
+                name: item.data.name ?? '',
+              }
+            : undefined,
         },
       });
     },
