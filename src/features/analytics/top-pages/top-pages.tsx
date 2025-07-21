@@ -22,7 +22,7 @@ export default function TopPages({ data = [] }: TopPagesProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 dark:border-gray-100 dark:bg-white/[0.03] md:p-6">
+    <div className="h-full rounded-2xl border border-gray-100 bg-white p-5 dark:border-gray-100 dark:bg-white/[0.03] md:p-6 flex flex-col gap-6">
       <div className="flex items-start justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Частота упоминаний
@@ -52,7 +52,7 @@ export default function TopPages({ data = [] }: TopPagesProps) {
         </div>
       </div>
 
-      <div className="my-6">
+      <div>
         <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-200">
           <span className="text-gray-400 text-theme-xs">Слово</span>
           <span className="text-right text-gray-400 text-theme-xs">Кол-во</span>
