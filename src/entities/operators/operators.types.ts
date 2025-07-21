@@ -1,4 +1,4 @@
-export interface OperatorResponse {
+export interface Operator {
   id: number
   name: string | null
 }
