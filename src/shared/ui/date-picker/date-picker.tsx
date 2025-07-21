@@ -160,9 +160,9 @@ export const DateTimePicker = ({
   };
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative h-full">
       {label && (
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+        <label className="h-8 text-sm font-semibold text-gray-700 flex items-center">
           {label}
         </label>
       )}
