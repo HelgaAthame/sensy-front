@@ -1,21 +1,21 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import AnalyticsMetrics from '@/features/analytics/analytics-metrics/analytics-metrics'
-import AnalyticsBarChart from '@/features/analytics/analytics-bar-chart/analytics-bar-chart'
-import ImpressionChart from '@/features/analytics/analytics-impression-chart/analytics-impression-chart'
-import TopChannel from '@/features/analytics/top-channel/top-channel'
-import TopPages from '@/features/analytics/top-pages/top-pages'
-import { useGetAnalyticsDashboardQuery } from '@/entities/analytics/analytics.api'
-import Button from '@/shared/ui/button/button'
-import { FilterIcon } from '@/../public/assets/icons'
-import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
-import { getLast30DaysRange } from '@/shared/utils/date-utils'
-import { LoaderContent } from '@/shared/ui/loader'
+import React, { useState } from 'react';
+import AnalyticsMetrics from '@/features/analytics/analytics-metrics/analytics-metrics';
+import AnalyticsBarChart from '@/features/analytics/analytics-bar-chart/analytics-bar-chart';
+import ImpressionChart from '@/features/analytics/analytics-impression-chart/analytics-impression-chart';
+import TopChannel from '@/features/analytics/top-channel/top-channel';
+import TopPages from '@/features/analytics/top-pages/top-pages';
+import { useGetAnalyticsDashboardQuery } from '@/entities/analytics/analytics.api';
+import Button from '@/shared/ui/button/button';
+import { FilterIcon } from '@/../public/assets/icons';
+import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal';
+import { getLast30DaysRange } from '@/shared/utils/date-utils';
+import { LoaderContent } from '@/shared/ui/loader';
 
 export const Analytics = () => {
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
-  const defaultDateRange = getLast30DaysRange()
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const defaultDateRange = getLast30DaysRange();
   const [filterParams, setFilterParams] = useState({
     start: defaultDateRange.start,
     end: defaultDateRange.end,
@@ -24,25 +24,25 @@ export const Analytics = () => {
     limit: 10,
     topNKeywords: 5,
     negativeLevelThreshold: 0.3,
-  })
+  });
 
-  const { data, isLoading } = useGetAnalyticsDashboardQuery(filterParams)
+  const { data, isLoading } = useGetAnalyticsDashboardQuery(filterParams);
 
-  const openFilterModal = () => setIsFilterModalOpen(true)
-  const closeFilterModal = () => setIsFilterModalOpen(false)
+  const openFilterModal = () => setIsFilterModalOpen(true);
+  const closeFilterModal = () => setIsFilterModalOpen(false);
 
   const applyFilters = (params: any) => {
-    setFilterParams({ ...filterParams, ...params })
-    closeFilterModal()
-  }
+    setFilterParams({ ...filterParams, ...params });
+    closeFilterModal();
+  };
 
   const currentDateRange = {
     start: filterParams.start,
     end: filterParams.end,
-  }
+  };
 
   return (
-    <div className="bg-white rounded-lg">
+    <div className="rounded-lg">
       {isLoading ? (
         <LoaderContent width={200} height={200} isLoading={isLoading} />
       ) : (
@@ -63,7 +63,10 @@ export const Analytics = () => {
               <AnalyticsMetrics data={data?.summaryData} />
             </div>
             <div className="col-span-12 md:col-span-6">
-              <ImpressionChart data={data?.plotData} dateRange={currentDateRange} />
+              <ImpressionChart
+                data={data?.plotData}
+                dateRange={currentDateRange}
+              />
             </div>
             <div className="col-span-12 md:col-span-6">
               <AnalyticsBarChart data={data?.negativeHistogramData} />
@@ -97,5 +100,5 @@ export const Analytics = () => {
         </>
       )}
     </div>
-  )
-}
+  );
+};

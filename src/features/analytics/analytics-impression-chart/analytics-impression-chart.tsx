@@ -1,61 +1,64 @@
-'use client'
+'use client';
 
-import { ApexOptions } from 'apexcharts'
-import dynamic from 'next/dynamic'
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
+import { ApexOptions } from 'apexcharts';
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 interface PlotDataItem {
-  dateTime: string
-  keywordsExceedCount: number
-  maxSilenceDurationExceedCount: number
-  negativeLevelExceedCount: number
-  simultaneousSpeechExceedCount: number
+  dateTime: string;
+  keywordsExceedCount: number;
+  maxSilenceDurationExceedCount: number;
+  negativeLevelExceedCount: number;
+  simultaneousSpeechExceedCount: number;
 }
 
 interface ImpressionChartProps {
-  data?: PlotDataItem[]
-  dateRange?: { start: string; end: string }
+  data?: PlotDataItem[];
+  dateRange?: { start: string; end: string };
 }
 
-export default function ImpressionChart({ data, dateRange }: ImpressionChartProps) {
+export default function ImpressionChart({
+  data,
+  dateRange,
+}: ImpressionChartProps) {
   const processHourlyData = (
     data: PlotDataItem[] | undefined,
     dateRange?: { start: string; end: string }
   ) => {
-    if (!data || data.length === 0) return { categories: [], series: [] }
+    if (!data || data.length === 0) return { categories: [], series: [] };
 
     // Create a map to store daily aggregated data
     const dailyData = new Map<
       string,
       {
-        negativeLevelExceedCount: number
-        keywordsExceedCount: number
-        maxSilenceDurationExceedCount: number
-        simultaneousSpeechExceedCount: number
+        negativeLevelExceedCount: number;
+        keywordsExceedCount: number;
+        maxSilenceDurationExceedCount: number;
+        simultaneousSpeechExceedCount: number;
       }
-    >()
+    >();
 
-    const allDates: string[] = []
+    const allDates: string[] = [];
     if (dateRange) {
-      const start = new Date(dateRange.start)
-      const end = new Date(dateRange.end)
+      const start = new Date(dateRange.start);
+      const end = new Date(dateRange.end);
 
       for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
-        const dateKey = dt.toISOString().split('T')[0]
-        allDates.push(dateKey)
+        const dateKey = dt.toISOString().split('T')[0];
+        allDates.push(dateKey);
 
         dailyData.set(dateKey, {
           negativeLevelExceedCount: 0,
           keywordsExceedCount: 0,
           maxSilenceDurationExceedCount: 0,
           simultaneousSpeechExceedCount: 0,
-        })
+        });
       }
     }
 
-    data.forEach(item => {
-      const date = new Date(item.dateTime)
-      const dateKey = date.toISOString().split('T')[0]
+    data.forEach((item) => {
+      const date = new Date(item.dateTime);
+      const dateKey = date.toISOString().split('T')[0];
 
       if (!dailyData.has(dateKey)) {
         dailyData.set(dateKey, {
@@ -63,33 +66,41 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
           keywordsExceedCount: 0,
           maxSilenceDurationExceedCount: 0,
           simultaneousSpeechExceedCount: 0,
-        })
+        });
       }
 
-      const current = dailyData.get(dateKey)!
-      current.negativeLevelExceedCount += item.negativeLevelExceedCount || 0
-      current.keywordsExceedCount += item.keywordsExceedCount || 0
-      current.maxSilenceDurationExceedCount += item.maxSilenceDurationExceedCount || 0
-      current.simultaneousSpeechExceedCount += item.simultaneousSpeechExceedCount || 0
-    })
+      const current = dailyData.get(dateKey)!;
+      current.negativeLevelExceedCount += item.negativeLevelExceedCount || 0;
+      current.keywordsExceedCount += item.keywordsExceedCount || 0;
+      current.maxSilenceDurationExceedCount +=
+        item.maxSilenceDurationExceedCount || 0;
+      current.simultaneousSpeechExceedCount +=
+        item.simultaneousSpeechExceedCount || 0;
+    });
 
-    const sortedDates = allDates.length > 0 ? allDates : Array.from(dailyData.keys()).sort()
+    const sortedDates =
+      allDates.length > 0 ? allDates : Array.from(dailyData.keys()).sort();
 
-    const formattedDates = sortedDates.map(dateStr => {
-      const date = new Date(dateStr)
-      return new Intl.DateTimeFormat('ru', { month: 'short', day: 'numeric' }).format(date)
-    })
+    const formattedDates = sortedDates.map((dateStr) => {
+      const date = new Date(dateStr);
+      return new Intl.DateTimeFormat('ru', {
+        month: 'short',
+        day: 'numeric',
+      }).format(date);
+    });
 
     const negativeLevelData = sortedDates.map(
-      date => dailyData.get(date)?.negativeLevelExceedCount || 0
-    )
-    const keywordsData = sortedDates.map(date => dailyData.get(date)?.keywordsExceedCount || 0)
+      (date) => dailyData.get(date)?.negativeLevelExceedCount || 0
+    );
+    const keywordsData = sortedDates.map(
+      (date) => dailyData.get(date)?.keywordsExceedCount || 0
+    );
     const silenceData = sortedDates.map(
-      date => dailyData.get(date)?.maxSilenceDurationExceedCount || 0
-    )
+      (date) => dailyData.get(date)?.maxSilenceDurationExceedCount || 0
+    );
     const speechData = sortedDates.map(
-      date => dailyData.get(date)?.simultaneousSpeechExceedCount || 0
-    )
+      (date) => dailyData.get(date)?.simultaneousSpeechExceedCount || 0
+    );
 
     return {
       categories: formattedDates,
@@ -115,10 +126,10 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
           color: '#FF9500',
         },
       ],
-    }
-  }
+    };
+  };
 
-  const { categories, series } = processHourlyData(data, dateRange)
+  const { categories, series } = processHourlyData(data, dateRange);
 
   const options: ApexOptions = {
     legend: {
@@ -195,7 +206,7 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
         text: '',
       },
     },
-  }
+  };
 
   return (
     <div
@@ -204,10 +215,12 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
     >
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
-          <h3 className="mb-1 text-lg font-semibold text-neutral-900">Тренды</h3>
+          <h3 className="mb-1 text-lg font-semibold text-neutral-900">
+            Тренды
+          </h3>
         </div>
       </div>
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
+      <div className="max-w-full overflow-x-clip custom-scrollbar">
         <div className="-ml-5 min-w-[1300px] xl:min-w-full pl-2">
           {series.length > 0 ? (
             <Chart options={options} series={series} type="line" height={350} />
@@ -219,5 +232,5 @@ export default function ImpressionChart({ data, dateRange }: ImpressionChartProp
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,28 +1,28 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { MoreDotIcon } from '@/../public/assets/icons'
-import { Dropdown } from '@/shared/ui/dropdown/dropdown'
-import { DropdownItem } from '@/shared/ui/dropdown/dropdown-Item'
-import { KeywordFrequencyItem } from '@/entities/analytics/analytics.types'
+import { useState } from 'react';
+import { MoreDotIcon } from '@/../public/assets/icons';
+import { Dropdown } from '@/shared/ui/dropdown/dropdown';
+import { DropdownItem } from '@/shared/ui/dropdown/dropdown-Item';
+import { KeywordFrequencyItem } from '@/entities/analytics/analytics.types';
 
 interface TopPagesProps {
-  data?: KeywordFrequencyItem[]
+  data?: KeywordFrequencyItem[];
 }
 
 export default function TopPages({ data = [] }: TopPagesProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {
-    setIsOpen(!isOpen)
+    setIsOpen(!isOpen);
   }
 
   function closeDropdown() {
-    setIsOpen(false)
+    setIsOpen(false);
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-200 dark:bg-white/[0.03] md:p-6">
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 dark:border-gray-100 dark:bg-white/[0.03] md:p-6">
       <div className="flex items-start justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Частота упоминаний
@@ -31,7 +31,11 @@ export default function TopPages({ data = [] }: TopPagesProps) {
           <button className="dropdown-toggle" onClick={toggleDropdown}>
             <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
           </button>
-          <Dropdown isOpen={isOpen} onClose={closeDropdown} className="w-40 p-2">
+          <Dropdown
+            isOpen={isOpen}
+            onClose={closeDropdown}
+            className="w-40 p-2"
+          >
             <DropdownItem
               onItemClick={closeDropdown}
               className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
@@ -56,7 +60,10 @@ export default function TopPages({ data = [] }: TopPagesProps) {
 
         {data && data.length > 0 ? (
           data.slice(0, 5).map((frequency, index) => (
-            <div key={index} className="py-3 border-b border-gray-100 dark:border-gray-200">
+            <div
+              key={index}
+              className="py-3 border-b border-gray-100 dark:border-gray-200"
+            >
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-800 text-theme-sm dark:text-gray-300">
                   {frequency.keyword}
@@ -74,5 +81,5 @@ export default function TopPages({ data = [] }: TopPagesProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

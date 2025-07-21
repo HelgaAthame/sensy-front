@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import { Calendar, DateObject } from 'react-multi-date-picker'
-import TimePicker from 'react-multi-date-picker/plugins/analog_time_picker'
-import 'react-multi-date-picker/styles/colors/purple.css'
-import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css'
-import './date-picker.css'
+import { Calendar, DateObject } from 'react-multi-date-picker';
+import TimePicker from 'react-multi-date-picker/plugins/analog_time_picker';
+import 'react-multi-date-picker/styles/colors/purple.css';
+import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css';
+import './date-picker.css';
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
 
 interface DateTimePickerProps {
-  value: Date | Date[] | null
-  onChange: (date: Date | Date[] | null) => void
-  label?: string
-  withTime?: boolean
-  format?: string
-  disabled?: boolean
-  placeholder?: string
-  className?: string
-  range?: boolean
+  value: Date | Date[] | null;
+  onChange: (date: Date | Date[] | null) => void;
+  label?: string;
+  withTime?: boolean;
+  format?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  className?: string;
+  range?: boolean;
 }
 
 const months = [
@@ -33,7 +33,7 @@ const months = [
   ['октябрь'],
   ['ноябрь'],
   ['декабрь'],
-]
+];
 const weekDays = [
   ['вос', 'вс'],
   ['пон', 'пн'],
@@ -42,7 +42,7 @@ const weekDays = [
   ['чет', 'чт'],
   ['пят', 'пт'],
   ['суб', 'сб'],
-]
+];
 
 export const DateTimePicker = ({
   value,
@@ -55,29 +55,29 @@ export const DateTimePicker = ({
   placeholder = 'Выберите дату',
   range = false,
 }: DateTimePickerProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const calendarContainerRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const prevValueRef = useRef<Date | Date[] | null>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const calendarContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const prevValueRef = useRef<Date | Date[] | null>(null);
 
   const getFormattedValue = () => {
-    if (!value) return ''
+    if (!value) return '';
 
-    const dateFormat = format ?? (withTime ? 'DD.MM.YYYY HH:mm' : 'DD.MM.YYYY')
+    const dateFormat = format ?? (withTime ? 'DD.MM.YYYY HH:mm' : 'DD.MM.YYYY');
 
     if (Array.isArray(value)) {
-      if (value.length === 0) return ''
+      if (value.length === 0) return '';
       if (value.length === 1) {
-        return new DateObject(value[0]).format(dateFormat)
+        return new DateObject(value[0]).format(dateFormat);
       }
-      return `${new DateObject(value[0]).format(dateFormat)} — ${new DateObject(value[1]).format(dateFormat)}`
+      return `${new DateObject(value[0]).format(dateFormat)} — ${new DateObject(value[1]).format(dateFormat)}`;
     } else {
-      return new DateObject(value).format(dateFormat)
+      return new DateObject(value).format(dateFormat);
     }
-  }
+  };
 
-  const formattedValue = getFormattedValue()
-  const now = new Date()
+  const formattedValue = getFormattedValue();
+  const now = new Date();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -87,79 +87,85 @@ export const DateTimePicker = ({
         inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const isOnlyTimeChanged = (newDate: any, oldDate: any): boolean => {
-    if (!withTime || !newDate || !oldDate) return false
+    if (!withTime || !newDate || !oldDate) return false;
 
     if (Array.isArray(newDate) && Array.isArray(oldDate)) {
-      if (newDate.length !== oldDate.length) return false
+      if (newDate.length !== oldDate.length) return false;
 
       for (let i = 0; i < newDate.length; i++) {
-        const newD = new DateObject(newDate[i])
-        const oldD = new DateObject(oldDate[i])
+        const newD = new DateObject(newDate[i]);
+        const oldD = new DateObject(oldDate[i]);
 
         if (
           newD.day !== oldD.day ||
           newD.month.number !== oldD.month.number ||
           newD.year !== oldD.year
         ) {
-          return false
+          return false;
         }
       }
-      return true
+      return true;
     } else if (!Array.isArray(newDate) && !Array.isArray(oldDate)) {
-      const newD = new DateObject(newDate)
-      const oldD = new DateObject(oldDate)
+      const newD = new DateObject(newDate);
+      const oldD = new DateObject(oldDate);
 
       return (
         newD.day === oldD.day &&
         newD.month.number === oldD.month.number &&
         newD.year === oldD.year &&
         (newD.hour !== oldD.hour || newD.minute !== oldD.minute)
-      )
+      );
     }
 
-    return false
-  }
+    return false;
+  };
 
   const handleDateChange = (date: any) => {
-    const timeOnlyChanged = isOnlyTimeChanged(date, prevValueRef.current)
+    const timeOnlyChanged = isOnlyTimeChanged(date, prevValueRef.current);
 
     if (date) {
       prevValueRef.current = Array.isArray(date)
-        ? (date.map(d => d?.toDate?.() ?? null).filter(Boolean) as Date[])
-        : (date?.toDate?.() ?? null)
+        ? (date.map((d) => d?.toDate?.() ?? null).filter(Boolean) as Date[])
+        : (date?.toDate?.() ?? null);
     } else {
-      prevValueRef.current = null
+      prevValueRef.current = null;
     }
 
     if (!date) {
-      onChange(null)
+      onChange(null);
     } else if (Array.isArray(date)) {
-      const dateArray = date.map(d => d?.toDate?.() ?? null).filter(Boolean) as Date[]
-      onChange(dateArray.length > 0 ? dateArray : null)
+      const dateArray = date
+        .map((d) => d?.toDate?.() ?? null)
+        .filter(Boolean) as Date[];
+      onChange(dateArray.length > 0 ? dateArray : null);
     } else {
-      const d = date?.toDate?.() ?? null
-      onChange(d)
+      const d = date?.toDate?.() ?? null;
+      onChange(d);
     }
 
     if (range && Array.isArray(date) && date.length >= 2) {
-      setIsOpen(false)
+      setIsOpen(false);
     }
-  }
+  };
 
   return (
     <div className="w-full relative">
-      {label && <label className="block mb-1.5 text-sm font-medium text-gray-700">{label}</label>}
+      {label && (
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          {label}
+        </label>
+      )}
 
       <input
         ref={inputRef}
@@ -167,7 +173,7 @@ export const DateTimePicker = ({
         value={formattedValue}
         readOnly
         placeholder={placeholder}
-        className={`h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-gray-400 focus:outline-hidden focus:ring-1 focus:ring-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-gray-500 ${value ? 'text-gray-800 dark:text-white/90' : 'text-gray-400 dark:text-gray-400'} ${className}`}
+        className={`h-11 w-full appearance-none rounded-full border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-gray-400 focus:outline-hidden focus:ring-1 focus:ring-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-gray-500 ${value ? 'text-gray-800 dark:text-white/90' : 'text-gray-400 dark:text-gray-400'} ${className}`}
         disabled={disabled}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       />
@@ -189,5 +195,5 @@ export const DateTimePicker = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

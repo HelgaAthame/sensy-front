@@ -33,13 +33,9 @@ export const Operators = () => {
           >
             Операторы
           </h2>
-          <div className="space-y-6">
-            <ComponentCard>
               {operatorsData && (
                 <OperatorsTable data={operatorsData} columns={columns} itemsPerPage={10} />
               )}
-            </ComponentCard>
-          </div>
         </>
       )}
     </>

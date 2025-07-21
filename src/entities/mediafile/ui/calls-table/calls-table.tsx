@@ -1,28 +1,37 @@
-'use client'
+'use client';
 
-import { JSX } from 'react'
-import Button from '@/shared/ui/button/button'
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/shared/ui/table/table'
-import { FilterIcon } from '@/../public/assets/icons'
-import { appRoutes } from '@/shared/constants/routes'
-import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
-import { useCalls } from '@/entities/mediafile/hooks/use-calls'
+import { JSX } from 'react';
+import Button from '@/shared/ui/button/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from '@/shared/ui/table/table';
+import { FilterIcon } from '@/../public/assets/icons';
+import { appRoutes } from '@/shared/constants/routes';
+import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table';
+import { useCalls } from '@/entities/mediafile/hooks/use-calls';
 import {
   getNegativeColorClass,
   getSilenceColorClass,
   getValueColorClass,
-} from '@/shared/lib/color/get-color-class'
-import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal'
-import { ResetFiltersActive, ResetFilters, DownloadIcon } from '@/../public/assets/svg-components'
-import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils'
-import Pagination from '@/shared/ui/pagination/pagination'
-import { LoaderContent } from '@/shared/ui/loader'
-
+} from '@/shared/lib/color/get-color-class';
+import AnalyticsFilterModal from '@/features/analytics/analytics-filter-modal/analytics-filter-modal';
+import {
+  ResetFiltersActive,
+  ResetFilters,
+  DownloadIcon,
+} from '@/../public/assets/svg-components';
+import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils';
+import Pagination from '@/shared/ui/pagination/pagination';
+import { LoaderContent } from '@/shared/ui/loader';
 
 const getChanelColor = (chanel: number) => {
-  if (chanel >1) return 'bg-green-100 text-green-800'
-  return 'bg-yellow-100 text-yellow-800'
-}
+  if (chanel > 1) return 'bg-green-100 text-green-800';
+  return 'bg-yellow-100 text-yellow-800';
+};
 
 export const CallsTable = (): JSX.Element => {
   const {
@@ -48,30 +57,41 @@ export const CallsTable = (): JSX.Element => {
     totalEntries,
     startIndex,
     endIndex,
-  } = useCalls()
+  } = useCalls();
 
   return (
     <div className={'relative'}>
       {isLoading ? (
         <LoaderContent width={200} height={200} isLoading={isLoading} />
       ) : (
-        <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03]">
-          <div className="flex flex-col gap-2 px-4 py-4 border border-b-0 border-gray-100 dark:border-white/[0.05] rounded-t-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03] border border-gray-100">
+          <div className="flex flex-col gap-2 px-4 py-4 rounded-t-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 flex-wrap">
             <div className="flex items-center gap-3">
-              <span className="text-gray-500 dark:text-gray-400">Показывать</span>
+              <span className="text-gray-500 dark:text-gray-400">
+                Показывать
+              </span>
               <div className="relative z-20 bg-transparent">
                 <select
                   className="w-[66px] py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-full appearance-none h-9 shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                   value={rowsPerPage}
                   onChange={handleRowsPerPageChange}
                 >
-                  <option value="10" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+                  <option
+                    value="10"
+                    className="text-gray-500 dark:bg-gray-900 dark:text-gray-400"
+                  >
                     10
                   </option>
-                  <option value="8" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+                  <option
+                    value="8"
+                    className="text-gray-500 dark:bg-gray-900 dark:text-gray-400"
+                  >
                     8
                   </option>
-                  <option value="5" className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+                  <option
+                    value="5"
+                    className="text-gray-500 dark:bg-gray-900 dark:text-gray-400"
+                  >
                     5
                   </option>
                 </select>
@@ -133,7 +153,7 @@ export const CallsTable = (): JSX.Element => {
             </div>
           </div>
 
-          <div className="max-w-full overflow-x-auto custom-scrollbar">
+          <div className="max-w-full overflow-x-clip custom-scrollbar">
             <div>
               <Table>
                 <TableHeader>
@@ -142,17 +162,13 @@ export const CallsTable = (): JSX.Element => {
                       <TableCell
                         key={column.key}
                         isHeader
-                        className={`px-4 py-3 border-y ${
-                          index === 0
-                            ? 'border-l'
-                            : index === columnConfig.length - 1
-                              ? 'border-r'
-                              : ''
-                        } border-gray-100 dark:border-white/[0.05]`}
+                        className={`px-4 py-3 border-y border-gray-100 dark:border-white/[0.05]`}
                       >
                         <div
                           className={`flex items-center gap-2 ${column.sortable ? 'cursor-pointer' : ''}`}
-                          onClick={() => column.sortable && handleSort(column.key)}
+                          onClick={() =>
+                            column.sortable && handleSort(column.key)
+                          }
                         >
                           <div className="flex gap-3">
                             <span className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
@@ -183,31 +199,42 @@ export const CallsTable = (): JSX.Element => {
                 </TableHeader>
                 <TableBody>
                   {mediaFilesDataTable && mediaFilesDataTable.length > 0 ? (
-                    mediaFilesDataTable.map(item => {
-                      const summaryAnalyserResult = item?.summaryAnalyserResult || {}
+                    mediaFilesDataTable.map((item) => {
+                      const summaryAnalyserResult =
+                        item?.summaryAnalyserResult || {};
                       const negativeValue = Math.round(
                         (summaryAnalyserResult?.negativeLevelOverall || 0) * 100
-                      )
+                      );
                       const silenceSeconds =
-                        summaryAnalyserResult?.maxSimultaneousSilenceDuration || 0
-                      const lexis = item?.filteredKeywordsCount || 0
-                      const interruptions = summaryAnalyserResult?.simultaneousSpeechCount || 0
-                      const clientNumber = item?.additionalMetadata?.clientNumber || 'Н/Д'
+                        summaryAnalyserResult?.maxSimultaneousSilenceDuration ||
+                        0;
+                      const lexis = item?.filteredKeywordsCount || 0;
+                      const interruptions =
+                        summaryAnalyserResult?.simultaneousSpeechCount || 0;
+                      const clientNumber =
+                        item?.additionalMetadata?.clientNumber || 'Н/Д';
 
-                      const scorePercentage = (item.gptChecklist&&item.gptChecklist.collection.length > 0) ? ( item.gptChecklist.collection[0].score /  item.gptChecklist.collection[0].maxScore) * 100 : 0
-
-
+                      const scorePercentage =
+                        item.gptChecklist &&
+                        item.gptChecklist.collection.length > 0
+                          ? (item.gptChecklist.collection[0].score /
+                              item.gptChecklist.collection[0].maxScore) *
+                            100
+                          : 0;
 
                       return (
                         <TableRow
                           className="cursor-pointer hover:bg-gray-100"
                           key={item.id}
                           onClick={() =>
-                            item?.id && router.push(appRoutes.private.call(String(item.id)))
+                            item?.id &&
+                            router.push(appRoutes.private.call(String(item.id)))
                           }
                         >
                           <TableCell className="px-4 py-4 border-b border-l border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
-                            {item?.createDate ? formatDatesTime(new Date(item.createDate)) : 'Н/Д'}
+                            {item?.createDate
+                              ? formatDatesTime(new Date(item.createDate))
+                              : 'Н/Д'}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
                             {item?.operatorName || 'Н/Д'}
@@ -219,7 +246,7 @@ export const CallsTable = (): JSX.Element => {
                             <span
                               className={`text-xs px-2 py-0.5 rounded-full font-medium ${getChanelColor(item.numChannels)}`}
                             >
-                               {item.projectName}
+                              {item.projectName}
                             </span>
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
@@ -235,19 +262,25 @@ export const CallsTable = (): JSX.Element => {
                             </span>
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span className={`${getValueColorClass(lexis)}`}>{lexis}</span>
+                            <span className={`${getValueColorClass(lexis)}`}>
+                              {lexis}
+                            </span>
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span className={`${getValueColorClass(interruptions)}`}>
+                            <span
+                              className={`${getValueColorClass(interruptions)}`}
+                            >
                               {interruptions}
                             </span>
                           </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100  border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span className={`${getSilenceColorClass(silenceSeconds)}`}>
+                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                            <span
+                              className={`${getSilenceColorClass(silenceSeconds)}`}
+                            >
                               {formatDuration(silenceSeconds)}
                             </span>
                           </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100  font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <TableCell className="px-4 py-4 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
                             <div className="w-24 bg-gray-200 rounded-full h-2.5">
                               <div
                                 className={`h-2.5 rounded-full ${
@@ -265,13 +298,13 @@ export const CallsTable = (): JSX.Element => {
                             {item.gptSummary}
                           </TableCell>
                         </TableRow>
-                      )
+                      );
                     })
                   ) : (
                     <TableRow>
                       <TableCell
                         colSpan={columnConfig.length}
-                        className="px-4 py-4 text-center border border-gray-100"
+                        className="px-4 py-4 text-center"
                       >
                         Данные не найдены
                       </TableCell>
@@ -288,27 +321,30 @@ export const CallsTable = (): JSX.Element => {
             storagePrefix="_calls"
             filtersReset={filtersReset}
           />
-          <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
-            <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
-              <div className="pb-3 xl:pb-0">
-                {totalEntries && totalEntries > 0 && (
-                  <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
-                    Отображаются от {(startIndex || 0) + 1} до {endIndex || 0} из {totalEntries}{' '}
-                    записей
-                  </p>
-                )}
+          {(totalEntries && totalEntries > 0) ||
+          (totalPages && totalPages > 1) ? (
+            <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
+              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
+                {totalEntries && totalEntries > 0 ? (
+                  <div className="pb-3 xl:pb-0">
+                    <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
+                      Отображаются от {(startIndex || 0) + 1} до {endIndex || 0}{' '}
+                      из {totalEntries} записей
+                    </p>
+                  </div>
+                ) : null}
+                {totalPages && totalPages > 1 ? (
+                  <Pagination
+                    currentPage={currentPage || 1}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                ) : null}
               </div>
-              {totalPages && totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage || 1}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              )}
             </div>
-          </div>
+          ) : null}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
