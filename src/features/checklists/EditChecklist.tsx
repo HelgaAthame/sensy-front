@@ -193,6 +193,7 @@ export const EditChecklist = () => {
               <div className="flex flex-col justify-between gap-6">
                 <Button
                   className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
+                  type="button"
                   onClick={() => {
                     cloneChecklist(checklistid);
                   }}
@@ -204,6 +205,7 @@ export const EditChecklist = () => {
                 </Button>
                 <Button
                   className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
+                  type="button"
                   onClick={() => {
                     setIsEditingChecklist(true);
                   }}
@@ -232,7 +234,7 @@ export const EditChecklist = () => {
                   {(block.criterias ?? []).map((criteria, ind) => (
                     <Fragment key={ind}>
                       <div className="flex flex-col gap-6">
-                        <div className="flex gap-8">
+                        <div className="grid grid-cols-3 gap-8">
                           <div className="flex flex-col gap-2">
                             <div className="flex gap-2 items-center">
                               <Label>Критерий {ind + 1}</Label>
@@ -262,7 +264,7 @@ export const EditChecklist = () => {
                                   ?.name?.message
                               }
                             />
-                          </div>{' '}
+                          </div>
                           <div className="flex flex-col gap-4">
                             <Label>Тип шкалы</Label>
                             <div className="flex gap-3">
@@ -281,9 +283,9 @@ export const EditChecklist = () => {
                                   />
                                   <span
                                     className={`
-                                  inline-block w-4 h-4 rounded-full transition after:duration-300       
+                                  inline-block shrink-0 w-4 h-4 rounded-full transition after:duration-300       
                                   relative after:content-[''] after:absolute after:top-1 after:left-1 
-                                  after:w-2 after:h-2 after:rounded-full after:bg-white 
+                                  after:w-2 after:h-2 after:rounded-full after:bg-white grow-0
                                   after:opacity-0 peer-checked:after:opacity-100 bg-purple-900
                                 `}
                                   ></span>
@@ -366,6 +368,7 @@ export const EditChecklist = () => {
                 <div className="flex justify-center">
                   <Button
                     className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
+                    type="button"
                     onClick={() => {
                       setValue(`data.blocks.${index}.criterias`, [
                         ...(block.criterias ?? []),
@@ -392,6 +395,7 @@ export const EditChecklist = () => {
             <div className="flex justify-center">
               <Button
                 className="px-2 py-2 text-gray-700 hover:bg-gray-100 bg-white border border-gray-200 cursor-pointer rounded-full"
+                type="button"
                 onClick={() => {
                   setValue('data.blocks', [
                     ...(blocks ?? []),
