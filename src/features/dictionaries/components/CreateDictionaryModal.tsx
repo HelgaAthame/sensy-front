@@ -15,6 +15,7 @@ import Label from '@/shared/ui/label/label';
 import { dictionaryColors } from '@/shared/constants/dictionaryColors';
 import Textarea from '@/shared/ui/textarea/textarea';
 import { Switcher } from '@/shared/ui/switcher';
+import { DropdownCustom } from '@/shared/ui/dropdown-custom';
 
 interface Props {
   isOpen: boolean;
@@ -75,17 +76,30 @@ export const CreateDictionaryModal = ({ isOpen, onClose, onApply }: Props) => {
         <Controller
           control={control}
           render={({ field: { onChange, value } }) => (
-            <Select
-              value={value}
+            <DropdownCustom
+              onChange={onChange}
               label="Тип словаря"
-              onChange={(newValue) => {
-                onChange(newValue as DictionaryType);
+              placeholder="Выберите тип словаря"
+              selected={{
+                label: value,
+                value: value,
               }}
               options={DictionaryTypeValues.map((dictionaryValue, index) => ({
                 label: dictionaryValue,
                 value: dictionaryValue,
               }))}
             />
+            // <Select
+            //   value={value}
+            //   label="Тип словаря"
+            //   onChange={(newValue) => {
+            //     onChange(newValue as DictionaryType);
+            //   }}
+            //   options={DictionaryTypeValues.map((dictionaryValue, index) => ({
+            //     label: dictionaryValue,
+            //     value: dictionaryValue,
+            //   }))}
+            // />
           )}
           name={'type'}
         />

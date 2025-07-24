@@ -51,7 +51,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     } border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-1 ${className}`;
 
     if (disabled) {
-      inputClasses += ` text-gray-500 border-gray-300 bg-gray-100 cursor-not-allowed opacity-40
+      inputClasses += ` text-gray-500 border-gray-200 bg-gray-100 cursor-not-allowed opacity-40
       dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700`;
     } else if (error) {
       inputClasses += ` border-rose-500 bg-drose-50/10 text-rose-900
@@ -64,8 +64,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       dark:border-success-500 dark:text-success-400 dark:focus:border-success-400
       dark:bg-success-900/10`;
     } else {
-      inputClasses += ` bg-transparent text-gray-800 border-gray-300
-    focus:border-gray-400 focus:ring-gray-300
+      inputClasses += ` bg-transparent text-gray-800 border-gray-200
+    focus:border-gray-400 focus:ring-gray-200
     dark:border-gray-700 dark:text-white/90 dark:focus:border-gray-500`;
     }
 

@@ -1,39 +1,47 @@
-'use client'
-import ComponentCard from '@/shared/ui/component-card/component-card'
-import Form from '@/shared/ui/form/form'
-import Button from '@/shared/ui/button/button'
-import { useCreateMediaFileMutation } from '@/entities/mediafile/api/mediafile.api'
-import { useForm } from 'react-hook-form'
-import { MediaFileData, MediaFileSchema } from '@/features/uploading-record/use-uploading-record'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ControlledSelect } from '@/shared/ui/select/controlled-select'
-import { ControlledTextField } from '@/shared/ui/input/controlled-text-field'
-import { useEffect, useState } from 'react'
-import { ErrorComponent } from '@/shared/ui/error/error'
-import { toast } from 'react-toastify'
-import { useGetProjectsQuery } from '@/entities/projects/projects.api'
-import { useGetOperatorsQuery } from '@/entities/operators/operators.api'
-import { setToLocalStorage } from '@/shared/utils/common-utils'
-import { formatDateWithLocalTimeZone } from '@/shared/utils/date-utils'
-import 'react-multi-date-picker/styles/backgrounds/bg-gray.css'
-import 'react-multi-date-picker/styles/colors/purple.css'
-import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css'
-import { DateTimePicker } from '@/shared/ui/date-picker/date-picker'
+'use client';
+import ComponentCard from '@/shared/ui/component-card/component-card';
+import Form from '@/shared/ui/form/form';
+import Button from '@/shared/ui/button/button';
+import { useCreateMediaFileMutation } from '@/entities/mediafile/api/mediafile.api';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  MediaFileData,
+  MediaFileSchema,
+} from '@/features/uploading-record/use-uploading-record';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ControlledSelect } from '@/shared/ui/select/controlled-select';
+import { ControlledTextField } from '@/shared/ui/input/controlled-text-field';
+import { useEffect, useState } from 'react';
+import { ErrorComponent } from '@/shared/ui/error/error';
+import { toast } from 'react-toastify';
+import { useGetProjectsQuery } from '@/entities/projects/projects.api';
+import { useGetOperatorsQuery } from '@/entities/operators/operators.api';
+import { setToLocalStorage } from '@/shared/utils/common-utils';
+import { formatDateWithLocalTimeZone } from '@/shared/utils/date-utils';
+import 'react-multi-date-picker/styles/backgrounds/bg-gray.css';
+import 'react-multi-date-picker/styles/colors/purple.css';
+import 'react-multi-date-picker/styles/colors/analog_time_picker_purple.css';
+import { DateTimePicker } from '@/shared/ui/date-picker/date-picker';
+import { DropdownCustom } from '@/shared/ui/dropdown-custom';
 
 interface UploadFormProps {
-  uploadedFile: File[] | null
-  onFileUploaded: (files: File[]) => void
-  setIsLoading: (isLoading: boolean) => void
+  uploadedFile: File[] | null;
+  onFileUploaded: (files: File[]) => void;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
-export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: UploadFormProps) => {
-  const [createMediaFile, { isLoading }] = useCreateMediaFileMutation()
-  const { data: projectsData } = useGetProjectsQuery()
-  const { data: operatorsData } = useGetOperatorsQuery()
+export const UploadForm = ({
+  uploadedFile,
+  onFileUploaded,
+  setIsLoading,
+}: UploadFormProps) => {
+  const [createMediaFile, { isLoading }] = useCreateMediaFileMutation();
+  const { data: projectsData } = useGetProjectsQuery();
+  const { data: operatorsData } = useGetOperatorsQuery();
 
-  const today = new Date()
+  const today = new Date();
 
-  const [selectedDate, setSelectedDate] = useState<Date>(today)
+  const [selectedDate, setSelectedDate] = useState<Date>(today);
 
   const {
     control,
@@ -49,25 +57,25 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
       projectId: '',
       file: null,
     },
-  })
+  });
 
   useEffect(() => {
     if (uploadedFile && uploadedFile.length > 0) {
-      setValue('file', uploadedFile[0])
+      setValue('file', uploadedFile[0]);
     }
-  }, [uploadedFile, setValue])
+  }, [uploadedFile, setValue]);
 
   const reset = () => {
-    hookFormReset()
-    onFileUploaded([])
-    setSelectedDate(today)
-  }
+    hookFormReset();
+    onFileUploaded([]);
+    setSelectedDate(today);
+  };
 
-  const onSubmit = handleSubmit(async data => {
-    if (!data.file) return
+  const onSubmit = handleSubmit(async (data) => {
+    if (!data.file) return;
 
-    const createDate = formatDateWithLocalTimeZone(selectedDate.toISOString())
-    setIsLoading(true)
+    const createDate = formatDateWithLocalTimeZone(selectedDate.toISOString());
+    setIsLoading(true);
 
     try {
       await createMediaFile({
@@ -78,31 +86,31 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
           operatorId: parseInt(data.operatorId),
           projectId: parseInt(data.projectId),
         },
-      }).unwrap()
+      }).unwrap();
 
-      const uploadTimestamp = new Date().getTime()
-      setToLocalStorage('lastUploadTimestamp', uploadTimestamp.toString())
+      const uploadTimestamp = new Date().getTime();
+      setToLocalStorage('lastUploadTimestamp', uploadTimestamp.toString());
 
-      toast.success('Запись создана')
-      reset()
+      toast.success('Запись создана');
+      reset();
     } catch (error) {
-      toast.error('Ошибка загрузки')
+      toast.error('Ошибка загрузки');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  })
+  });
 
   const projectOptions =
-    projectsData?.map(project => ({
+    projectsData?.map((project) => ({
       label: project.name,
       value: project.id.toString(),
-    })) ?? []
+    })) ?? [];
 
   const operatorsOptions =
-    operatorsData?.map(operator => ({
+    operatorsData?.map((operator) => ({
       label: operator.name,
       value: operator.id.toString(),
-    })) ?? []
+    })) ?? [];
 
   return (
     <>
@@ -110,20 +118,36 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
         <Form onSubmit={onSubmit}>
           <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
             <div>
-              <ControlledSelect
+              <Controller
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <DropdownCustom
+                    onChange={onChange}
+                    label="Оператор"
+                    placeholder="Выберите оператора"
+                    selected={{
+                      label: value,
+                      value: value,
+                    }}
+                    options={operatorsOptions}
+                  />
+                )}
+                name={'operatorId'}
+              />
+              {/* <ControlledSelect
                 control={control}
                 name="operatorId"
                 label={'Оператор'}
                 placeholder="Выберите оператора"
                 options={operatorsOptions}
-              />
+              /> */}
             </div>
             <div className="w-full">
               <DateTimePicker
                 value={new Date(selectedDate)}
-                onChange={date => {
+                onChange={(date) => {
                   if (date) {
-                    setSelectedDate(Array.isArray(date) ? date[0] : date)
+                    setSelectedDate(Array.isArray(date) ? date[0] : date);
                   }
                 }}
                 label="Дата и время"
@@ -132,13 +156,29 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
             </div>
             <div className="col-span-1 sm:col-span-2 flex gap-5">
               <div className="w-full">
-                <ControlledSelect
+                <Controller
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DropdownCustom
+                      onChange={onChange}
+                      label={'Проект'}
+                      placeholder="Выберите проект"
+                      selected={{
+                        label: value,
+                        value: value,
+                      }}
+                      options={projectOptions}
+                    />
+                  )}
+                  name={'projectId'}
+                />
+                {/* <ControlledSelect
                   control={control}
                   name="projectId"
                   label={'Проект'}
                   placeholder="Выберите проект"
                   options={projectOptions}
-                />
+                /> */}
               </div>
               <div className="w-full">
                 <ControlledTextField
@@ -152,7 +192,11 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
             </div>
             {errors.file && (
               <ErrorComponent
-                text={typeof errors.file.message === 'string' ? errors.file.message : ''}
+                text={
+                  typeof errors.file.message === 'string'
+                    ? errors.file.message
+                    : ''
+                }
               />
             )}
             <div className="col-span-full">
@@ -168,5 +212,5 @@ export const UploadForm = ({ uploadedFile, onFileUploaded, setIsLoading }: Uploa
         </Form>
       </ComponentCard>
     </>
-  )
-}
+  );
+};

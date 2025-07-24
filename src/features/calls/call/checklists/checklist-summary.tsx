@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Select from '@/shared/ui/select/select';
+import { DropdownCustom } from '@/shared/ui/dropdown-custom';
 
 interface ChecklistSummaryProps {
   checklist: {
     collection?: {
       blocks?: {
         criterias?: {
-          name: string | null; 
+          name: string | null;
           minScore: number;
           maxScore: number;
           score: number;
@@ -28,30 +29,40 @@ interface ChecklistSummaryProps {
   defaultMaxScore?: number;
 }
 
-export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({ checklist }) => {
-  const { collection } = checklist
+export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({
+  checklist,
+}) => {
+  const { collection } = checklist;
   const [selectedCheckList, setSelectedCheckList] = useState(collection?.[0]);
   const [checkListPercentage, setCheckListPercentage] = useState(0);
 
   useEffect(() => {
-    const data = collection?.[0] || {maxScore: 0, score: 0};
-    const percentage = data.maxScore  > 0 ? (data.score / data.maxScore || 1) * 100 : 0;
+    const data = collection?.[0] || { maxScore: 0, score: 0 };
+    const percentage =
+      data.maxScore > 0 ? (data.score / data.maxScore || 1) * 100 : 0;
     setCheckListPercentage(percentage);
   }, [collection]);
 
   const checkListsOptions = useMemo(() => {
-    return collection?.map((checklist, index) => ({
-      label: checklist.name || '-',
-      value: index.toString(),
-    })) || [];
+    return (
+      collection?.map((checklist, index) => ({
+        label: checklist.name || '-',
+        value: index.toString(),
+      })) || []
+    );
   }, [collection]);
 
   const handleChange = (val: string) => {
     const selectedIndex = parseInt(val, 10);
-    if (collection && (selectedIndex >= 0 && selectedIndex < collection.length)) {
-      const selectedList = collection ? collection[selectedIndex] : {maxScore: 0, score: 0, minScore: 0};
+    if (collection && selectedIndex >= 0 && selectedIndex < collection.length) {
+      const selectedList = collection
+        ? collection[selectedIndex]
+        : { maxScore: 0, score: 0, minScore: 0 };
       setSelectedCheckList(selectedList);
-      const percentage = selectedList?.maxScore > 0 ? (selectedList.score / selectedList.maxScore) * 100 : 0;
+      const percentage =
+        selectedList?.maxScore > 0
+          ? (selectedList.score / selectedList.maxScore) * 100
+          : 0;
       setCheckListPercentage(percentage);
     }
   };
@@ -67,22 +78,32 @@ export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({ checklist })
     return <div>Нет доступных чек-листов.</div>;
   }
 
-
   return (
     <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden bg-white">
       <div className="flex justify-between p-5">
         <div>
-          <Select
+          <DropdownCustom
+            label="Чек-лист"
+            placeholder="Выберите чек-лист"
+            onChange={handleChange}
+            selected={{
+              label: selectedCheckList?.name || '',
+              value: selectedCheckList?.name || '',
+            }}
+            options={checkListsOptions}
+          />
+          {/* <Select
             label="Чек-лист"
             placeholder="Выберите чек-лист"
             onChange={handleChange}
             options={checkListsOptions}
-          />
+          /> */}
         </div>
         <div className="flex items-center">
           <div className="flex items-center">
             <div className="mr-3 font-medium text-sm">
-              Общий балл по чек-листу: {selectedCheckList?.score}/{selectedCheckList?.maxScore}
+              Общий балл по чек-листу: {selectedCheckList?.score}/
+              {selectedCheckList?.maxScore}
             </div>
             <div className="w-24 bg-gray-200 rounded-full h-2.5">
               <div
@@ -100,12 +121,15 @@ export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({ checklist })
         </div>
       </div>
       {selectedCheckList?.blocks?.map((block, index) => {
-        const scorePercentage = block.maxScore > 0 ? (block.score / block.maxScore) * 100 : 0;
+        const scorePercentage =
+          block.maxScore > 0 ? (block.score / block.maxScore) * 100 : 0;
         return (
           <div key={index}>
             <div className="bg-purple-50 p-4 border-b border-gray-200">
               <div className="flex justify-between items-center">
-                <h3 className="font-medium text-purple-800">{block.name || 'Сводка по чеклисту'}</h3>
+                <h3 className="font-medium text-purple-800">
+                  {block.name || 'Сводка по чеклисту'}
+                </h3>
                 <div className="flex items-center">
                   <div className="mr-3 font-medium text-sm">
                     Общий балл: {block.score}/{block.maxScore}
@@ -128,7 +152,10 @@ export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({ checklist })
 
             <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {block.criterias?.map((item, index) => (
-                <div key={index} className="border border-gray-200 rounded p-3 bg-white">
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded p-3 bg-white"
+                >
                   <div className="flex justify-between items-center mb-1">
                     <div className="font-medium text-sm">{item.name}</div>
                     <span
@@ -137,7 +164,9 @@ export const ChecklistSummary: React.FC<ChecklistSummaryProps> = ({ checklist })
                       {item.score}/{item.maxScore}
                     </span>
                   </div>
-                  {item.comment && <p className="text-xs text-gray-500">{item.comment}</p>}
+                  {item.comment && (
+                    <p className="text-xs text-gray-500">{item.comment}</p>
+                  )}
                 </div>
               ))}
             </div>

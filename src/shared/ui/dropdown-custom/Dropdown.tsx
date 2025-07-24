@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import Button from '../button/button';
+import Label from '../label/label';
 
 interface Option {
-  label: string;
+  label: string | null;
   value: string;
 }
 
@@ -54,21 +55,25 @@ export const DropdownCustom = ({
 
   return (
     <div className="">
-      {label && (
-        <div className="border-b border-stroke px-4 py-4 dark:border-strokedark sm:px-6 xl:px-7.5">
-          <h3 className="font-medium text-black dark:text-white">{label}</h3>
-        </div>
-      )}
+      {label && <Label>{label}</Label>}
 
-      <div className="">
-        <div className="relative inline-block">
+      <div className="w-full flex ">
+        <div className="relative grow flex">
           <div
             ref={trigger}
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="min-h-11 transition duration-200 hover:bg-gray-100 inline-flex items-center 
-            gap-2.5 py-3.5 px-5 text-sm text-gray-800 bg-transparent border border-gray-200 rounded-full appearance-none h-9 shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+            className={`grow min-h-11 transition duration-200 hover:bg-gray-100 inline-flex items-center 
+            gap-2.5 py-3.5 px-5 text-sm bg-transparent border border-gray-200 
+            rounded-full appearance-none h-9 shadow-theme-xs cursor-pointer placeholder:text-gray-400 
+            focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 
+            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 
+            dark:placeholder:text-white/30 dark:focus:border-brand-800 ${
+              selected && selected.label ? 'text-gray-800' : 'text-gray-400'
+            }`}
           >
-            {selected ? selected.label : placeholder}
+            <div className="grow">
+              {selected && selected.label ? selected.label : placeholder}
+            </div>
             <svg
               className={`fill-current transition duration-200 ease-linear ${
                 dropdownOpen && 'rotate-180'
@@ -95,7 +100,7 @@ export const DropdownCustom = ({
             ref={dropdown}
             onFocus={() => setDropdownOpen(true)}
             onBlur={() => setDropdownOpen(false)}
-            className={`transition duration-200 overflow-hidden absolute left-0 top-full z-40 mt-2 min-w-full bg-white text-sm text-gray-800 border border-gray-300 rounded-[22px] appearance-none shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${
+            className={`transition duration-200 overflow-hidden absolute left-0 top-full z-40 mt-2 min-w-full bg-white text-sm text-gray-800 border border-gray-200 rounded-[22px] appearance-none shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${
               dropdownOpen === true ? 'block' : 'hidden'
             }`}
           >

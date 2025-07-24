@@ -17,6 +17,7 @@ import Textarea from '@/shared/ui/textarea/textarea';
 import { Switcher } from '@/shared/ui/switcher';
 import { useGetDictionaryQuery } from '@/entities/dictionaries/dictionaries.api';
 import { useEffect } from 'react';
+import { DropdownCustom } from '@/shared/ui/dropdown-custom';
 
 interface Props {
   isOpen: boolean;
@@ -99,17 +100,29 @@ export const EditDictionaryModal = ({
         <Controller
           control={control}
           render={({ field: { onChange, value } }) => (
-            <Select
-              value={value}
+            <DropdownCustom
+              onChange={onChange}
               label="Тип словаря"
-              onChange={(newValue) => {
-                onChange(newValue as DictionaryType);
+              selected={{
+                label: value,
+                value: value,
               }}
               options={DictionaryTypeValues.map((dictionaryValue, index) => ({
                 label: dictionaryValue,
                 value: dictionaryValue,
               }))}
             />
+            // <Select
+            //   value={value}
+            //   label="Тип словаря"
+            //   onChange={(newValue) => {
+            //     onChange(newValue as DictionaryType);
+            //   }}
+            //   options={DictionaryTypeValues.map((dictionaryValue, index) => ({
+            //     label: dictionaryValue,
+            //     value: dictionaryValue,
+            //   }))}
+            // />
           )}
           name={'type'}
         />
