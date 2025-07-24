@@ -1,52 +1,56 @@
-'use client'
+'use client';
 
-import Button from '@/shared/ui/button/button'
+import Button from '@/shared/ui/button/button';
 
 interface PaginationProps {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) => {
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationProps) => {
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      onPageChange(page)
+      onPageChange(page);
     }
-  }
+  };
 
   // Generate page numbers with ellipsis
   const getPageNumbers = () => {
-    const pageNumbers = []
+    const pageNumbers = [];
 
-    pageNumbers.push(1)
+    pageNumbers.push(1);
 
     if (currentPage > 3) {
-      pageNumbers.push('ellipsis')
+      pageNumbers.push('ellipsis');
     }
 
     // Pages around current page
-    const startPage = Math.max(2, currentPage - 1)
-    const endPage = Math.min(totalPages - 1, currentPage + 1)
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
 
     for (let i = startPage; i <= endPage; i++) {
       if (i <= totalPages - 1 && i >= 2) {
-        pageNumbers.push(i)
+        pageNumbers.push(i);
       }
     }
 
     // Show ellipsis before last page if needed
     if (currentPage < totalPages - 2) {
-      pageNumbers.push('ellipsis')
+      pageNumbers.push('ellipsis');
     }
 
     // Always show last page if there is more than one page
     if (totalPages > 1) {
-      pageNumbers.push(totalPages)
+      pageNumbers.push(totalPages);
     }
 
-    return pageNumbers
-  }
+    return pageNumbers;
+  };
 
   return (
     <div>
@@ -55,7 +59,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
         <Button
           size="sm"
           variant="outline"
-          className="rounded-full cursor-pointer px-4 py-2 border border-gray-200"
+          className="rounded-full cursor-pointer px-4 py-2 border-px border-gray-200"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -89,14 +93,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
           onClick={() => goToPage(currentPage + 1)}
           size="sm"
           variant="outline"
-          className="rounded-full cursor-pointer px-4 py-2 border border-gray-200"
+          className="rounded-full cursor-pointer px-4 py-2 border-px border-gray-200"
           disabled={currentPage === totalPages}
         >
           <span className="text-sm font-medium">Вперёд</span>
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Pagination
+export default Pagination;

@@ -27,6 +27,7 @@ import {
 import { formatDatesTime, formatDuration } from '@/shared/utils/date-utils';
 import Pagination from '@/shared/ui/pagination/pagination';
 import { LoaderContent } from '@/shared/ui/loader';
+import { DropdownCustom } from '@/shared/ui/dropdown-custom';
 
 const getChanelColor = (chanel: number) => {
   if (chanel > 1) return 'bg-green-100 text-green-800';
@@ -70,7 +71,21 @@ export const CallsTable = (): JSX.Element => {
               <span className="text-gray-500 dark:text-gray-400">
                 Показывать
               </span>
-              <div className="relative z-20 bg-transparent">
+              <DropdownCustom
+                onChange={(newValue) => {
+                  const newNumberValue = parseInt(newValue, 10);
+                  handleRowsPerPageChange(newNumberValue);
+                }}
+                selected={{
+                  label: String(rowsPerPage),
+                  value: String(rowsPerPage),
+                }}
+                options={['10', '8', '5'].map((value) => ({
+                  label: value,
+                  value: value,
+                }))}
+              />
+              {/* <div className="relative z-20 bg-transparent">
                 <select
                   className="w-[66px] py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-full appearance-none h-9 shadow-theme-xs cursor-pointer placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-1 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                   value={rowsPerPage}
@@ -113,7 +128,7 @@ export const CallsTable = (): JSX.Element => {
                     />
                   </svg>
                 </span>
-              </div>
+              </div> */}
               <span className="text-gray-500 dark:text-gray-400">строк</span>
             </div>
 
@@ -231,7 +246,7 @@ export const CallsTable = (): JSX.Element => {
                             router.push(appRoutes.private.call(String(item.id)))
                           }
                         >
-                          <TableCell className="px-4 py-4 border-b border-l border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
+                          <TableCell className="px-4 py-4 border-b border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
                             {item?.createDate
                               ? formatDatesTime(new Date(item.createDate))
                               : 'Н/Д'}
@@ -243,11 +258,11 @@ export const CallsTable = (): JSX.Element => {
                             {clientNumber}
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-full font-medium ${getChanelColor(item.numChannels)}`}
+                            <div
+                              className={`text-xs px-3 py-1 rounded-full font-medium ${getChanelColor(item.numChannels)}`}
                             >
                               {item.projectName}
-                            </span>
+                            </div>
                           </TableCell>
                           <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
                             {typeof item?.duration === 'number'
@@ -280,7 +295,7 @@ export const CallsTable = (): JSX.Element => {
                               {formatDuration(silenceSeconds)}
                             </span>
                           </TableCell>
-                          <TableCell className="px-4 py-4 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
                             <div className="w-24 bg-gray-200 rounded-full h-2.5">
                               <div
                                 className={`h-2.5 rounded-full ${
@@ -294,7 +309,7 @@ export const CallsTable = (): JSX.Element => {
                               ></div>
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs px-4 py-4 border-b border-r font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90">
+                          <TableCell className="text-xs px-4 py-4 border-b font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90">
                             {item.gptSummary}
                           </TableCell>
                         </TableRow>
@@ -323,11 +338,14 @@ export const CallsTable = (): JSX.Element => {
           />
           {(totalEntries && totalEntries > 0) ||
           (totalPages && totalPages > 1) ? (
-            <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
+            <div className="border-gray-100 py-4 pl-[18px] pr-4 ">
               <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
                 {totalEntries && totalEntries > 0 ? (
                   <div className="pb-3 xl:pb-0">
-                    <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
+                    <p
+                      className={`pb-3 text-sm font-medium text-center text-gray-500 ${totalPages && totalPages > 1 && 'border-b'} border-gray-100 
+                      dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left`}
+                    >
                       Отображаются от {(startIndex || 0) + 1} до {endIndex || 0}{' '}
                       из {totalEntries} записей
                     </p>

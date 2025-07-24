@@ -241,8 +241,7 @@ export const useCalls = () => {
     }
   }
 
-  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    const newRowsPerPage = parseInt(e.target.value, 10)
+  const handleRowsPerPageChange = (newRowsPerPage: number): void => {
     setRowsPerPage(newRowsPerPage)
 
     updateSearchParams({
