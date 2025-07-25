@@ -2,15 +2,12 @@ import { Modal } from '@/shared/ui/modal/modal';
 import Button from '@/shared/ui/button/button';
 import {
   DictionaryReqBody,
-  DictionaryType,
   DictionaryTypeValues,
-  type Dictionary,
 } from '@/entities/dictionaries/dictionaries.types';
 import { z } from 'zod';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from '@/shared/ui/input/input';
-import Select from '@/shared/ui/select/select';
 import Label from '@/shared/ui/label/label';
 import { dictionaryColors } from '@/shared/constants/dictionaryColors';
 import Textarea from '@/shared/ui/textarea/textarea';
@@ -73,7 +70,11 @@ export const EditDictionaryModal = ({
         name: dictioinaryData.name ?? '',
         isActive: dictioinaryData.isActive,
         type: dictioinaryData.type,
-        colorHex: dictioinaryData.colorHex ?? '#FF3B30',
+        colorHex:
+          dictioinaryData.colorHex &&
+          dictionaryColors.includes(dictioinaryData.colorHex)
+            ? dictioinaryData.colorHex
+            : '#FF3B30',
         phrases: dictioinaryData.data?.phrases ?? [],
       });
     }
