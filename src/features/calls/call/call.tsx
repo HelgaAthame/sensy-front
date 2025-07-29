@@ -68,21 +68,21 @@ export const Call = () => {
   const [activeTab, setActiveTab] = useState(CallTab.Transcript)
   const [playbackRate, setPlaybackRate] = useState('1x')
 
-  
+
 
   const mouseEvent = (event: any) => {
-    if(event.type === 'mouseover'){
+    if (event.type === 'mouseover') {
       event.target.querySelector('#tooltip').style.opacity = '1'
-    }else{
+    } else {
       event.target.querySelector('#tooltip').style.opacity = '0'
     }
   }
 
-  const tooltipContent = (actualColor: string, region: any, indicator: { type: string } ) =>{
+  const tooltipContent = (actualColor: string, region: any, indicator: { type: string }) => {
     const inner = document.createElement('div')
     inner.id = 'tooltip'
     inner.style.borderRadius = '5px'
-    inner.style.boxShadow =' 2px 2px 6px -4px #999'
+    inner.style.boxShadow = ' 2px 2px 6px -4px #999'
     inner.style.fontFamily = 'inherit'
     inner.style.padding = '4px'
     inner.style.border = '1px solid #e3e3e3'
@@ -107,11 +107,11 @@ export const Call = () => {
     indicatorPoint.style.margin = '4px'
     indicatorPoint.style.width = '8px'
     indicatorPoint.style.height = '8px'
-    
+
     const indicatorType = document.createElement('span')
-    if(region.phrase){
-      indicatorType.innerHTML = indicator.type+': <span style="display: inline-block; margin-left: 4px; font-weight: 600;">'+region.phrase+'</span>'
-    }else{
+    if (region.phrase) {
+      indicatorType.innerHTML = indicator.type + ': <span style="display: inline-block; margin-left: 4px; font-weight: 600;">' + region.phrase + '</span>'
+    } else {
       indicatorType.innerHTML = indicator.type
     }
     header.appendChild(indicatorPoint)
@@ -200,7 +200,7 @@ export const Call = () => {
 
         if (isCircleMarker) {
           const regionId = `marker-${indicator.type}-${region.start}-${region.channel || 0}`
-      
+
           const markerRegion = regionsPluginRef.current.addRegion({
             id: regionId,
             start: region.start,
@@ -229,15 +229,15 @@ export const Call = () => {
             circle.style.transform = 'translate(-50%, -50%)'
             circle.setAttribute(
               'style',
-              ''+circle.getAttribute('style') + '; z-index: 100 !important;')
+              '' + circle.getAttribute('style') + '; z-index: 100 !important;')
             circle.onmouseover = mouseEvent
             circle.onmouseleave = mouseEvent
             const tooltip = tooltipContent(actualColor, region, indicator)
-            circle.appendChild (tooltip)
+            circle.appendChild(tooltip)
             markerRegion.setContent(circle)
           }
-        } else if(isSilence) {
-          const markerRegion =  regionsPluginRef.current.addRegion({
+        } else if (isSilence) {
+          const markerRegion = regionsPluginRef.current.addRegion({
             start: region.start,
             end: region.end,
             color: actualColor,
@@ -257,9 +257,9 @@ export const Call = () => {
           marker.style.fontSize = '12px'
           marker.style.fontWeight = '600'
           marker.style.color = '#947500'
-          marker.innerHTML = duration>10 ? 'Пауза: '+duration+'c' : ''
+          marker.innerHTML = duration > 10 ? 'Пауза: ' + duration + 'c' : ''
           markerRegion.setContent(marker)
-        }else{
+        } else {
           regionsPluginRef.current.addRegion({
             start: region.start,
             end: region.end,
@@ -307,7 +307,7 @@ export const Call = () => {
 
     regionsPluginRef.current.regionsContainer.style.position = 'static'
 
-    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream` 
+    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`
 
     // wavesurfer.load(audioUrl)
     fetch(audioUrl, {
@@ -555,9 +555,8 @@ export const Call = () => {
             {playbackRates.map(rate => (
               <button
                 key={rate}
-                className={`text-sm px-2 py-1 rounded cursor-pointer ${
-                  playbackRate === rate ? 'text-purple-700 font-medium' : 'text-gray-500'
-                }`}
+                className={`text-sm px-2 py-1 rounded cursor-pointer ${playbackRate === rate ? 'text-purple-700 font-medium' : 'text-gray-500'
+                  }`}
                 onClick={() => setPlaybackRate(rate)}
               >
                 {rate}
@@ -577,7 +576,7 @@ export const Call = () => {
         <div>
           {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
           {activeTab === CallTab.Transcript && (
-            <Transcript summary={summaryContent} callInfo={callInfo} sttData={mediaFileResult?.stt} currentPlayerTime={currentTime} />
+            <Transcript summary={summaryContent} callInfo={callInfo} Stt={mediaFileResult?.stt} currentPlayerTime={currentTime} />
           )}
           {activeTab === CallTab.Checklists && (
             <Checklist checklistData={checklistData} gptChecklist={mediaFileResult?.gptChecklist} />

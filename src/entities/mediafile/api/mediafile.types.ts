@@ -80,63 +80,173 @@ export interface MediaFileRequest {
   filterByPhrasesCategoriesCommaSeparated?: string
 }
 
+// export interface MediaFileResultResponse {
+//   gptSummary: string | null
+//   gptChecklist: string | null
+//   stt: {
+//     text: string | null
+//     chunks: {
+//       channel: number
+//       startChar: number
+//       endChar: number
+//       startTime: number
+//       endTime: number
+//       text: string
+//       regions: {
+//         channel: number
+//         startChar: number
+//         endChar: number
+//         startTime: number
+//         endTime: number
+//       }[]
+//     }[]
+//     regions: any[]
+//   }
+//   tonal: {
+//     regions: {
+//       prob: number
+//       type: number
+//       startTime: number
+//       endTime: number
+//       channel: number
+//     }[]
+//   }
+//   simultaneousSpeech: {
+//     regions: {
+//       actorByChannel: number
+//       actor: number
+//       startTime: number
+//       endTime: number
+//     }[]
+//   }
+//   simultaneousSilence: {
+//     regions: {
+//       startTime: number
+//       endTime: number
+//     }[]
+//   }
+//   keywordsSearchResult: {
+//     regions: {
+//       phrase: any
+//       category: number
+//       startChar: number
+//       endChar: number
+//       startTime: number
+//       endTime: number
+//       channel: number
+//     }[]
+//   }
+// }
+
 export interface MediaFileResultResponse {
-  gptSummary: string | null
-  gptChecklist: string | null
-  stt: {
-    text: string | null
-    chunks: {
-      channel: number
-      startChar: number
-      endChar: number
-      startTime: number
-      endTime: number
-      text: string
-      regions: {
-        channel: number
-        startChar: number
-        endChar: number
-        startTime: number
-        endTime: number
-      }[]
-    }[]
-    regions: any[]
-  }
-  tonal: {
-    regions: {
-      prob: number
-      type: number
-      startTime: number
-      endTime: number
-      channel: number
-    }[]
-  }
-  simultaneousSpeech: {
-    regions: {
-      actorByChannel: number
-      actor: number
-      startTime: number
-      endTime: number
-    }[]
-  }
-  simultaneousSilence: {
-    regions: {
-      startTime: number
-      endTime: number
-    }[]
-  }
-  keywordsSearchResult: {
-    regions: {
-      phrase: any
-      category: number
-      startChar: number
-      endChar: number
-      startTime: number
-      endTime: number
-      channel: number
-    }[]
-  }
+  gptSummary: string | null;
+  gptChecklist: GptChecklist | null;
+  stt: Stt | null;
+  tonal: Tonal | null;
+  simultaneousSpeech: SimultaneousSpeech | null;
+  simultaneousSilence: SimultaneousSilence | null;
+  keywordsSearchResult: KeywordsSearchResult | null;
 }
+
+export interface GptChecklist {
+  collection: ChecklistItem[];
+}
+
+export interface ChecklistItem {
+  name: string | null;
+  minScore: number;
+  maxScore: number;
+  score: number | null;
+  blocks: ChecklistBlock[];
+}
+
+export interface ChecklistBlock {
+  name: string;
+  minScore: number;
+  maxScore: number;
+  score: number | null;
+  criterias: ChecklistCriteria[];
+}
+
+export interface ChecklistCriteria {
+  name: string;
+  minScore: number;
+  maxScore: number;
+  score: number | null;
+  comment: string | null;
+}
+
+export interface Stt {
+  text: string | null;
+  chunks: SttChunk[] | null;
+  regions: SttRegion[] | null;
+}
+
+export interface SttChunk {
+  channel: number;
+  startChar: number;
+  endChar: number;
+  startTime: number;
+  endTime: number;
+  text: string;
+  regions: SttRegion[];
+}
+
+export interface SttRegion {
+  channel: number;
+  startChar: number;
+  endChar: number;
+  startTime: number;
+  endTime: number;
+}
+
+export interface Tonal {
+  regions: TonalRegion[] | null;
+}
+
+export interface TonalRegion {
+  prob: number;
+  type: number;
+  startTime: number;
+  endTime: number;
+  channel: number;
+}
+
+export interface SimultaneousSpeech {
+  regions: SimultaneousSpeechRegion[] | null;
+}
+
+export interface SimultaneousSpeechRegion {
+  actorByChannel: number | null;
+  actor: number;
+  startTime: number;
+  endTime: number;
+}
+
+export interface SimultaneousSilence {
+  regions: SimultaneousSilenceRegion[] | null;
+}
+
+export interface SimultaneousSilenceRegion {
+  startTime: number;
+  endTime: number;
+}
+
+export interface KeywordsSearchResult {
+  regions: KeywordRegion[] | null;
+}
+
+export interface KeywordRegion {
+  category: number;
+  categoryName: string | null;
+  phrase: string | null;
+  startChar: number;
+  endChar: number;
+  startTime: number;
+  endTime: number;
+  channel: number;
+}
+
 
 export interface MediaFileResultRequest {
   id: number

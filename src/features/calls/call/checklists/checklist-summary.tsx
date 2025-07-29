@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import Select from '@/shared/ui/select/select';
 import { DropdownCustom } from '@/shared/ui/dropdown-custom';
 
 interface ChecklistSummaryProps {
