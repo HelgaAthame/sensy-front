@@ -1,10 +1,10 @@
 import { ReactNode } from 'react'
-import { MainLayout } from '@/widgets/main-layout/main-layout'
+import { CallLayout } from '@/widgets/CallLayout'
 
 export const metadata = {
-  title: 'Звонки',
+  title: 'Звонок',
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <MainLayout>{children}</MainLayout>
+  return <CallLayout>{children}</CallLayout>
 }

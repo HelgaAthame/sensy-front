@@ -16,7 +16,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <RootLayout>
-      <div className="min-h-screen xl:flex w-full overflow-x-hidden">
+      <div className="min-h-screen xl:flex w-full overflow-x-auto">
         <div>
           <Sidebar />
           <Backdrop />

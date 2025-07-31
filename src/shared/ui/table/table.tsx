@@ -44,8 +44,8 @@ interface TableCellProps {
 // Table Component
 const Table: React.FC<TableProps> = ({ children, className }) => {
   return (
-    <div className="overflow-x-clip">
-      <table className={`min-w-full ${className}`}>{children}</table>
+    <div>
+      <table className={`${className}`}>{children}</table>
     </div>
   );
 };

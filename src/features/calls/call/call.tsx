@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Tab } from '@/shared/ui/tab/tab'
 import PageBreadcrumb from '@/shared/ui/page-breadcrumb/page-breadcrumb'
 import { Transcript } from './transcript/transcript'
@@ -470,14 +470,14 @@ export const Call = () => {
   }
 
   return (
-    <div>
+    <Fragment>
       <PageBreadcrumb
         pageTitle={callInfo.name}
         backTitle="Звонки"
         backHref={appRoutes.private.calls}
       />
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col overflow-y-auto">
         {/* <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center text-white font-medium">
@@ -572,17 +572,14 @@ export const Call = () => {
         <div className="-mx-6">
           <hr className="my-5 border-gray-200" />
         </div>
-
-        <div>
-          {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
-          {activeTab === CallTab.Transcript && (
-            <Transcript summary={summaryContent} callInfo={callInfo} Stt={mediaFileResult?.stt} currentPlayerTime={currentTime} />
-          )}
-          {activeTab === CallTab.Checklists && (
-            <Checklist checklistData={checklistData} gptChecklist={mediaFileResult?.gptChecklist} />
-          )}
-        </div>
+        {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
+        {activeTab === CallTab.Transcript && (
+          <Transcript summary={summaryContent} callInfo={callInfo} Stt={mediaFileResult?.stt} currentPlayerTime={currentTime} />
+        )}
+        {activeTab === CallTab.Checklists && (
+          <Checklist checklistData={checklistData} gptChecklist={mediaFileResult?.gptChecklist} />
+        )}
       </div>
-    </div>
+    </Fragment>
   )
 }

@@ -65,7 +65,7 @@ export const CallsTable = (): JSX.Element => {
       {isLoading ? (
         <LoaderContent width={200} height={200} isLoading={isLoading} />
       ) : (
-        <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03] border border-gray-100">
+        <div className="overflow-x-auto rounded-xl bg-white dark:bg-white/[0.03] border border-gray-100">
           <div className="flex flex-col gap-2 px-4 py-4 rounded-t-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 flex-wrap">
             <div className="flex items-center gap-3">
               <span className="text-gray-500 dark:text-gray-400">
@@ -168,166 +168,163 @@ export const CallsTable = (): JSX.Element => {
             </div>
           </div>
 
-          <div className="max-w-full overflow-x-clip custom-scrollbar">
-            <div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {columnConfig.map((column, index) => (
-                      <TableCell
-                        key={column.key}
-                        isHeader
-                        className={`px-4 py-3 border-y border-gray-100 dark:border-white/[0.05]`}
+          <div className="overflow-x-auto custom-scrollbar">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columnConfig.map((column, index) => (
+                    <TableCell
+                      key={column.key}
+                      isHeader
+                      className={`px-4 py-3 border-y border-gray-100 dark:border-white/[0.05]`}
+                    >
+                      <div
+                        className={`flex items-center gap-2 ${column.sortable ? 'cursor-pointer' : ''}`}
+                        onClick={() =>
+                          column.sortable && handleSort(column.key)
+                        }
                       >
-                        <div
-                          className={`flex items-center gap-2 ${column.sortable ? 'cursor-pointer' : ''}`}
-                          onClick={() =>
-                            column.sortable && handleSort(column.key)
-                          }
-                        >
-                          <div className="flex gap-3">
-                            <span className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
-                              {column.label}
-                            </span>
-                          </div>
-                          {column.sortable && (
-                            <button className="flex items-center justify-center">
-                              <svg
-                                className={`${getSortDirection(column.key) === 'ascending' ? 'text-gray-700 dark:text-white' : 'text-gray-300 dark:text-gray-700'}`}
-                                width="8"
-                                height="5"
-                                viewBox="0 0 8 5"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M4.40962 4.41483C4.21057 4.69919 3.78943 4.69919 3.59038 4.41483L1.05071 0.786732C0.81874 0.455343 1.05582 0 1.46033 0H6.53967C6.94418 0 7.18126 0.455342 6.94929 0.786731L4.40962 4.41483Z"
-                                  fill="currentColor"
-                                />
-                              </svg>
-                            </button>
-                          )}
+                        <div className="flex gap-3">
+                          <span className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
+                            {column.label}
+                          </span>
                         </div>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mediaFilesDataTable && mediaFilesDataTable.length > 0 ? (
-                    mediaFilesDataTable.map((item) => {
-                      const summaryAnalyserResult =
-                        item?.summaryAnalyserResult || {};
-                      const negativeValue = Math.round(
-                        (summaryAnalyserResult?.negativeLevelOverall || 0) * 100
-                      );
-                      const silenceSeconds =
-                        summaryAnalyserResult?.maxSimultaneousSilenceDuration ||
-                        0;
-                      const lexis = item?.filteredKeywordsCount || 0;
-                      const interruptions =
-                        summaryAnalyserResult?.simultaneousSpeechCount || 0;
-                      const clientNumber =
-                        item?.additionalMetadata?.clientNumber || 'Н/Д';
+                        {column.sortable && (
+                          <button className="flex items-center justify-center">
+                            <svg
+                              className={`${getSortDirection(column.key) === 'ascending' ? 'text-gray-700 dark:text-white' : 'text-gray-300 dark:text-gray-700'}`}
+                              width="8"
+                              height="5"
+                              viewBox="0 0 8 5"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4.40962 4.41483C4.21057 4.69919 3.78943 4.69919 3.59038 4.41483L1.05071 0.786732C0.81874 0.455343 1.05582 0 1.46033 0H6.53967C6.94418 0 7.18126 0.455342 6.94929 0.786731L4.40962 4.41483Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mediaFilesDataTable && mediaFilesDataTable.length > 0 ? (
+                  mediaFilesDataTable.map((item) => {
+                    const summaryAnalyserResult =
+                      item?.summaryAnalyserResult || {};
+                    const negativeValue = Math.round(
+                      (summaryAnalyserResult?.negativeLevelOverall || 0) * 100
+                    );
+                    const silenceSeconds =
+                      summaryAnalyserResult?.maxSimultaneousSilenceDuration ||
+                      0;
+                    const lexis = item?.filteredKeywordsCount || 0;
+                    const interruptions =
+                      summaryAnalyserResult?.simultaneousSpeechCount || 0;
+                    const clientNumber =
+                      item?.additionalMetadata?.clientNumber || 'Н/Д';
 
-                      const scorePercentage =
-                        item.gptChecklist &&
+                    const scorePercentage =
+                      item.gptChecklist &&
                         item.gptChecklist.collection.length > 0
-                          ? (item.gptChecklist.collection[0].score /
-                              item.gptChecklist.collection[0].maxScore) *
-                            100
-                          : 0;
+                        ? (item.gptChecklist.collection[0].score /
+                          item.gptChecklist.collection[0].maxScore) *
+                        100
+                        : 0;
 
-                      return (
-                        <TableRow
-                          className="cursor-pointer hover:bg-gray-100"
-                          key={item.id}
-                          onClick={() =>
-                            item?.id &&
-                            router.push(appRoutes.private.call(String(item.id)))
-                          }
-                        >
-                          <TableCell className="px-4 py-4 border-b border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
-                            {item?.createDate
-                              ? formatDatesTime(new Date(item.createDate))
-                              : 'Н/Д'}
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
-                            {item?.operatorName || 'Н/Д'}
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                            {clientNumber}
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                            <div
-                              className={`text-xs px-3 py-1 rounded-full font-medium ${getChanelColor(item.numChannels)}`}
-                            >
-                              {item.projectName}
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                            {typeof item?.duration === 'number'
-                              ? formatDuration(item.duration)
-                              : 'Н/Д'}
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span
-                              className={`text-sm font-normal ${getNegativeColorClass(negativeValue)}`}
-                            >
-                              {`${negativeValue}%`}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span className={`${getValueColorClass(lexis)}`}>
-                              {lexis}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span
-                              className={`${getValueColorClass(interruptions)}`}
-                            >
-                              {interruptions}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <span
-                              className={`${getSilenceColorClass(silenceSeconds)}`}
-                            >
-                              {formatDuration(silenceSeconds)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
-                            <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                              <div
-                                className={`h-2.5 rounded-full ${
-                                  scorePercentage >= 80
-                                    ? 'bg-green-500'
-                                    : scorePercentage >= 60
-                                      ? 'bg-yellow-500'
-                                      : 'bg-red-500'
-                                }`}
-                                style={{ width: `${scorePercentage}%` }}
-                              ></div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-xs px-4 py-4 border-b font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90">
-                            {item.gptSummary}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columnConfig.length}
-                        className="px-4 py-4 text-center"
+                    return (
+                      <TableRow
+                        className="cursor-pointer hover:bg-gray-100"
+                        key={item.id}
+                        onClick={() =>
+                          item?.id &&
+                          router.push(appRoutes.private.call(String(item.id)))
+                        }
                       >
-                        Данные не найдены
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 text-gray-800 dark:border-white/[0.05] dark:text-white/90 whitespace-nowrap">
+                          {item?.createDate
+                            ? formatDatesTime(new Date(item.createDate))
+                            : 'Н/Д'}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-semibold text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap">
+                          {item?.operatorName || 'Н/Д'}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                          {clientNumber}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                          <div
+                            className={`text-xs px-3 py-1 rounded-full font-medium ${getChanelColor(item.numChannels)}`}
+                          >
+                            {item.projectName}
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                          {typeof item?.duration === 'number'
+                            ? formatDuration(item.duration)
+                            : 'Н/Д'}
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span
+                            className={`text-sm font-normal ${getNegativeColorClass(negativeValue)}`}
+                          >
+                            {`${negativeValue}%`}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span className={`${getValueColorClass(lexis)}`}>
+                            {lexis}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span
+                            className={`${getValueColorClass(interruptions)}`}
+                          >
+                            {interruptions}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <span
+                            className={`${getSilenceColorClass(silenceSeconds)}`}
+                          >
+                            {formatDuration(silenceSeconds)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-4 border-b border-gray-100 font-normal dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                          <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className={`h-2.5 rounded-full ${scorePercentage >= 80
+                                ? 'bg-green-500'
+                                : scorePercentage >= 60
+                                  ? 'bg-yellow-500'
+                                  : 'bg-red-500'
+                                }`}
+                              style={{ width: `${scorePercentage}%` }}
+                            ></div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs px-4 py-4 border-b font-normal text-gray-800 dark:border-white/[0.05] text-theme-sm dark:text-white/90">
+                          {item.gptSummary}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columnConfig.length}
+                      className="px-4 py-4 text-center"
+                    >
+                      Данные не найдены
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
           <AnalyticsFilterModal
             isOpen={isFilterModalOpen}
@@ -337,7 +334,7 @@ export const CallsTable = (): JSX.Element => {
             filtersReset={filtersReset}
           />
           {(totalEntries && totalEntries > 0) ||
-          (totalPages && totalPages > 1) ? (
+            (totalPages && totalPages > 1) ? (
             <div className="border-gray-100 py-4 pl-[18px] pr-4 ">
               <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
                 {totalEntries && totalEntries > 0 ? (

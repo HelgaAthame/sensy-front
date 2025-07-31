@@ -184,12 +184,12 @@ export const Transcript: React.FC<TranscriptProps> = ({ callInfo, Stt, currentPl
   }, [currentPlayerTime, messages])
 
   return (
-    <div ref={containerRef} className="max-h-[calc(100vh-480px)] overflow-y-hidden">
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+    // <div  /*className="max-h-[calc(100vh-480px)] overflow-y-hidden"*/>
+    <div ref={containerRef} className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 overflow-y-hidden">
 
-        <div className="flex flex-col gap-6 p-4">
-          <div className="items-center justify-between mb-6">
-            {/* <div className="flex items-center">
+      <div className="flex flex-col gap-6 p-4">
+        <div className="items-center justify-between mb-6">
+          {/* <div className="flex items-center">
                 <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center text-white font-medium">
                   {callInfo.name.charAt(0).toUpperCase()}
                 </div>
@@ -200,75 +200,75 @@ export const Transcript: React.FC<TranscriptProps> = ({ callInfo, Stt, currentPl
                   </>
                 </div>
               </div> */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold">Номер телефона</h2>
-              <p className="font-medium">{callInfo.phone}</p>
-            </div>
-            <div className="flex justify-between items-center mb-4">
-              <h5 className="font-semibold">Дата/время звонка</h5>
-              <div className="font-medium">{callInfo.date}</div>
-            </div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold">Специалист</h2>
-              <p className="font-medium">{callInfo.name}</p>
-            </div>
-
-            <div className="mb-4">
-              <h2 className="font-semibold">Резюме</h2>
-              <p className="text-gray-700 text-sm leading-relaxed">{summary}</p>
-            </div>
-            {/*<Button*/}
-            {/*  className="w-[164px] h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 mb-2 flex items-center gap-2 cursor-pointer"*/}
-            {/*  onClick={() => {}}*/}
-            {/*>*/}
-            {/*  <span>Редактировать</span>*/}
-            {/*  <EditIcon width={20} height={20} />*/}
-            {/*</Button>*/}
-            {/* </div> */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-semibold">Номер телефона</h2>
+            <p className="font-medium">{callInfo.phone}</p>
           </div>
-        </div>
-        <div className="flex flex-col gap-6 p-4 max-h-[calc(100vh-500px)] overflow-y-auto">
-          {messages.map(message => {
-            const isRightAligned = !message.isMono && message.sender === 'agent'
-            return (
-              <div
-                key={message.id}
-                ref={el => {
-                  messageRefs.current[message.id] = el
-                }}
-                className={`flex ${isRightAligned ? 'justify-end' : 'justify-start'} 
-                              transition-opacity duration-300 ${activeMessageId === message.id ? 'opacity-200' : 'opacity-200'}`}
-              >
-                <div
-                  className={`max-w-md ${activeMessageId === message.id ? 'transform transition-transform duration-300 scale-102' : ''}`}
-                >
-                  <div
-                    className={`py-2 px-4 rounded-2xl ${message.isMono
-                      ? 'bg-purple-100 text-purple-900'
-                      : message.sender === 'agent'
-                        ? 'bg-purple-700 text-white'
-                        : 'bg-purple-100 text-purple-900'
-                      } ${activeMessageId === message.id ? 'ring-2 ring-purple-400' : ''}`}
-                  >
-                    {/* <p>{message.text}</p> */}
-                    <Text text={message.text} currentPlayerTime={currentPlayerTime} message={message} />
-                  </div>
-                  <div
-                    className={`text-xs text-gray-500 mt-1 ${isRightAligned ? 'text-right' : 'text-left'
-                      }`}
-                  >
-                    {message.isMono
-                      ? message.time
-                      : message.sender === 'agent'
-                        ? `Абонент, ${message.time}`
-                        : `Оператор, ${message.time}`}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+          <div className="flex justify-between items-center mb-4">
+            <h5 className="font-semibold">Дата/время звонка</h5>
+            <div className="font-medium">{callInfo.date}</div>
+          </div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-semibold">Специалист</h2>
+            <p className="font-medium">{callInfo.name}</p>
+          </div>
+
+          <div className="mb-4">
+            <h2 className="font-semibold">Резюме</h2>
+            <p className="text-gray-700 text-sm leading-relaxed">{summary}</p>
+          </div>
+          {/*<Button*/}
+          {/*  className="w-[164px] h-[44px] border border-gray-200 rounded-full hover:bg-gray-100 mb-2 flex items-center gap-2 cursor-pointer"*/}
+          {/*  onClick={() => {}}*/}
+          {/*>*/}
+          {/*  <span>Редактировать</span>*/}
+          {/*  <EditIcon width={20} height={20} />*/}
+          {/*</Button>*/}
+          {/* </div> */}
         </div>
       </div>
+      <div className="flex flex-col gap-6 p-4 1max-h-[calc(100vh-500px)] overflow-y-auto">
+        {messages.map(message => {
+          const isRightAligned = !message.isMono && message.sender === 'agent'
+          return (
+            <div
+              key={message.id}
+              ref={el => {
+                messageRefs.current[message.id] = el
+              }}
+              className={`flex ${isRightAligned ? 'justify-end' : 'justify-start'} 
+                              transition-opacity duration-300 ${activeMessageId === message.id ? 'opacity-200' : 'opacity-200'}`}
+            >
+              <div
+                className={`max-w-md ${activeMessageId === message.id ? 'transform transition-transform duration-300 scale-102' : ''}`}
+              >
+                <div
+                  className={`py-2 px-4 rounded-2xl ${message.isMono
+                    ? 'bg-purple-100 text-purple-900'
+                    : message.sender === 'agent'
+                      ? 'bg-purple-700 text-white'
+                      : 'bg-purple-100 text-purple-900'
+                    } ${activeMessageId === message.id ? 'ring-2 ring-purple-400' : ''}`}
+                >
+                  {/* <p>{message.text}</p> */}
+                  <Text text={message.text} currentPlayerTime={currentPlayerTime} message={message} />
+                </div>
+                <div
+                  className={`text-xs text-gray-500 mt-1 ${isRightAligned ? 'text-right' : 'text-left'
+                    }`}
+                >
+                  {message.isMono
+                    ? message.time
+                    : message.sender === 'agent'
+                      ? `Абонент, ${message.time}`
+                      : `Оператор, ${message.time}`}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
+    // </div>
   )
 }
