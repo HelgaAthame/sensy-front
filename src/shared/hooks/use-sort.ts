@@ -1,57 +1,77 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
+
+export type SortDirection = 'asc' | 'desc' | null;
 
 export interface SortConfig<T> {
-  key: keyof T | null
-  isActive: boolean
+  key: keyof T | null;
+  direction: SortDirection;
 }
 
 export interface ColumnConfig<T> {
-  key: keyof T
-  label: string
-  sortable: boolean
+  key: keyof T;
+  label: string;
+  sortable: boolean;
 }
 
-export function useSortable<T extends Record<string, any>>(
-  initialKey: keyof T | null = null,
-  onSortChange?: (key: keyof T | null, isActive: boolean) => void,
-  initialActive: boolean = false
+export function useSortable<
+  T extends Record<string, any>,
+  K extends keyof T = keyof T,
+>(
+  initialKey: K | null = null,
+  onSortChange?: (key: K | null, direction: SortDirection) => void,
+  initialDirection: SortDirection = null
 ) {
   const [sortConfig, setSortConfig] = useState<SortConfig<T>>({
     key: initialKey,
-    isActive: initialActive,
-  })
+    direction: initialDirection,
+  });
 
-  const initialEffectCalled = useRef(false)
+  const initialEffectCalled = useRef(false);
 
   useEffect(() => {
-    if (!initialEffectCalled.current && initialActive && initialKey && onSortChange) {
-      initialEffectCalled.current = true
-      onSortChange(initialKey, true)
+    if (
+      !initialEffectCalled.current &&
+      initialDirection !== null &&
+      initialKey !== null &&
+      onSortChange
+    ) {
+      initialEffectCalled.current = true;
+      onSortChange(initialKey, initialDirection);
     }
-  }, [])
+  }, [initialKey, initialDirection, onSortChange]);
 
-  const requestSort = (key: keyof T, columnConfig: ColumnConfig<T>[]): void => {
-    const column = columnConfig.find(col => col.key === key)
-    if (!column || !column.sortable) return
+  const requestSort = (key: K, columnConfig: ColumnConfig<T>[]): void => {
+    const column = columnConfig.find((col) => col.key === key);
+    if (!column || !column.sortable) return;
 
-    if (sortConfig.key === key && sortConfig.isActive) {
-      setSortConfig({ key: null, isActive: false })
-      if (onSortChange) onSortChange(null, false)
-      return
+    let direction: SortDirection = 'asc';
+
+    if (sortConfig.key === key) {
+      direction =
+        sortConfig.direction === 'asc'
+          ? 'desc'
+          : sortConfig.direction === 'desc'
+            ? null
+            : 'asc';
     }
 
-    setSortConfig({ key, isActive: true })
-    if (onSortChange) onSortChange(key, true)
-  }
+    const newSortConfig = {
+      key: direction ? key : null,
+      direction,
+    };
 
-  const getSortState = (key: keyof T): 'active' | null => {
-    if (sortConfig.key !== key || !sortConfig.isActive) return null
-    return 'active'
-  }
+    setSortConfig(newSortConfig);
+    if (onSortChange) onSortChange(newSortConfig.key, newSortConfig.direction);
+  };
+
+  const getSortState = (key: K): SortDirection => {
+    if (sortConfig.key !== key || !sortConfig.direction) return null;
+    return sortConfig.direction;
+  };
 
   return {
     sortConfig,
     requestSort,
     getSortState,
-  }
+  };
 }

@@ -1,321 +1,272 @@
-import { useCallback, useEffect, useState } from 'react'
-import { getLast30DaysRange } from '@/shared/utils/date-utils'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react';
+import { getLast30DaysRange } from '@/shared/utils/date-utils';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import {
   useGetMediaFilesQueryQuery,
   useLazyGetDownloadFileExcelQuery,
-} from '@/entities/mediafile/api/mediafile.api'
-import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table'
-import { toast } from 'react-toastify'
-import { useSortable } from '@/shared/hooks/use-sort'
+} from '@/entities/mediafile/api/mediafile.api';
+import { columnConfig } from '@/shared/constants/header-table/calls-table/calls-table';
+import { toast } from 'react-toastify';
+import { SortDirection, useSortable } from '@/shared/hooks/use-sort';
+import { getSortParamName, SortKey } from './getSortParamsName';
 
 export interface TableRowData {
-  id: string
-  date: string
-  operator: string
-  phone: string
-  numChannels: string
-  duration: string
-  negative: string
-  negativeValue: number
-  lexis: number
-  interruptions: number
-  silence: string
-  silenceSeconds: number
-  checklist: any
-  gptSummary: string
-  projectName: string
+  id: string;
+  date: string;
+  operator: string;
+  phone: string;
+  numChannels: string;
+  duration: string;
+  negative: string;
+  negativeValue: number;
+  lexis: number;
+  interruptions: number;
+  silence: string;
+  silenceSeconds: number;
+  checklist: any;
+  gptSummary: string;
+  projectName: string;
 }
 
 export const useCalls = () => {
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
-  const [filtersReset, setFiltersReset] = useState(false)
-  const defaultDateRange = getLast30DaysRange()
-  const router = useRouter()
-  const [totalEntries, setTotalEntries] = useState<number>(0)
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const [filtersReset, setFiltersReset] = useState(false);
+  const defaultDateRange = getLast30DaysRange();
+  const router = useRouter();
+  const [totalEntries, setTotalEntries] = useState<number>(0);
 
-  const updateSortParams = (key: string | null, isActive: boolean) => {
-    if (
-      key === 'date' &&
-      isActive &&
-      params.has('orderByDescCreateDate') &&
-      params.get('orderByDescCreateDate') === 'true'
-    ) {
-      return
-    }
+  const pathname = usePathname();
 
-    ;[
-      'orderByDescOperatorName',
-      'orderByDescCreateDate',
-      'orderByDescClientNumber',
-      'orderByDescDuration',
-      'orderByDescNegativeLevel',
-      'orderByDescPhrasesCount',
-      'orderByDescSimultaneousSpeechCount',
-      'orderByDescMaxSimultaneousSilence',
-    ].forEach(param => {
-      params.delete(param)
-    })
+  const updateSortParams = (key: SortKey | null, direction: SortDirection) => {
+    const newParams: Record<string, string> = { page: '1' };
 
-    if (key && isActive) {
-      switch (key) {
-        case 'operator':
-          params.set('orderByDescOperatorName', 'true')
-          break
-        case 'date':
-          params.set('orderByDescCreateDate', 'true')
-          break
-        case 'phone':
-          params.set('orderByDescClientNumber', 'true')
-          break
-        case 'duration':
-          params.set('orderByDescDuration', 'true')
-          break
-        case 'negative':
-          params.set('orderByDescNegativeLevel', 'true')
-          break
-        case 'lexis':
-          params.set('orderByDescPhrasesCount', 'true')
-          break
-        case 'interruptions':
-          params.set('orderByDescSimultaneousSpeechCount', 'true')
-          break
-        case 'silence':
-          params.set('orderByDescMaxSimultaneousSilence', 'true')
-          break
+    if (key && direction) {
+      const sortParam = getSortParamName(key, direction);
+      if (sortParam) {
+        newParams[sortParam] = 'true';
       }
     }
 
-    updateSearchParams({ page: '1' })
-    router.push(`?${params.toString()}`)
-  }
+    updateSearchParams(newParams);
+  };
 
-  const handleSortChange = (key: keyof TableRowData | null, isActive: boolean) => {
-    updateSortParams(key as string, isActive)
-  }
+  const handleSortChange = (key: SortKey | null, direction: SortDirection) => {
+    updateSortParams(key, direction);
+  };
 
-  const { sortConfig, requestSort, getSortState } = useSortable<TableRowData>(
-    'date',
-    handleSortChange,
-    true
-  )
+  const { sortConfig, requestSort, getSortState } = useSortable<
+    TableRowData,
+    SortKey
+  >('date', handleSortChange, null);
 
-  const getSortParams = () => {
-    if (!sortConfig.key || !sortConfig.isActive) return {}
+  const getSortParams = (): Record<string, boolean> => {
+    if (!sortConfig.key || !sortConfig.direction) return {};
 
-    const params: Record<string, boolean> = {}
-
-    switch (sortConfig.key) {
-      case 'operator':
-        params.orderByDescOperatorName = true
-        break
-      case 'date':
-        params.orderByDescCreateDate = true
-        break
-      case 'phone':
-        params.orderByDescClientNumber = true
-        break
-      case 'duration':
-        params.orderByDescDuration = true
-        break
-      case 'negative':
-        params.orderByDescNegativeLevel = true
-        break
-      case 'lexis':
-        params.orderByDescPhrasesCount = true
-        break
-      case 'interruptions':
-        params.orderByDescSimultaneousSpeechCount = true
-        break
-      case 'silence':
-        params.orderByDescMaxSimultaneousSilence = true
-        break
-      default:
-        break
-    }
-
-    return params
-  }
+    const param = getSortParamName(
+      sortConfig.key as SortKey,
+      sortConfig.direction
+    );
+    return param ? { [param]: true } : {};
+  };
 
   const getPrefix = useCallback(() => {
-    return window.location.pathname.replace(/\//g, '_')
-  }, [])
+    return window.location.pathname.replace(/\//g, '_');
+  }, []);
 
-  const getFilterKey = useCallback((key: string) => `${getPrefix()}_filter-${key}`, [getPrefix])
+  const getFilterKey = useCallback(
+    (key: string) => `${getPrefix()}_filter-${key}`,
+    [getPrefix]
+  );
 
   const getParamOrStorage = (paramName: string) => {
-    const filterKey = getFilterKey(paramName)
+    const filterKey = getFilterKey(paramName);
 
-    return searchParams.get(paramName) || localStorage.getItem(filterKey) || ''
-  }
+    return searchParams.get(paramName) || localStorage.getItem(filterKey) || '';
+  };
 
-  const searchTerm = getParamOrStorage('search') || ''
-  const startDate = getParamOrStorage('start') || defaultDateRange.start
-  const endDate = getParamOrStorage('end') || defaultDateRange.end
-  const currentPage = Number(getParamOrStorage('page') || 1)
+  const searchTerm = getParamOrStorage('search') || '';
+  const startDate = getParamOrStorage('start') || defaultDateRange.start;
+  const endDate = getParamOrStorage('end') || defaultDateRange.end;
+  const currentPage = Number(getParamOrStorage('page') || 1);
   const filterByCategories =
-    getParamOrStorage('filterByPhrasesCategoriesCommaSeparated') || undefined
-  const initialRowsPerPage = Number(getParamOrStorage('limit')) || 10
-  const [rowsPerPage, setRowsPerPage] = useState<number>(initialRowsPerPage)
+    getParamOrStorage('filterByPhrasesCategoriesCommaSeparated') || undefined;
+  const initialRowsPerPage = Number(getParamOrStorage('limit')) || 10;
+  const [rowsPerPage, setRowsPerPage] = useState<number>(initialRowsPerPage);
 
-  const queryParams = {
+  const rawParams = {
     start: startDate,
     end: endDate,
     offset: (currentPage - 1) * rowsPerPage,
     limit: rowsPerPage,
     searchPhrase: searchTerm,
     filterByPhrasesCategoriesCommaSeparated: filterByCategories,
-    ...getSortParams(),
-  }
+  };
 
-  const { data: mediaFilesData, refetch, isLoading } = useGetMediaFilesQueryQuery(queryParams)
-  const [downloadUrl] = useLazyGetDownloadFileExcelQuery()
+  const sortParams = getSortParams();
 
-  const mediaFilesDataTable = mediaFilesData?.mediaFile || []
-  const totalCount = mediaFilesData?.totalCount || 0
+  Object.keys(rawParams).forEach((key) => {
+    if (key.startsWith('orderBy')) {
+      delete (rawParams as Record<string, unknown>)[key];
+    }
+  });
+
+  const queryParams = {
+    ...rawParams,
+    ...sortParams,
+  };
+
+  const {
+    data: mediaFilesData,
+    refetch,
+    isLoading,
+  } = useGetMediaFilesQueryQuery(queryParams);
+  const [downloadUrl] = useLazyGetDownloadFileExcelQuery();
+
+  const mediaFilesDataTable = mediaFilesData?.mediaFile || [];
+  const totalCount = mediaFilesData?.totalCount || 0;
 
   useEffect(() => {
     if (mediaFilesData) {
-      setTotalEntries(mediaFilesData.totalCount || 0)
+      setTotalEntries(mediaFilesData.totalCount || 0);
     }
-  }, [mediaFilesData])
+  }, [mediaFilesData]);
 
-  const updateSearchParams = (newParams: Partial<Record<string, string | undefined>>) => {
-    const params = new URLSearchParams(searchParams)
-    let hasChanges = false
+  const updateSearchParams = (
+    newParams: Partial<Record<string, string | undefined>>
+  ) => {
+    const params = new URLSearchParams(searchParams);
+
+    Array.from(params.keys())
+      .filter((key) => key.startsWith('orderBy'))
+      .forEach((key) => params.delete(key));
 
     Object.entries(newParams).forEach(([key, value]) => {
-      const filterKey = getFilterKey(key)
+      const filterKey = getFilterKey(key);
 
       if (value === undefined || value === '') {
-        if (params.has(key)) {
-          params.delete(key)
-          hasChanges = true
-        }
-        localStorage.removeItem(filterKey)
+        params.delete(key);
+        localStorage.removeItem(filterKey);
       } else {
-        if (params.get(key) !== value) {
-          params.set(key, value)
-          hasChanges = true
-        }
-        localStorage.setItem(filterKey, value)
+        params.set(key, value);
+        localStorage.setItem(filterKey, value);
       }
-    })
+    });
 
-    if (hasChanges) {
-      router.push(`?${params.toString()}`)
-    }
-  }
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
-  const [filtersActive, setFiltersActive] = useState<boolean>(false)
+  const [filtersActive, setFiltersActive] = useState<boolean>(false);
 
   useEffect(() => {
     const isDefaultDateRange =
-      startDate === defaultDateRange.start && endDate === defaultDateRange.end
+      startDate === defaultDateRange.start && endDate === defaultDateRange.end;
 
-    const datesActive = startDate && endDate && !isDefaultDateRange
+    const datesActive = startDate && endDate && !isDefaultDateRange;
 
-    const active = Boolean(searchTerm || datesActive || filterByCategories)
+    const active = Boolean(searchTerm || datesActive || filterByCategories);
 
-    setFiltersActive(active)
-    localStorage.setItem(getFilterKey('_calls_filter-filtersActive'), JSON.stringify(active))
-  }, [searchTerm, startDate, endDate, filterByCategories, defaultDateRange])
+    setFiltersActive(active);
+    localStorage.setItem(
+      getFilterKey('_calls_filter-filtersActive'),
+      JSON.stringify(active)
+    );
+  }, [searchTerm, startDate, endDate, filterByCategories, defaultDateRange]);
 
   const openFilterModal = () => {
-    setIsFilterModalOpen(true)
-  }
+    setIsFilterModalOpen(true);
+  };
 
   const closeFilterModal = () => {
-    setIsFilterModalOpen(false)
-  }
+    setIsFilterModalOpen(false);
+  };
 
-  const totalPages: number = Math.ceil(totalCount / rowsPerPage)
-  const startIndex = (currentPage - 1) * rowsPerPage
-  const endIndex = Math.min(startIndex + rowsPerPage, totalEntries)
+  const totalPages: number = Math.ceil(totalCount / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, totalEntries);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      updateSearchParams({ page: page.toString() })
+      updateSearchParams({ page: page.toString() });
     }
-  }
+  };
 
   const handleRowsPerPageChange = (newRowsPerPage: number): void => {
-    setRowsPerPage(newRowsPerPage)
+    setRowsPerPage(newRowsPerPage);
 
     updateSearchParams({
       page: '1',
       limit: newRowsPerPage.toString(),
-    })
+    });
 
-    refetch()
-  }
+    refetch();
+  };
 
-  const handleSort = (key: keyof TableRowData) => {
-    requestSort(key, columnConfig)
-  }
+  const handleSort = (key: SortKey) => {
+    requestSort(key, columnConfig);
+  };
 
-  const getSortDirection = (key: string): string => {
-    const state = getSortState(key as keyof TableRowData)
-    return state === 'active' ? 'ascending' : ''
-  }
+  const getSortDirection = (key: SortKey): string => {
+    return getSortState(key) ?? '';
+  };
 
   const handleDownload = async () => {
     try {
-      const result = await downloadUrl().unwrap()
+      const result = await downloadUrl().unwrap();
 
       if (result) {
-        const link = document.createElement('a')
-        link.href = result
-        link.download = 'mediafile.xlsx'
-        document.body.appendChild(link)
-        link.click()
-        link.remove()
+        const link = document.createElement('a');
+        link.href = result;
+        link.download = 'mediafile.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
       }
     } catch (error) {
-      toast.error('Ошибка при загрузке файла.')
+      toast.error('Ошибка при загрузке файла.');
     }
-  }
+  };
 
   const applyFilters = (newParams: Record<string, string>) => {
+    console.log(newParams);
     updateSearchParams({
       ...newParams,
       page: '1',
-    })
-    setIsFilterModalOpen(false)
-  }
+    });
+    setIsFilterModalOpen(false);
+  };
 
   const resetSearchParams = () => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams);
     params.forEach((_, key) => {
-      params.delete(key)
-    })
-    router.push(window.location.pathname)
-  }
+      params.delete(key);
+    });
+    router.push(window.location.pathname);
+  };
 
   const handleResetFilters = () => {
-    resetSearchParams()
-    const prefixKey = getPrefix()
-    Object.keys(localStorage).forEach(key => {
+    resetSearchParams();
+    const prefixKey = getPrefix();
+    Object.keys(localStorage).forEach((key) => {
       if (key.startsWith(`${prefixKey}_filter-`)) {
-        localStorage.removeItem(key)
+        localStorage.removeItem(key);
       }
-    })
+    });
 
-    window.dispatchEvent(new CustomEvent('filters-reset'))
+    window.dispatchEvent(new CustomEvent('filters-reset'));
 
-    setFiltersReset(true)
+    setFiltersReset(true);
 
     setTimeout(() => {
-      setFiltersReset(false)
-    }, 100)
-  }
+      setFiltersReset(false);
+    }, 100);
+  };
 
   const handleRefresh = () => {
-    refetch()
-    toast.success('Данные успешно обновлены')
-  }
+    refetch();
+    toast.success('Данные успешно обновлены');
+  };
 
   return {
     isLoading,
@@ -347,5 +298,5 @@ export const useCalls = () => {
     openFilterModal,
     closeFilterModal,
     handleDownload,
-  }
-}
+  };
+};
