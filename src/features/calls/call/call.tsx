@@ -525,7 +525,7 @@ export const Call = () => {
         </div> */}
 
         <div
-          className={`bg-purple-50 rounded-xl p-4 mb-4 relative ${hasMultipleChannels ? 'h-32' : 'h-24'}`}
+          className={`bg-purple-50 rounded-xl p-4 mb-4 relative ${hasMultipleChannels ? 'h-32' : 'h-20'}`}
         >
           {!isAudioLoading && (
             <button
@@ -572,7 +572,7 @@ export const Call = () => {
           )}
 
           <div
-            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-24' : 'h-24'}`}
+            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-24' : 'h-12'}`}
             ref={containerRef}
             id="waveform"
           >
