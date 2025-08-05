@@ -120,18 +120,24 @@ export const UploadForm = ({
             <div>
               <Controller
                 control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DropdownCustom
-                    onChange={onChange}
-                    label="Оператор"
-                    placeholder="Выберите оператора"
-                    selected={{
-                      label: value,
-                      value: value,
-                    }}
-                    options={operatorsOptions}
-                  />
-                )}
+                render={({ field: { onChange, value } }) => {
+                  const selectedOperator = operatorsData?.find(
+                    (operator) => operator.id === parseInt(value)
+                  );
+
+                  return (
+                    <DropdownCustom
+                      onChange={onChange}
+                      label="Оператор"
+                      placeholder="Выберите оператора"
+                      selected={{
+                        label: selectedOperator?.name ?? value,
+                        value: value,
+                      }}
+                      options={operatorsOptions}
+                    />
+                  );
+                }}
                 name={'operatorId'}
               />
               {/* <ControlledSelect
@@ -158,18 +164,23 @@ export const UploadForm = ({
               <div className="w-full">
                 <Controller
                   control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <DropdownCustom
-                      onChange={onChange}
-                      label={'Проект'}
-                      placeholder="Выберите проект"
-                      selected={{
-                        label: value,
-                        value: value,
-                      }}
-                      options={projectOptions}
-                    />
-                  )}
+                  render={({ field: { onChange, value } }) => {
+                    const selectedProject = projectsData?.find(
+                      (project) => project.id === parseInt(value)
+                    );
+                    return (
+                      <DropdownCustom
+                        onChange={onChange}
+                        label={'Проект'}
+                        placeholder="Выберите проект"
+                        selected={{
+                          label: selectedProject?.name ?? value,
+                          value: value,
+                        }}
+                        options={projectOptions}
+                      />
+                    );
+                  }}
                   name={'projectId'}
                 />
                 {/* <ControlledSelect
