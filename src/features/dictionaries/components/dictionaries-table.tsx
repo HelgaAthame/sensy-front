@@ -166,11 +166,11 @@ export const DictionariesTable = <T extends Dictionary>({
                   >
                     <TableCell className="h-16 pl-6 pr-3">
                       <div className="flex items-center gap-3">
-                        <div>
-                          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-                            {item.name}
-                          </span>
-                        </div>
+                        <span
+                          className={`block font-medium text-gray-700 text-theme-sm dark:text-gray-400 bg-[${item.colorHex}]`}
+                        >
+                          {item.name}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="h-16 px-3">

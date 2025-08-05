@@ -1,6 +1,7 @@
 import { Modal } from '@/shared/ui/modal/modal';
 import Button from '@/shared/ui/button/button';
 import {
+  DictionariesTranslations,
   DictionaryReqBody,
   DictionaryTypeValues,
 } from '@/entities/dictionaries/dictionaries.types';
@@ -105,11 +106,11 @@ export const EditDictionaryModal = ({
               onChange={onChange}
               label="Тип словаря"
               selected={{
-                label: value,
+                label: DictionariesTranslations[value],
                 value: value,
               }}
               options={DictionaryTypeValues.map((dictionaryValue, index) => ({
-                label: dictionaryValue,
+                label: DictionariesTranslations[dictionaryValue],
                 value: dictionaryValue,
               }))}
             />

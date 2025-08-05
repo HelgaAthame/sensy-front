@@ -26,3 +26,10 @@ export const DictionaryTypeValues = [
   'Hotwords',
 ] as const;
 export type DictionaryType = (typeof DictionaryTypeValues)[number];
+
+export const DictionariesTranslations = {
+  'All': "Общий",
+  'OnlyOperator': "Для оператора",
+  'OnlyClient': "Для клиента",
+  'Hotwords': "Термины",
+}
