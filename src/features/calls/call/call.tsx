@@ -1,24 +1,34 @@
-'use client'
+'use client';
 
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Tab } from '@/shared/ui/tab/tab'
-import PageBreadcrumb from '@/shared/ui/page-breadcrumb/page-breadcrumb'
-import { Transcript } from './transcript/transcript'
-import { Checklist, ChecklistGroup } from '@/features/calls/call/checklists/checklists'
-import { Summary } from '@/features/calls/call/summary/summary'
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Tab } from '@/shared/ui/tab/tab';
+import PageBreadcrumb from '@/shared/ui/page-breadcrumb/page-breadcrumb';
+import { Transcript } from './transcript/transcript';
+import {
+  Checklist,
+  ChecklistGroup,
+} from '@/features/calls/call/checklists/checklists';
+import { Summary } from '@/features/calls/call/summary/summary';
 import {
   useGetMediaFileByIdQuery,
   useGetMediaFileResultQuery,
-} from '@/entities/mediafile/api/mediafile.api'
-import { useParams } from 'next/navigation'
-import WaveSurfer from 'wavesurfer.js'
-import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
-import { getFromLocalStorage } from '@/shared/utils/common-utils'
-import { formatDatesTime, formatDates } from '@/shared/utils/date-utils'
+} from '@/entities/mediafile/api/mediafile.api';
+import { useParams } from 'next/navigation';
+import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
+import { getFromLocalStorage } from '@/shared/utils/common-utils';
+import { formatDatesTime, formatDates } from '@/shared/utils/date-utils';
 
-import './call.css'
-import { appRoutes } from '@/shared/constants/routes'
-import { LoaderContent } from '@/shared/ui/loader'
+import './call.css';
+import { appRoutes } from '@/shared/constants/routes';
+import { LoaderContent } from '@/shared/ui/loader';
 
 enum CallTab {
   Transcript = 'transcript',
@@ -27,98 +37,104 @@ enum CallTab {
 }
 
 type TabItem = {
-  name: string
-  key: string
-}
+  name: string;
+  key: string;
+};
 
 type AudioIndicator = {
-  type: string
-  color: string
+  type: string;
+  color: string;
   regions?: {
-    phrase?: string
-    start: number
-    end: number
-    channel?: number
-    actorByChannel?: number
-  }[]
-}
+    phrase?: string;
+    start: number;
+    end: number;
+    channel?: number;
+    actorByChannel?: number;
+  }[];
+};
 
 export const Call = () => {
-  const params = useParams()
-  const id = Number(params.id)
-  const token = getFromLocalStorage('accessToken', null)
-  const [isAudioLoading, setIsAudioLoading] = useState(true)
-  const wavesurferRef = useRef<WaveSurfer | null>(null)
-  const regionsPluginRef = useRef<any>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [wavesurferReady, setWavesurferReady] = useState(false)
-  const regionsAddedRef = useRef(false)
+  const params = useParams();
+  const id = Number(params.id);
+  const token = getFromLocalStorage('accessToken', null);
+  const [isAudioLoading, setIsAudioLoading] = useState(true);
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const regionsPluginRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [wavesurferReady, setWavesurferReady] = useState(false);
+  const regionsAddedRef = useRef(false);
 
-  const { data: mediaFileById, isLoading } = useGetMediaFileByIdQuery({ id })
+  const { data: mediaFileById, isLoading } = useGetMediaFileByIdQuery({ id });
 
   const { data: mediaFileResult } = useGetMediaFileResultQuery({
     id,
     negativeProbThreshold: 0.15,
     simultaneousSilenceDurationThreshold: 10,
-  })
+  });
 
-  const [activeTab, setActiveTab] = useState(CallTab.Transcript)
-  const [playbackRate, setPlaybackRate] = useState('1x')
-
-
+  const [activeTab, setActiveTab] = useState(CallTab.Transcript);
+  const [playbackRate, setPlaybackRate] = useState('1x');
 
   const mouseEvent = (event: any) => {
     if (event.type === 'mouseover') {
-      event.target.querySelector('#tooltip').style.opacity = '1'
+      event.target.querySelector('#tooltip').style.opacity = '1';
     } else {
-      event.target.querySelector('#tooltip').style.opacity = '0'
+      event.target.querySelector('#tooltip').style.opacity = '0';
     }
-  }
+  };
 
-  const tooltipContent = (actualColor: string, region: any, indicator: { type: string }) => {
-    const inner = document.createElement('div')
-    inner.id = 'tooltip'
-    inner.style.borderRadius = '5px'
-    inner.style.boxShadow = ' 2px 2px 6px -4px #999'
-    inner.style.fontFamily = 'inherit'
-    inner.style.padding = '4px'
-    inner.style.border = '1px solid #e3e3e3'
-    inner.style.background = 'rgba(255, 255, 255, .96)'
-    inner.style.fontSize = '12px'
-    inner.style.top = '-20px'
-    inner.style.left = '20px'
-    inner.style.opacity = '0'
-    inner.style.pointerEvents = 'none'
-    inner.style.position = 'absolute'
-    inner.style.display = 'flex'
-    inner.style.flexDirection = 'column'
-    inner.style.overflow = 'hidden'
-    inner.style.whiteSpace = 'nowrap'
-    inner.style.zIndex = '12'
-    inner.style.transition = '.15s ease all'
-    const header = document.createElement('div')
-    header.style.display = 'flex'
-    const indicatorPoint = document.createElement('div')
-    indicatorPoint.style.backgroundColor = actualColor
-    indicatorPoint.style.borderRadius = '50%'
-    indicatorPoint.style.margin = '4px'
-    indicatorPoint.style.width = '8px'
-    indicatorPoint.style.height = '8px'
+  const tooltipContent = (
+    actualColor: string,
+    region: any,
+    indicator: { type: string }
+  ) => {
+    const inner = document.createElement('div');
+    inner.id = 'tooltip';
+    inner.style.borderRadius = '5px';
+    inner.style.boxShadow = ' 2px 2px 6px -4px #999';
+    inner.style.fontFamily = 'inherit';
+    inner.style.padding = '4px';
+    inner.style.border = '1px solid #e3e3e3';
+    inner.style.background = 'rgba(255, 255, 255, .96)';
+    inner.style.fontSize = '12px';
+    inner.style.top = '-20px';
+    inner.style.left = '20px';
+    inner.style.opacity = '0';
+    inner.style.pointerEvents = 'none';
+    inner.style.position = 'absolute';
+    inner.style.display = 'flex';
+    inner.style.flexDirection = 'column';
+    inner.style.overflow = 'hidden';
+    inner.style.whiteSpace = 'nowrap';
+    inner.style.zIndex = '12';
+    inner.style.transition = '.15s ease all';
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    const indicatorPoint = document.createElement('div');
+    indicatorPoint.style.backgroundColor = actualColor;
+    indicatorPoint.style.borderRadius = '50%';
+    indicatorPoint.style.margin = '4px';
+    indicatorPoint.style.width = '8px';
+    indicatorPoint.style.height = '8px';
 
-    const indicatorType = document.createElement('span')
+    const indicatorType = document.createElement('span');
     if (region.phrase) {
-      indicatorType.innerHTML = indicator.type + ': <span style="display: inline-block; margin-left: 4px; font-weight: 600;">' + region.phrase + '</span>'
+      indicatorType.innerHTML =
+        indicator.type +
+        ': <span style="display: inline-block; margin-left: 4px; font-weight: 600;">' +
+        region.phrase +
+        '</span>';
     } else {
-      indicatorType.innerHTML = indicator.type
+      indicatorType.innerHTML = indicator.type;
     }
-    header.appendChild(indicatorPoint)
-    header.appendChild(indicatorType)
-    inner.appendChild(header)
-    return inner
-  }
+    header.appendChild(indicatorPoint);
+    header.appendChild(indicatorType);
+    inner.appendChild(header);
+    return inner;
+  };
 
   const audioIndicators: AudioIndicator[] = useMemo(() => {
     return [
@@ -127,8 +143,8 @@ export const Call = () => {
         color: 'bg-red-400',
         regions:
           mediaFileResult?.tonal?.regions
-            ?.filter(region => region.type === 1)
-            ?.map(region => ({
+            ?.filter((region) => region.type === 1)
+            ?.map((region) => ({
               start: region.startTime,
               end: region.endTime,
               channel: region.channel,
@@ -138,18 +154,18 @@ export const Call = () => {
         type: 'Лексика',
         color: 'bg-blue-400',
         regions:
-          mediaFileResult?.keywordsSearchResult?.regions?.map(region => ({
+          mediaFileResult?.keywordsSearchResult?.regions?.map((region) => ({
             start: region.startTime,
             end: region.endTime,
             channel: region.channel !== undefined ? region.channel : 0,
-            phrase: region.phrase
+            phrase: region.phrase,
           })) || [],
       },
       {
         type: 'Паузы',
         color: 'bg-yellow-400',
         regions:
-          mediaFileResult?.simultaneousSilence?.regions?.map(region => ({
+          mediaFileResult?.simultaneousSilence?.regions?.map((region) => ({
             start: region.startTime,
             end: region.endTime,
           })) || [],
@@ -158,48 +174,55 @@ export const Call = () => {
         type: 'Перебивания',
         color: 'bg-red-500',
         regions:
-          mediaFileResult?.simultaneousSpeech?.regions?.map(region => ({
+          mediaFileResult?.simultaneousSpeech?.regions?.map((region) => ({
             start: region.startTime,
             end: region.endTime,
-            channel: region.actorByChannel !== undefined ? region.actorByChannel : 0,
+            channel:
+              region.actorByChannel !== undefined ? region.actorByChannel : 0,
           })) || [],
       },
-    ]
-  }, [mediaFileResult])
+    ];
+  }, [mediaFileResult]);
 
-  const numChannels = mediaFileById?.numChannels ?? 0
-  const hasMultipleChannels = numChannels > 1
+  const numChannels = mediaFileById?.numChannels ?? 0;
+  const hasMultipleChannels = numChannels > 1;
 
   const createRegions = useCallback(() => {
-    if (!wavesurferRef.current || !regionsPluginRef.current || regionsAddedRef.current) return
-    regionsPluginRef.current.clearRegions()
+    if (
+      !wavesurferRef.current ||
+      !regionsPluginRef.current ||
+      regionsAddedRef.current
+    )
+      return;
+    regionsPluginRef.current.clearRegions();
 
-    audioIndicators.forEach(indicator => {
-      if (!indicator.regions) return
-      indicator.regions.forEach(region => {
-        const isCircleMarker = indicator.type === 'Перебивания' || indicator.type === 'Лексика'
-        const isSilence = indicator.type === 'Паузы'
-        let actualColor
+    audioIndicators.forEach((indicator) => {
+      if (!indicator.regions) return;
+      indicator.regions.forEach((region) => {
+        const isCircleMarker =
+          indicator.type === 'Перебивания' || indicator.type === 'Лексика';
+        const isSilence = indicator.type === 'Паузы';
+        let actualColor;
 
         switch (indicator.color) {
           case 'bg-red-400':
-            actualColor = '#ff6467' // Более заметный красный для негатива
-            break
+            actualColor = '#ff6467'; // Более заметный красный для негатива
+            break;
           case 'bg-blue-400':
-            actualColor = '#639fe5' // Более заметный синий для лексики
-            break
+            actualColor = '#639fe5'; // Более заметный синий для лексики
+            break;
           case 'bg-yellow-400':
-            actualColor = '#fce8c0' // Желтый для пауз
-            break
+            actualColor = '#fce8c0'; // Желтый для пауз
+            break;
           case 'bg-red-500':
-            actualColor = '#fb2c36' // Зеленоватый для перебиваний
-            break
+            actualColor = '#fb2c36'; // Зеленоватый для перебиваний
+            break;
           default:
-            actualColor = 'rgba(107, 33, 168, 0.5)' // Фиолетовый по умолчанию
+            actualColor = 'rgba(107, 33, 168, 0.5)'; // Фиолетовый по умолчанию
         }
 
         if (isCircleMarker) {
-          const regionId = `marker-${indicator.type}-${region.start}-${region.channel || 0}`
+          const regionId = `marker-${indicator.type}-${region.start}-${region.channel || 0}`;
 
           const markerRegion = regionsPluginRef.current.addRegion({
             id: regionId,
@@ -214,27 +237,28 @@ export const Call = () => {
           });
 
           if (markerRegion && markerRegion.element) {
-            markerRegion.element.style.zIndex = '100'
-            const circle = document.createElement('div')
-            circle.className = 'marker-circle'
-            circle.style.position = 'absolute'
-            circle.style.width = '15px'
-            circle.style.height = '15px'
-            circle.style.border = '1px solid rgba(0, 0, 0, 0.3)'
-            circle.style.borderRadius = '50%'
-            circle.style.backgroundColor = actualColor
-            circle.style.top = '50%'
-            circle.style.left = '0'
-            circle.style.cursor = 'pointer'
-            circle.style.transform = 'translate(-50%, -50%)'
+            markerRegion.element.style.zIndex = '100';
+            const circle = document.createElement('div');
+            circle.className = 'marker-circle';
+            circle.style.position = 'absolute';
+            circle.style.width = '15px';
+            circle.style.height = '15px';
+            circle.style.border = '1px solid rgba(0, 0, 0, 0.3)';
+            circle.style.borderRadius = '50%';
+            circle.style.backgroundColor = actualColor;
+            circle.style.top = '50%';
+            circle.style.left = '0';
+            circle.style.cursor = 'pointer';
+            circle.style.transform = 'translate(-50%, -50%)';
             circle.setAttribute(
               'style',
-              '' + circle.getAttribute('style') + '; z-index: 100 !important;')
-            circle.onmouseover = mouseEvent
-            circle.onmouseleave = mouseEvent
-            const tooltip = tooltipContent(actualColor, region, indicator)
-            circle.appendChild(tooltip)
-            markerRegion.setContent(circle)
+              '' + circle.getAttribute('style') + '; z-index: 100 !important;'
+            );
+            circle.onmouseover = mouseEvent;
+            circle.onmouseleave = mouseEvent;
+            const tooltip = tooltipContent(actualColor, region, indicator);
+            circle.appendChild(tooltip);
+            markerRegion.setContent(circle);
           }
         } else if (isSilence) {
           const markerRegion = regionsPluginRef.current.addRegion({
@@ -245,20 +269,20 @@ export const Call = () => {
             resize: false,
             channelIdx: region.channel,
             channel: region.channel,
-          })
-          const duration = Math.round(region.end - region.start)
-          const marker = document.createElement('div')
-          marker.style.display = 'inline-block'
-          marker.style.padding = '0.2em 0.4em'
-          marker.style.position = 'relative'
-          marker.style.width = '100%'
-          marker.style.top = '40%'
-          marker.style.textAlign = 'center'
-          marker.style.fontSize = '12px'
-          marker.style.fontWeight = '600'
-          marker.style.color = '#947500'
-          marker.innerHTML = duration > 10 ? 'Пауза: ' + duration + 'c' : ''
-          markerRegion.setContent(marker)
+          });
+          const duration = Math.round(region.end - region.start);
+          const marker = document.createElement('div');
+          marker.style.display = 'inline-block';
+          marker.style.padding = '0.2em 0.4em';
+          marker.style.position = 'relative';
+          marker.style.width = '100%';
+          marker.style.top = '40%';
+          marker.style.textAlign = 'center';
+          marker.style.fontSize = '12px';
+          marker.style.fontWeight = '600';
+          marker.style.color = '#947500';
+          marker.innerHTML = duration > 10 ? 'Пауза: ' + duration + 'c' : '';
+          markerRegion.setContent(marker);
         } else {
           regionsPluginRef.current.addRegion({
             start: region.start,
@@ -268,20 +292,20 @@ export const Call = () => {
             resize: false,
             channelIdx: region.channel,
             channel: region.channel,
-          })
+          });
         }
-      })
-    })
+      });
+    });
 
-    regionsAddedRef.current = true
-  }, [audioIndicators])
+    regionsAddedRef.current = true;
+  }, [audioIndicators]);
 
   useEffect(() => {
-    if (!containerRef.current || !mediaFileById) return
+    if (!containerRef.current || !mediaFileById) return;
 
     if (wavesurferRef.current) {
-      wavesurferRef.current.destroy()
-      regionsAddedRef.current = false
+      wavesurferRef.current.destroy();
+      regionsAddedRef.current = false;
     }
 
     const wavesurfer = WaveSurfer.create({
@@ -290,7 +314,9 @@ export const Call = () => {
       progressColor: 'bg-gray-500',
       height: hasMultipleChannels ? 48 : 48,
       cursorColor: '#6B21A8',
-      splitChannels: hasMultipleChannels ? new Array(numChannels).fill({}) : undefined,
+      splitChannels: hasMultipleChannels
+        ? new Array(numChannels).fill({})
+        : undefined,
       // barWidth: 2,
       // barGap: 1,
       // barRadius: 2,
@@ -300,14 +326,16 @@ export const Call = () => {
           Authorization: `Bearer ${token}`,
         },
       },
-    })
+    });
 
-    wavesurferRef.current = wavesurfer
-    regionsPluginRef.current = wavesurfer.registerPlugin(RegionsPlugin.create())
+    wavesurferRef.current = wavesurfer;
+    regionsPluginRef.current = wavesurfer.registerPlugin(
+      RegionsPlugin.create()
+    );
 
-    regionsPluginRef.current.regionsContainer.style.position = 'static'
+    regionsPluginRef.current.regionsContainer.style.position = 'static';
 
-    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`
+    const audioUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/mediafile/${mediaFileById.id}/stream`;
 
     // wavesurfer.load(audioUrl)
     fetch(audioUrl, {
@@ -315,99 +343,102 @@ export const Call = () => {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(response => {
-        if (!response.ok) throw new Error('Ошибка загрузки аудио')
-        return response.blob()
+      .then((response) => {
+        if (!response.ok) throw new Error('Ошибка загрузки аудио');
+        return response.blob();
       })
-      .then(blob => {
-        wavesurfer.loadBlob(blob)
+      .then((blob) => {
+        wavesurfer.loadBlob(blob);
       })
-      .catch(error => {
-        console.error('Ошибка при загрузке аудио:', error)
-      })
+      .catch((error) => {
+        console.error('Ошибка при загрузке аудио:', error);
+      });
 
-    wavesurfer.on('loading', percent => {
-      setIsAudioLoading(true)
-    })
+    wavesurfer.on('loading', (percent) => {
+      setIsAudioLoading(true);
+    });
 
     wavesurfer.on('ready', () => {
-      setDuration(wavesurfer.getDuration())
-      setIsAudioLoading(false)
-      setWavesurferReady(true)
-    })
+      setDuration(wavesurfer.getDuration());
+      setIsAudioLoading(false);
+      setWavesurferReady(true);
+    });
 
     wavesurfer.on('audioprocess', () => {
-      const time = wavesurfer.getCurrentTime()
-      setCurrentTime(prevTime => {
+      const time = wavesurfer.getCurrentTime();
+      setCurrentTime((prevTime) => {
         if (Math.abs(prevTime - time) > 0.1) {
-          return time
+          return time;
         }
-        return prevTime
-      })
-    })
+        return prevTime;
+      });
+    });
 
     wavesurfer.on('seeking', () => {
-      setCurrentTime(wavesurfer.getCurrentTime())
-    })
+      setCurrentTime(wavesurfer.getCurrentTime());
+    });
 
     wavesurfer.on('play', () => {
-      setIsPlaying(true)
-    })
+      setIsPlaying(true);
+    });
 
     wavesurfer.on('pause', () => {
-      setIsPlaying(false)
-    })
+      setIsPlaying(false);
+    });
 
     return () => {
       if (wavesurferRef.current) {
-        wavesurferRef.current.destroy()
+        wavesurferRef.current.destroy();
       }
-    }
-  }, [mediaFileById, hasMultipleChannels, numChannels])
+    };
+  }, [mediaFileById, hasMultipleChannels, numChannels]);
 
   useEffect(() => {
     if (wavesurferReady && mediaFileResult && !regionsAddedRef.current) {
-      createRegions()
+      createRegions();
     }
-  }, [wavesurferReady, mediaFileResult])
+  }, [wavesurferReady, mediaFileResult]);
 
   useEffect(() => {
     if (wavesurferRef.current) {
-      const rate = parseFloat(playbackRate.replace('x', ''))
-      wavesurferRef.current.setPlaybackRate(rate)
+      const rate = parseFloat(playbackRate.replace('x', ''));
+      wavesurferRef.current.setPlaybackRate(rate);
     }
-  }, [playbackRate])
+  }, [playbackRate]);
 
   const togglePlayPause = () => {
     if (wavesurferRef.current) {
-      wavesurferRef.current.playPause()
+      wavesurferRef.current.playPause();
     }
-  }
+  };
 
   const formatTime = (timeInSeconds: number): string => {
-    if (isNaN(timeInSeconds)) return '00:00'
+    if (isNaN(timeInSeconds)) return '00:00';
 
-    const minutes = Math.floor(timeInSeconds / 60)
-    const seconds = Math.floor(timeInSeconds % 60)
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-  }
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   const tabs: TabItem[] = [
     { name: 'Расшифровка', key: CallTab.Transcript },
     // { name: 'Резюме', key: CallTab.Summary },
     { name: 'Чек-листы', key: CallTab.Checklists },
-  ]
+  ];
 
   const handleTabChange = (tab: TabItem) => {
-    setActiveTab(tab.key as CallTab)
-  }
+    setActiveTab(tab.key as CallTab);
+  };
 
   const callInfo = {
     name: mediaFileById?.operatorName || 'Lindsay Curtis',
-    phone: mediaFileById?.additionalMetadata?.clientNumber || '+123 (45) 678-91-01',
-    date: formatDatesTime(mediaFileById?.createDate ? new Date(mediaFileById.createDate) : null),
+    phone:
+      mediaFileById?.additionalMetadata?.clientNumber || '+123 (45) 678-91-01',
+    date: formatDatesTime(
+      mediaFileById?.createDate ? new Date(mediaFileById.createDate) : null
+    ),
     duration: `${formatTime(currentTime)} / ${formatTime(duration)}`,
-  }
+  };
 
   const generateChecklistData = (): ChecklistGroup[] => {
     const baseGroup = {
@@ -448,25 +479,25 @@ export const Call = () => {
       ],
       totalScore: 35,
       maxTotalScore: 35,
-    }
+    };
 
-    const secondGroup = JSON.parse(JSON.stringify(baseGroup))
-    return [baseGroup, secondGroup]
-  }
+    const secondGroup = JSON.parse(JSON.stringify(baseGroup));
+    return [baseGroup, secondGroup];
+  };
 
-  const checklistData = generateChecklistData()
-  const playbackRates = ['1x', '1.25x', '1.5x']
+  const checklistData = generateChecklistData();
+  const playbackRates = ['1x', '1.25x', '1.5x'];
 
   const summaryContent =
     mediaFileResult?.gptSummary ||
-    `В рамках спецификации современных стандартов, непосредственные участники технического прогресса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть описаны максимально подробно.`
+    `В рамках спецификации современных стандартов, непосредственные участники технического прогресса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть описаны максимально подробно.`;
 
   if (isLoading) {
     return (
       <div className="p-4 min-h-screen flex items-center justify-center">
         <LoaderContent width={200} height={200} isLoading={isLoading} />
       </div>
-    )
+    );
   }
 
   return (
@@ -509,8 +540,22 @@ export const Call = () => {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <rect x="2" y="2" width="4" height="10" rx="1" fill="currentColor" />
-                  <rect x="8" y="2" width="4" height="10" rx="1" fill="currentColor" />
+                  <rect
+                    x="2"
+                    y="2"
+                    width="4"
+                    height="10"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                  <rect
+                    x="8"
+                    y="2"
+                    width="4"
+                    height="10"
+                    rx="1"
+                    fill="currentColor"
+                  />
                 </svg>
               ) : (
                 <svg
@@ -527,7 +572,7 @@ export const Call = () => {
           )}
 
           <div
-            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-48' : 'h-24'}`}
+            className={`wavesurfer-container ml-10 ${hasMultipleChannels ? 'h-24' : 'h-24'}`}
             ref={containerRef}
             id="waveform"
           >
@@ -545,18 +590,23 @@ export const Call = () => {
           <div className="flex gap-5 text-sm">
             {audioIndicators.map((indicator, index) => (
               <div key={index} className="flex items-center">
-                <div className={`w-2 h-2 rounded-full ${indicator.color} mr-2`}></div>
+                <div
+                  className={`w-2 h-2 rounded-full ${indicator.color} mr-2`}
+                ></div>
                 <span className="text-gray-600">{indicator.type}</span>
               </div>
             ))}
           </div>
 
           <div className="flex gap-2">
-            {playbackRates.map(rate => (
+            {playbackRates.map((rate) => (
               <button
                 key={rate}
-                className={`text-sm px-2 py-1 rounded cursor-pointer ${playbackRate === rate ? 'text-purple-700 font-medium' : 'text-gray-500'
-                  }`}
+                className={`text-sm px-2 py-1 rounded cursor-pointer ${
+                  playbackRate === rate
+                    ? 'text-purple-700 font-medium'
+                    : 'text-gray-500'
+                }`}
                 onClick={() => setPlaybackRate(rate)}
               >
                 {rate}
@@ -574,12 +624,20 @@ export const Call = () => {
         </div>
         {activeTab === CallTab.Summary && <Summary content={summaryContent} />}
         {activeTab === CallTab.Transcript && (
-          <Transcript summary={summaryContent} callInfo={callInfo} Stt={mediaFileResult?.stt} currentPlayerTime={currentTime} />
+          <Transcript
+            summary={summaryContent}
+            callInfo={callInfo}
+            Stt={mediaFileResult?.stt}
+            currentPlayerTime={currentTime}
+          />
         )}
         {activeTab === CallTab.Checklists && (
-          <Checklist checklistData={checklistData} gptChecklist={mediaFileResult?.gptChecklist} />
+          <Checklist
+            checklistData={checklistData}
+            gptChecklist={mediaFileResult?.gptChecklist}
+          />
         )}
       </div>
     </Fragment>
-  )
-}
+  );
+};
