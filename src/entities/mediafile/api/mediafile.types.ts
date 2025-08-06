@@ -1,83 +1,85 @@
+import { Block } from '@/entities/checklists/checklists.types';
+
 export interface MediaFileQueryParams {
-  createDate: string
-  clientNumber: string
-  operatorId: number
-  projectId: number
+  createDate: string;
+  clientNumber: string;
+  operatorId: number;
+  projectId: number;
 }
 
 export interface CreateMediaFileRequest {
-  file: File
-  queryParams: MediaFileQueryParams
+  file: File;
+  queryParams: MediaFileQueryParams;
 }
 
 export interface MediaFile {
-  projectName: string
-  gptChecklist: any
-  gptSummary: string
-  id: number
-  fileName: string | null
-  totalCount: number
-  numChannels: number
-  sampleRate: number
-  duration: number
-  operatorId: number
-  operatorName: string | null
-  operatorChannel: string | null
-  lastAccessUtc: string
-  createDate: string
-  isFailed: boolean
+  projectName: string;
+  gptChecklist: any;
+  gptSummary: string;
+  id: number;
+  fileName: string | null;
+  totalCount: number;
+  numChannels: number;
+  sampleRate: number;
+  duration: number;
+  operatorId: number;
+  operatorName: string | null;
+  operatorChannel: string | null;
+  lastAccessUtc: string;
+  createDate: string;
+  isFailed: boolean;
   additionalMetadata: {
-    outerId: string | null
-    clientId: string | null
-    clientNumber: string | null
-    direction: string | null
-  }
+    outerId: string | null;
+    clientId: string | null;
+    clientNumber: string | null;
+    direction: string | null;
+  };
   summaryAnalyserResult: {
-    simultaneousSpeechCount: number | null
-    simultaneousSilenceCount: number
-    maxSimultaneousSpeechDuration: number | null
-    maxSimultaneousSilenceDuration: number
-    averageSimultaneousSpeechDuration: number | null
-    averageSimultaneousSilenceDuration: number
+    simultaneousSpeechCount: number | null;
+    simultaneousSilenceCount: number;
+    maxSimultaneousSpeechDuration: number | null;
+    maxSimultaneousSilenceDuration: number;
+    averageSimultaneousSpeechDuration: number | null;
+    averageSimultaneousSilenceDuration: number;
     keywordsSearchCounter: {
-      [key: string]: number
-    }
-    totalSpeechOverall: number
-    totalNonSpeechOverall: number
-    negativeLevelOverall: number
-    totalSpeechDurationOperator: number | null
-    totalNonSpeechDurationOperator: number | null
-    negativeSpeechWeightedDurationOperator: number | null
-    negativeLevelOperator: number | null
-    totalSpeechDurationClient: number | null
-    totalNonSpeechDurationClient: number | null
-    negativeSpeechWeightedDurationClient: number | null
-    negativeLevelClient: number | null
-  }
-  filteredKeywordsCount: number
+      [key: string]: number;
+    };
+    totalSpeechOverall: number;
+    totalNonSpeechOverall: number;
+    negativeLevelOverall: number;
+    totalSpeechDurationOperator: number | null;
+    totalNonSpeechDurationOperator: number | null;
+    negativeSpeechWeightedDurationOperator: number | null;
+    negativeLevelOperator: number | null;
+    totalSpeechDurationClient: number | null;
+    totalNonSpeechDurationClient: number | null;
+    negativeSpeechWeightedDurationClient: number | null;
+    negativeLevelClient: number | null;
+  };
+  filteredKeywordsCount: number;
 }
 
 export interface MediaFileResponse {
-  totalCount: number
-  mediaFile: MediaFile[]
+  totalCount: number;
+  mediaFile: MediaFile[];
 }
 
 export interface MediaFileRequest {
-  start?: string
-  end?: string
-  offset?: number
-  limit?: number
-  operatorId?: number
-  searchPhrase?: string
-  orderByDescOperatorName?: boolean
-  orderByDescCreateDate?: boolean
-  orderByDescClientNumber?: boolean
-  orderByDescDuration?: boolean
-  orderByDescNegativeLevel?: boolean
-  orderByDescPhrasesCount?: boolean
-  orderByDescMaxSimultaneousSilence?: boolean
-  orderByDescSimultaneousSpeechCount?: boolean
-  filterByPhrasesCategoriesCommaSeparated?: string
+  start?: string;
+  end?: string;
+  offset?: number;
+  limit?: number;
+  operatorId?: number;
+  searchPhrase?: string;
+  orderByDescOperatorName?: boolean;
+  orderByDescCreateDate?: boolean;
+  orderByDescClientNumber?: boolean;
+  orderByDescDuration?: boolean;
+  orderByDescNegativeLevel?: boolean;
+  orderByDescPhrasesCount?: boolean;
+  orderByDescMaxSimultaneousSilence?: boolean;
+  orderByDescSimultaneousSpeechCount?: boolean;
+  filterByPhrasesCategoriesCommaSeparated?: string;
 }
 
 // export interface MediaFileResultResponse {
@@ -153,27 +155,12 @@ export interface GptChecklist {
 }
 
 export interface ChecklistItem {
+  id?: number;
   name: string | null;
   minScore: number;
   maxScore: number;
   score: number | null;
-  blocks: ChecklistBlock[];
-}
-
-export interface ChecklistBlock {
-  name: string;
-  minScore: number;
-  maxScore: number;
-  score: number | null;
-  criterias: ChecklistCriteria[];
-}
-
-export interface ChecklistCriteria {
-  name: string;
-  minScore: number;
-  maxScore: number;
-  score: number | null;
-  comment: string | null;
+  blocks: Block[];
 }
 
 export interface Stt {
@@ -247,9 +234,8 @@ export interface KeywordRegion {
   channel: number;
 }
 
-
 export interface MediaFileResultRequest {
-  id: number
-  negativeProbThreshold?: number
-  simultaneousSilenceDurationThreshold?: number
+  id: number;
+  negativeProbThreshold?: number;
+  simultaneousSilenceDurationThreshold?: number;
 }

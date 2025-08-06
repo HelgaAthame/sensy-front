@@ -1,13 +1,14 @@
-interface Criteria {
+export interface Criteria {
   name: string;
   minScore: number;
   maxScore: number;
   score: number | null;
   help: string | null;
   comment: string | null;
+  scale?: 'Full' | 'Binary';
 }
 
-interface Block {
+export interface Block {
   name: string;
   minScore: number;
   maxScore: number;

@@ -1,3 +1,4 @@
+import { ChecklistScale } from '@/entities/checklists/checklists.types';
 import { commonApi } from '@/entities/common/base-query';
 import {
   CreateMediaFileRequest,
@@ -85,10 +86,43 @@ export const MediaFileApi = commonApi.injectEndpoints({
         return URL.createObjectURL(blob);
       },
     }),
+    updateMediaFileChecklist: builder.mutation<
+      undefined,
+      {
+        id: number;
+        body: {
+          blocks?: {
+            name: string;
+            criterias?: {
+              name: string;
+              minScore?: number;
+              maxScore?: number;
+              help?: string | null;
+              scale?: ChecklistScale;
+            }[];
+          }[];
+        };
+        checklistId: number;
+      }
+    >({
+      query: (args) => {
+        const { id, body, checklistId } = args;
+        return {
+          url: `api/mediafile/${id}`,
+          method: 'POST',
+          body: body,
+          params: {
+            checklistId,
+          },
+        };
+      },
+      invalidatesTags: ['MEDIAFILE'],
+    }),
   }),
 });
 
 export const {
+  useUpdateMediaFileChecklistMutation,
   useCreateMediaFileMutation,
   useGetMediaFilesQueryQuery,
   useGetMediaFileByIdQuery,
