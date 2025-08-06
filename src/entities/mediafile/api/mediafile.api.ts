@@ -109,7 +109,7 @@ export const MediaFileApi = commonApi.injectEndpoints({
         const { id, body, checklistId } = args;
         return {
           url: `api/mediafile/${id}`,
-          method: 'POST',
+          method: 'PUT',
           body: body,
           params: {
             checklistId,

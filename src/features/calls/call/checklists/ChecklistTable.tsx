@@ -77,13 +77,25 @@ export const ChecklistTable = ({ checklist }: Props) => {
                           onClick={() => {
                             setCurBlock(() => block);
                             setCurCriteria(() => criteria);
-                            if (
-                              curBlock &&
-                              curCriteria &&
+
+                            const isBlockSelected = curBlock && curCriteria;
+
+                            const isCurrentBlock =
+                              isBlockSelected &&
                               block.name === curBlock.name &&
-                              criteria.name === curCriteria.name
-                            ) {
-                              setIsEditNumber((prev) => !prev);
+                              criteria.name === curCriteria.name;
+
+                            if (!isBlockSelected) {
+                              setIsEditNumber(() => true);
+                            }
+
+                            if (!isCurrentBlock && isEditNumber === false) {
+                              setIsEditNumber(() => true);
+                            }
+
+                            if (isCurrentBlock && isEditNumber === true) {
+                              setIsEditNumber(() => false);
+
                               const newBlocks = checklistItem.blocks.map(
                                 (bl) => {
                                   if (bl.name !== curBlock.name) return bl;
