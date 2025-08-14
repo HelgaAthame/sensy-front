@@ -34,7 +34,7 @@ const CriteriaSchema = z.object({
   name: z.string(),
   minScore: z.coerce.number().optional(),
   maxScore: z.coerce.number().optional(),
-  scale: z.enum(ChecklistScaleTypeValues),
+  scale: z.enum(ChecklistScaleTypeValues).default('Full'),
   help: z.string().nullable().optional(),
 });
 
@@ -265,7 +265,7 @@ export const EditChecklist = () => {
                               }
                             />
                           </div>
-                          <div className="flex flex-col gap-4">
+                          {/* <div className="flex flex-col gap-4">
                             <Label>Тип шкалы</Label>
                             <div className="flex gap-3">
                               {ChecklistScaleTypeValues.map((scale) => (
@@ -294,7 +294,7 @@ export const EditChecklist = () => {
                                 </label>
                               ))}
                             </div>
-                          </div>
+                          </div> */}
                           <div className="flex flex-col gap-2">
                             <Label>Значение</Label>
                             <div className="flex gap-3">

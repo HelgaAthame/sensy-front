@@ -1,6 +1,6 @@
 import { GptChecklist } from '@/entities/mediafile/api/mediafile.types';
 import { Fragment, useState } from 'react';
-import { EditIcon } from '../../../../../public/assets/icons';
+// import { EditIcon } from '../../../../../public/assets/icons';
 import type { Block, Criteria } from '@/entities/checklists/checklists.types';
 import Label from '@/shared/ui/label/label';
 import { useUpdateChecklistMutation } from '@/entities/checklists/checklists.api';
@@ -64,7 +64,7 @@ export const ChecklistTable = ({ checklist }: Props) => {
                     <Fragment key={index}>
                       <div className="flex items-center px-6 py-4  justify-betwwen w-full bg-white">
                         <div className="grow">{criteria.name ?? ' - '}</div>
-                        <div
+                        {/* <div
                           className={`w-8 h-8 shrink-0 cursor-pointer rounded-full hover:bg-purple-100 
                             transition duration-300 p-2 ${
                               isEditNumber &&
@@ -130,7 +130,7 @@ export const ChecklistTable = ({ checklist }: Props) => {
                           }}
                         >
                           <EditIcon />
-                        </div>
+                        </div> */}
                       </div>
 
                       <div className="flex items-center py-4 px-2 bg-white justify-center">
