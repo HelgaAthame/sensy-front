@@ -11,10 +11,7 @@ import {
 
 export const MediaFileApi = commonApi.injectEndpoints({
   endpoints: (builder) => ({
-    createMediaFile: builder.mutation<
-      MediaFileResponse[],
-      CreateMediaFileRequest
-    >({
+    createMediaFile: builder.mutation<MediaFile, CreateMediaFileRequest>({
       query: ({ file, queryParams }) => {
         const formData = new FormData();
         formData.append('file', file);
